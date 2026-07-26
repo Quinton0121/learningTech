@@ -1,65 +1,226 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+  const [isHovering, setIsHovering] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  
+  // Registration Flow State
+  const [step, setStep] = useState(1); // 1 = Details, 2 = Verify Code
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('LEARNER'); // 'LEARNER', 'EDUCATOR'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [statusMsg, setStatusMsg] = useState('');
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatusMsg('Processing...');
+    
+    // LOGIN
+    if (isLoginMode) {
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.token) {
+          setStatusMsg('Success! Logged in.');
+          localStorage.setItem('token', data.token);
+          setTimeout(() => {
+            setShowAuthModal(false);
+            if (data.user?.role === 'ADMIN' || data.user?.role === 'EDUCATOR') {
+              router.push('/dashboard');
+            } else {
+              router.push('/learner-hub');
+            }
+          }, 1000);
+        } else {
+          setStatusMsg(`Error: ${data.error}`);
+        }
+      } catch (err) {
+        setStatusMsg('Network error. Please try again.');
+      }
+      return;
+    }
+
+    // REGISTRATION - STEP 1 (Send Code)
+    if (!isLoginMode && step === 1) {
+      if (!name || !email || !password) {
+        setStatusMsg('Please fill in all fields.');
+        return;
+      }
+      setStatusMsg('Sending verification code...');
+      // MOCK SEND EMAIL
+      setTimeout(() => {
+        setStep(2);
+        setStatusMsg('A verification code has been sent to your email. (Hint: use 123456)');
+      }, 1000);
+      return;
+    }
+
+    // REGISTRATION - STEP 2 (Verify & Create Account)
+    if (!isLoginMode && step === 2) {
+      if (verificationCode !== '123456') {
+        setStatusMsg('Invalid verification code.');
+        return;
+      }
+      
+      setStatusMsg('Creating account...');
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name, role, authType: 'EMAIL' })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          setStatusMsg('Success! Registered.');
+          setTimeout(() => {
+            setIsLoginMode(true);
+            setStep(1);
+            setStatusMsg('Please log in with your new account.');
+          }, 1500);
+        } else {
+          setStatusMsg(`Error: ${data.error}`);
+        }
+      } catch (err) {
+        setStatusMsg('Network error. Please try again.');
+      }
+    }
+  };
+
+  const resetForm = (loginMode: boolean) => {
+    setIsLoginMode(loginMode);
+    setStep(1);
+    setStatusMsg('');
+    setEmail('');
+    setPassword('');
+    setVerificationCode('');
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+    <main style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="bg-blob bg-blob-1" />
+      <div className="bg-blob bg-blob-2" />
+
+      <nav className="glass-panel" style={{ margin: '24px auto', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', borderRadius: '10px' }} />
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }}>EduSphere</h2>
+        </div>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer' }}>Language: 🌐 EN</span>
+          <button type="button" className="btn-secondary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); }} onTouchStart={(e) => { e.preventDefault(); resetForm(true); setShowAuthModal(true); }}>Login</button>
+          <button type="button" className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(false); setShowAuthModal(true); }} onTouchStart={(e) => { e.preventDefault(); resetForm(false); setShowAuthModal(true); }}>Register</button>
+        </div>
+      </nav>
+
+      <section className="container" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 24px', position: 'relative' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: '800px', opacity: 0 }} className="animate-fade-in-up">
+          <div className="glass-panel" style={{ padding: '8px 16px', borderRadius: '30px', display: 'inline-block', marginBottom: '24px', border: '1px solid var(--primary)', color: 'var(--primary)', fontWeight: 500, fontSize: '0.9rem' }}>
+            ✨ Launching soon in Macau & Mainland China
+          </div>
+          <h1 style={{ fontSize: '4.5rem', lineHeight: 1.1, marginBottom: '24px', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Elevate Your Learning Experience
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p style={{ fontSize: '1.3rem', color: 'var(--text-muted)', marginBottom: '40px', maxWidth: '600px', lineHeight: 1.6 }}>
+            A frictionless, premium platform connecting world-class educators with ambitious learners. Start today with zero barriers.
           </p>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button 
+              className="btn-primary" 
+              style={{ fontSize: '1.2rem', padding: '16px 40px' }}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+              onClick={() => { resetForm(false); setShowAuthModal(true); }}
+              onTouchStart={(e) => { e.preventDefault(); resetForm(false); setShowAuthModal(true); }}
+            >
+              Start 30-Day Free Trial
+              <span style={{ transform: isHovering ? 'translateX(5px)' : 'translateX(0)', transition: 'transform 0.3s' }}>
+                →
+              </span>
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+    </main>
+      {/* Auth Modal overlay */}
+      {showAuthModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+        }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '40px', position: 'relative' }}>
+            <button 
+              onClick={() => setShowAuthModal(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}
+            >✕</button>
+            
+            <h3 style={{ fontSize: '1.8rem', marginBottom: '20px', textAlign: 'center' }}>
+              {isLoginMode ? 'Welcome Back' : 'Create Account'}
+            </h3>
+
+            <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              
+              {/* Registration Specific Fields - Step 1 */}
+              {!isLoginMode && step === 1 && (
+                <>
+                  <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} required
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
+                  
+                  <select value={role} onChange={e => setRole(e.target.value)} style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: '#1e293b', color: '#fff' }}>
+                    <option value="LEARNER">I am a Student (Learner)</option>
+                    <option value="EDUCATOR">I am a Teacher (Educator)</option>
+                  </select>
+                </>
+              )}
+
+              {/* Email & Password (Login + Register Step 1) */}
+              {(isLoginMode || (!isLoginMode && step === 1)) && (
+                <>
+                  <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
+
+                  <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
+                </>
+              )}
+
+              {/* Verification Code - Step 2 */}
+              {!isLoginMode && step === 2 && (
+                <div className="animate-fade-in-up">
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '10px' }}>Enter the 6-digit code sent to {email}</p>
+                  <input type="text" placeholder="Verification Code" value={verificationCode} onChange={e => setVerificationCode(e.target.value)} required
+                    style={{ padding: '12px', width: '100%', borderRadius: '8px', border: '1px solid var(--primary)', background: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '4px' }} maxLength={6} />
+                </div>
+              )}
+
+              <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '10px' }}>
+                {isLoginMode ? 'Sign In' : (step === 1 ? 'Send Verification Code' : 'Verify & Register')}
+              </button>
+            </form>
+            
+            {statusMsg && <p style={{ marginTop: '15px', textAlign: 'center', color: 'var(--primary)', fontSize: '0.9rem' }}>{statusMsg}</p>}
+            
+            <button type="button" style={{ marginTop: '20px', width: '100%', background: 'transparent', border: 'none', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer' }} onClick={() => resetForm(!isLoginMode)} onTouchStart={(e) => { e.preventDefault(); resetForm(!isLoginMode); }}>
+              {isLoginMode ? "Don't have an account? Register" : "Already have an account? Login"}
+            </button>
+          </div>
         </div>
-      </main>
-    </div>
+      )}
+    </>
   );
 }

@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id               String   @id @default(cuid())
+  
+  // Authentication
+  email            String?  @unique
+  passwordHash     String?
+  countryCode      String?  // e.g. +853, +86
+  phoneNumber      String?  @unique
+  authType         String   @default("EMAIL") // "EMAIL", "PHONE", "DUAL"
+  
+  // Preferences & Roles
+  languagePref     String   @default("EN")    // "EN", "ZH_HK", "ZH_CN"
+  role             String   @default("LEARNER") // "ADMIN", "EDUCATOR", "LEARNER"
+  
+  // Profile Info
+  name             String?
+  
+  // Trial Logic
+  createdAt        DateTime @default(now())
+  trialExpiresAt   DateTime
+
+  // Relationships
+  coursesTaught    Course[] @relation("EducatorCourses")
+  enrollments      Enrollment[]
+}
+
+model Course {
+  id             String       @id @default(cuid())
+  title          String
+  description    String
+  educatorId     String
+  isSynced       Boolean      @default(false)
+  currentSlide   Int          @default(0)
+  publishedSlide Int          @default(0)
+  educator       User         @relation("EducatorCourses", fields: [educatorId], references: [id])
+  enrollments    Enrollment[]
+}
+
+model Enrollment {
+  id           String    @id @default(cuid())
+  userId       String
+  courseId     String
+  status       String    @default("PENDING") // PENDING, APPROVED
+  lastSeenAt   DateTime?
+  currentSlide Int?      @default(0)
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
