@@ -113,6 +113,13 @@
         .excel-selected-blue { border: 2px dashed #38bdf8 !important; background-color: rgba(56, 189, 248, 0.1); z-index: 5; }
         .excel-selected-red { border: 2px dashed #f87171 !important; background-color: rgba(248, 113, 113, 0.1); z-index: 5; }
         .active-typing { border: 2px solid #10b981 !important; box-shadow: inset 0 0 10px rgba(16,185,129,0.2); background-color: #1e293b; color: white;}
+        
+        /* Slide 7 Range Selection Styles */
+        .range-selected { 
+            background-color: rgba(56, 189, 248, 0.3) !important; 
+            border: 1px solid #38bdf8 !important;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -184,7 +191,7 @@
             <i class="fa-solid fa-chevron-left text-xl"></i>
         </button>
         <div class="text-slate-300 font-mono text-sm tracking-widest">
-            <span id="current-slide-num">1</span> / <span id="total-slide-num">6</span>
+            <span id="current-slide-num">1</span> / <span id="total-slide-num">7</span>
         </div>
         <button id="next-btn" class="text-emerald-400 hover:text-emerald-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
             <i class="fa-solid fa-chevron-right text-xl"></i>
@@ -398,13 +405,48 @@
                     <!-- JS will populate this -->
                 </div>
 
-                <!-- Success Button (Hidden initially) -->
+                <!-- Success Message (Hidden initially) -->
                 <div id="s6-success" class="mt-12 hidden flex-col items-center animate-fade-in transition-all duration-500">
                      <p class="text-emerald-400 font-bold text-xl mb-4"><i class="fa-solid fa-check-circle"></i> <span class="lang-en">You did it! 281 is correct.</span><span class="lang-zh hidden">你做到了！281 是正確答案。</span></p>
-                     <button class="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-105 flex items-center gap-3">
-                        <span class="lang-en">Start Coding in the Sandbox</span><span class="lang-zh hidden">在沙盒中開始編碼</span> <i class="fa-solid fa-arrow-right"></i>
-                    </button>
+                     <p class="text-slate-400"><span class="lang-en">Press the Right Arrow to continue.</span><span class="lang-zh hidden">按向右鍵繼續。</span></p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Ranges -->
+    <div class="slide-container" id="slide-7">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-sky-400 text-sm font-semibold mb-4 tracking-wide">
+                    <span class="lang-en">STEP 6: RANGES</span><span class="lang-zh hidden">第六步：範圍</span>
+                </div>
+                <h2 class="text-4xl font-bold mb-6"><span class="lang-en">Grouping Cells Together</span><span class="lang-zh hidden">將儲存格分組</span></h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    <span class="lang-en">A <strong>Range</strong> is a collection of two or more cells. Instead of writing <code>=A1+A2+A3+A4</code>, Excel uses a colon (<strong>:</strong>) to connect the first and last cells.</span><span class="lang-zh hidden"><strong>範圍 (Range)</strong> 是兩個或更多儲存格的集合。Excel 不使用 <code>=A1+A2+A3+A4</code> 這樣寫，而是使用冒號 (<strong>:</strong>) 來連接第一個和最後一個儲存格。</span>
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-sky-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-sky-400"></i> <span class="lang-en">Click and drag on the grid to create a range:</span><span class="lang-zh hidden">在網格上點擊並拖曳以建立範圍：</span></p>
+                    
+                    <div class="flex flex-col items-center justify-center bg-slate-900 p-6 rounded-xl border border-slate-700 mt-6">
+                        <span class="text-slate-500 text-sm mb-2 uppercase tracking-widest"><span class="lang-en">Selected Range</span><span class="lang-zh hidden">已選取範圍</span></span>
+                        <div id="range-display" class="text-5xl font-mono font-bold text-sky-400 transition-all duration-200">
+                            A1
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 7 -->
+                <div id="grid-s7" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px; cursor: crosshair;">
+                    <!-- JS will populate this -->
+                </div>
+                
+                <button id="final-sandbox-btn" onclick="goBack()" class="mt-12 opacity-0 pointer-events-none bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-105 flex items-center gap-3">
+                    <span class="lang-en">Finish Interactive Lesson</span><span class="lang-zh hidden">完成互動課程</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -611,6 +653,7 @@
             buildGrid('grid-structure', 5, 4); // Cols A-D, Rows 1-3
             buildGrid('grid-intersection', 5, 4);
             buildSlide6Grid();
+            buildSlide7Grid();
             
             // Automatically sync total slide display with actual DOM elements
             document.getElementById('total-slide-num').textContent = totalSlides;
@@ -1110,6 +1153,101 @@
                         updateS6State(5);
                     }
                 });
+            }
+
+            // --- Slide 7 Range Logic ---
+            let isDragging = false;
+            let rangeStart = null;
+            let rangeEnd = null;
+
+            function buildSlide7Grid() {
+                const container = document.getElementById('grid-s7');
+                const cols = ['A', 'B', 'C', 'D'];
+                const numRows = 5;
+
+                // Header Row
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+
+                // Rows
+                for (let r = 1; r <= numRows; r++) {
+                    container.appendChild(createCell(r, 'demo-header'));
+                    
+                    for (let c = 0; c < cols.length; c++) {
+                        const cell = createCell('', 'demo-cell transition-colors duration-100');
+                        // Store coordinates for easy math later
+                        cell.dataset.col = c;
+                        cell.dataset.row = r;
+                        cell.dataset.colName = cols[c];
+                        cell.id = `s7-${cols[c]}${r}`;
+                        
+                        // Event Listeners for dragging
+                        cell.addEventListener('mousedown', (e) => startRangeSelect(e, c, r, cols[c]));
+                        cell.addEventListener('mouseenter', (e) => updateRangeSelect(e, c, r, cols[c]));
+                        
+                        container.appendChild(cell);
+                    }
+                }
+                
+                // Stop dragging when mouse goes up anywhere on the window
+                window.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        document.getElementById('final-sandbox-btn').classList.remove('opacity-0', 'pointer-events-none');
+                        document.getElementById('final-sandbox-btn').classList.add('opacity-100');
+                    }
+                });
+            }
+
+            function startRangeSelect(e, colIdx, rowIdx, colName) {
+                isDragging = true;
+                rangeStart = { colIdx, rowIdx, colName };
+                rangeEnd = { colIdx, rowIdx, colName };
+                renderRange();
+            }
+
+            function updateRangeSelect(e, colIdx, rowIdx, colName) {
+                if (!isDragging) return;
+                rangeEnd = { colIdx, rowIdx, colName };
+                renderRange();
+            }
+
+            function renderRange() {
+                if (!rangeStart || !rangeEnd) return;
+
+                const minCol = Math.min(rangeStart.colIdx, rangeEnd.colIdx);
+                const maxCol = Math.max(rangeStart.colIdx, rangeEnd.colIdx);
+                const minRow = Math.min(rangeStart.rowIdx, rangeEnd.rowIdx);
+                const maxRow = Math.max(rangeStart.rowIdx, rangeEnd.rowIdx);
+
+                const cols = ['A', 'B', 'C', 'D'];
+                const displayArea = document.getElementById('range-display');
+
+                // Clear previous selection
+                document.querySelectorAll('#grid-s7 .demo-cell').forEach(cell => {
+                    cell.classList.remove('range-selected');
+                });
+
+                // Apply new selection
+                for (let r = minRow; r <= maxRow; r++) {
+                    for (let c = minCol; c <= maxCol; c++) {
+                        const cellId = `s7-${cols[c]}${r}`;
+                        const cell = document.getElementById(cellId);
+                        if (cell) {
+                            cell.classList.add('range-selected');
+                        }
+                    }
+                }
+
+                // Update text display
+                const startLabel = `${cols[minCol]}${minRow}`;
+                const endLabel = `${cols[maxCol]}${maxRow}`;
+                
+                if (startLabel === endLabel) {
+                    displayArea.textContent = startLabel;
+                } else {
+                    displayArea.textContent = `${startLabel}:${endLabel}`;
+                }
             }
 
             // Init first UI state
