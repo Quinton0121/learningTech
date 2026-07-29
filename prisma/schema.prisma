@@ -24,6 +24,10 @@ model User {
   // Profile Info
   name             String?
   
+  // Student Specific
+  studentId        String?  @unique
+  mustChangePassword Boolean @default(false)
+  
   // Trial Logic
   createdAt        DateTime @default(now())
   trialExpiresAt   DateTime
@@ -39,6 +43,7 @@ model Course {
   description    String
   educatorId     String
   isSynced       Boolean      @default(false)
+  isActive       Boolean      @default(false)
   currentSlide   Int          @default(0)
   publishedSlide Int          @default(0)
   educator       User         @relation("EducatorCourses", fields: [educatorId], references: [id])
@@ -52,6 +57,7 @@ model Enrollment {
   status       String    @default("PENDING") // PENDING, APPROVED
   lastSeenAt   DateTime?
   currentSlide Int?      @default(0)
+  pcId         String?   // Mapped PC ID for this specific class
 
   user   User   @relation(fields: [userId], references: [id])
   course Course @relation(fields: [courseId], references: [id])

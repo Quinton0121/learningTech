@@ -18,6 +18,34 @@ export default function Home() {
   const [verificationCode, setVerificationCode] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
 
+  React.useEffect(() => {
+    const checkPcAutoLogin = async () => {
+      const pcId = localStorage.getItem('pc_id');
+      if (!pcId) return;
+      
+      try {
+        const res = await fetch('/api/auth/pc-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pcId })
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.token) {
+          localStorage.setItem('token', data.token);
+          window.location.href = '/learner-hub';
+        }
+      } catch (e) {
+        console.error("Auto login failed", e);
+      }
+    };
+    
+    checkPcAutoLogin();
+    
+    const interval = setInterval(checkPcAutoLogin, 5000);
+    return () => clearInterval(interval);
+  }, [router]);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatusMsg('Processing...');

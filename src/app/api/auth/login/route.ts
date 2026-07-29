@@ -47,7 +47,8 @@ export async function POST(request: Request) {
       { 
         userId: user.id, 
         role: user.role,
-        isTrialExpired 
+        isTrialExpired,
+        method: 'MANUAL'
       }, 
       JWT_SECRET, 
       { expiresIn: '7d' }

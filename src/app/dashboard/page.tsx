@@ -7,8 +7,10 @@ export default function EducatorDashboard() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState('');
   const [inviteEmail, setInviteEmail] = useState<{ [key: string]: string }>({});
+  const [csvFile, setCsvFile] = useState<{ [key: string]: File | null }>({});
 
   useEffect(() => {
     setMounted(true);
@@ -47,6 +49,51 @@ export default function EducatorDashboard() {
       alert(data.message);
       setInviteEmail({ ...inviteEmail, [courseId]: '' });
       fetchCourses(token); // refresh to update student count
+    } else {
+      alert("Error: " + data.error);
+    }
+  };
+
+  const handleCsvUpload = async (courseId: string) => {
+    const file = csvFile[courseId];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('courseId', courseId);
+
+    const res = await fetch('/api/courses/educator/csv-signup', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message);
+      setCsvFile({ ...csvFile, [courseId]: null });
+      fetchCourses(token);
+    } else {
+      alert("Error: " + data.error);
+    }
+  };
+
+
+  const handleStartClass = async (courseId: string, action: 'START' | 'STOP') => {
+    const res = await fetch('/api/courses/educator/start-class', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ courseId, action })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message);
+      fetchCourses(token);
     } else {
       alert("Error: " + data.error);
     }
@@ -97,12 +144,31 @@ export default function EducatorDashboard() {
           <h2 style={{ fontSize: '1.2rem', fontWeight: 700 }}>EduSphere</h2>
         </div>
 
+        {user && (
+          <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Welcome back,</p>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Educator {user.name}</h3>
+          </div>
+        )}
+
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
           <div style={{ padding: '12px 16px', background: 'rgba(56, 189, 248, 0.15)', borderLeft: '4px solid var(--primary)', borderRadius: '0 8px 8px 0', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer' }}>
             📚 My Courses
           </div>
           <div style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer' }} className="hover:text-white">👥 Students</div>
-          <div style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer' }} className="hover:text-white">📊 Analytics</div>
+          <div style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
+            📊 Analytics
+          </div>
+          <div style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
+            🛒 Purchase Courses
+          </div>
+          <div onClick={() => router.push('/custom-course')} style={{ padding: '12px 16px', color: '#38bdf8', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#38bdf8', borderRadius: '50%', boxShadow: '0 0 10px #38bdf8' }}></span>
+            🛠️ Custom Order
+          </div>
+          <div onClick={() => router.push('/settings')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
+            ⚙️ Settings
+          </div>
         </nav>
 
         <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', borderColor: 'rgba(255,100,100,0.3)', color: '#ff8a8a' }} onClick={() => {
@@ -138,6 +204,16 @@ export default function EducatorDashboard() {
                   {course.description}
                 </p>
                 
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                  <button 
+                    onClick={() => handleStartClass(course.id, course.isActive ? 'STOP' : 'START')}
+                    className={course.isActive ? "btn-secondary" : "btn-primary"}
+                    style={{ flex: 1, padding: '12px', fontSize: '1rem', border: 'none', background: course.isActive ? '#ef4444' : '#10b981', color: 'white', cursor: 'pointer', borderRadius: '8px' }}
+                  >
+                    {course.isActive ? '🛑 Stop Class' : '▶️ Start Class (Auto-Login PCs)'}
+                  </button>
+                </div>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)', padding: '16px 0', marginBottom: '16px' }}>
                   <div style={{ display: 'flex', gap: '16px' }}>
                     <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>👥 {course.enrollments?.length || 0} enrolled</span>
@@ -162,6 +238,26 @@ export default function EducatorDashboard() {
                       Connect
                     </button>
                   </div>
+                  
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>Bulk Import Students (CSV):</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Format: Name, StudentID, Password, PC_ID</p>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                    <input 
+                      type="file" 
+                      accept=".csv"
+                      onChange={e => setCsvFile({ ...csvFile, [course.id]: e.target.files ? e.target.files[0] : null })}
+                      style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: '0.8rem' }} 
+                    />
+                    <button 
+                      onClick={() => handleCsvUpload(course.id)}
+                      className="btn-secondary" 
+                      style={{ padding: '8px 16px' }}
+                      disabled={!csvFile[course.id]}
+                    >
+                      Upload CSV
+                    </button>
+                  </div>
+
                 </div>
 
                 {course.enrollments && course.enrollments.filter((e: any) => e.status === 'PENDING').length > 0 && (

@@ -59,5 +59,11 @@
         <p><strong>Implementation:</strong> When dynamically updating bilingual text via JS, use JS ternaries to select the plain text string based on <code>localStorage.getItem('courseLang')</code> rather than injecting raw HTML. This avoids both XSS risks and broken UI.</p>
     </div>
 
+    <div class="card">
+        <h3>🏗️ Architecture Note: PC Identification via Local Storage (Option A)</h3>
+        <p><strong>Context:</strong> For school computer labs, the teacher needs to know which PC is mapped to which student without requiring students to log in with passwords.</p>
+        <p><strong>Implementation:</strong> Implement a Local Storage setup mechanism. Before the term starts, an admin opens the website on each PC and inputs a unique PC identifier (e.g., "PC-01"). This is saved in <code>localStorage.setItem('pc_id', 'PC-01')</code>. During class, the website reads this ID and authenticates. The teacher can then upload a CSV mapping PC IDs to student accounts to automatically log them in.</p>
+    </div>
+
 </body>
 </html>

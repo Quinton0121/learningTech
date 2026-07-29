@@ -17,7 +17,8 @@ export async function GET(request: Request) {
       include: { course: true }
     });
     
-    return NextResponse.json({ enrollments }, { status: 200 });
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+    return NextResponse.json({ enrollments, user }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Failed to fetch enrollments' }, { status: 500 });

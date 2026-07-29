@@ -43,7 +43,8 @@ export async function GET(request: Request) {
       courses = [newCourse];
     }
     
-    return NextResponse.json({ courses }, { status: 200 });
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+    return NextResponse.json({ courses, user }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch courses' }, { status: 500 });
   }

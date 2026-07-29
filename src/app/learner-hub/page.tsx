@@ -8,6 +8,7 @@ export default function LearnerHub() {
   const [mounted, setMounted] = useState(false);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [availableCourses, setAvailableCourses] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState('');
 
   useEffect(() => {
@@ -19,17 +20,35 @@ export default function LearnerHub() {
     }
     setToken(t);
     
+    // Auto-Logout Polling: Check if class is still active
+    const interval = setInterval(() => {
+      fetch('/api/auth/status', {
+        headers: { 'Authorization': `Bearer ${t}` }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.active) {
+          localStorage.removeItem('token');
+          window.location.href = '/'; // Force refresh
+        }
+      })
+      .catch(e => console.error(e));
+    }, 5000);
+    
     // Fetch enrollments
     fetch('/api/courses/my-courses', {
       headers: { 'Authorization': `Bearer ${t}` }
     }).then(r => r.json()).then(data => {
       if (data.enrollments) setEnrollments(data.enrollments);
+      if (data.user) setUser(data.user);
     });
     
     // Fetch all courses
     fetch('/api/courses').then(r => r.json()).then(data => {
       if (data.courses) setAvailableCourses(data.courses);
     });
+
+    return () => clearInterval(interval);
   }, [router]);
 
   const handleEnroll = async (courseId: string) => {
@@ -68,12 +87,26 @@ export default function LearnerHub() {
           <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, var(--secondary), var(--primary))', borderRadius: '8px' }} />
           <h2 style={{ fontSize: '1.2rem', fontWeight: 700 }}>EduSphere Hub</h2>
         </div>
-        <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', borderColor: 'rgba(255,100,100,0.3)', color: '#ff8a8a', marginTop: 'auto' }} onClick={() => {
-          localStorage.removeItem('token');
-          router.push('/');
-        }}>
-          Sign Out
-        </button>
+
+        {user && (
+          <div style={{ marginBottom: '32px', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Logged in as</p>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--primary)' }}>{user.name}</h3>
+            {user.studentId && <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>ID: {user.studentId}</p>}
+          </div>
+        )}
+
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }} onClick={() => router.push('/settings')}>
+            ⚙️ Settings
+          </button>
+          <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', borderColor: 'rgba(255,100,100,0.3)', color: '#ff8a8a' }} onClick={() => {
+            localStorage.removeItem('token');
+            router.push('/');
+          }}>
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
