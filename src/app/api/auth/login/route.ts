@@ -42,13 +42,23 @@ export async function POST(request: Request) {
     // Check if trial is expired
     const isTrialExpired = new Date() > user.trialExpiresAt;
 
+    // Generate a unique session token
+    const crypto = require('crypto');
+    const sessionToken = crypto.randomUUID();
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { sessionToken }
+    });
+
     // Generate JWT
     const token = jwt.sign(
       { 
         userId: user.id, 
         role: user.role,
         isTrialExpired,
-        method: 'MANUAL'
+        method: 'MANUAL',
+        sessionToken
       }, 
       JWT_SECRET, 
       { expiresIn: '7d' }

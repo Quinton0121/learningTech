@@ -127,7 +127,7 @@ export default function LearnerHub() {
             {enrollments.filter(e => e.status === 'APPROVED').map(e => (
               <div 
                 key={e.id}
-                onClick={() => window.location.href = '/course.html'} 
+                onClick={() => window.location.href = `/course.html?id=${e.course.id}`} 
                 className="glass-panel animate-fade-in-up floating-element" 
                 style={{ overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.3s' }}
               >

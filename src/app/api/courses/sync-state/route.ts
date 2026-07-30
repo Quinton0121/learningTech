@@ -12,17 +12,30 @@ export async function GET(request: Request) {
     const decoded: any = jwt.verify(token, JWT_SECRET);
     
     const user = await prisma.user.findUnique({ where: { id: decoded.userId }});
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!user || user.sessionToken !== decoded.sessionToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     
     const { searchParams } = new URL(request.url);
     const clientSlideStr = searchParams.get('slide');
     const clientSlide = clientSlideStr ? parseInt(clientSlideStr, 10) : null;
+    const courseId = searchParams.get('courseId');
 
     let course;
     if (user.role === 'EDUCATOR' || user.role === 'ADMIN') {
-      course = await prisma.course.findFirst({ where: { educatorId: user.id } });
+      if (courseId) {
+        course = await prisma.course.findFirst({ where: { educatorId: user.id, id: courseId } });
+      } else {
+        course = await prisma.course.findFirst({ where: { educatorId: user.id } });
+      }
     } else {
-      const enrollment = await prisma.enrollment.findFirst({ where: { userId: user.id, status: 'APPROVED' }, include: { course: true } });
+      let enrollment;
+      if (courseId) {
+        enrollment = await prisma.enrollment.findFirst({ where: { userId: user.id, status: 'APPROVED', courseId: courseId }, include: { course: true } });
+      } else {
+        enrollment = await prisma.enrollment.findFirst({ where: { userId: user.id, status: 'APPROVED' }, include: { course: true } });
+      }
+
       if (enrollment) {
         course = enrollment.course;
         await prisma.enrollment.update({
@@ -78,12 +91,20 @@ export async function POST(request: Request) {
     const token = authHeader.split(' ')[1];
     const decoded: any = jwt.verify(token, JWT_SECRET);
     
-    const { isSynced, currentSlide, publishedSlide } = await request.json();
+    const { isSynced, currentSlide, publishedSlide, courseId } = await request.json();
     
     const user = await prisma.user.findUnique({ where: { id: decoded.userId }});
-    if (!user || (user.role !== 'EDUCATOR' && user.role !== 'ADMIN')) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    if (!user || user.sessionToken !== decoded.sessionToken || (user.role !== 'EDUCATOR' && user.role !== 'ADMIN')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
 
-    const course = await prisma.course.findFirst({ where: { educatorId: user.id } });
+    let course;
+    if (courseId) {
+      course = await prisma.course.findFirst({ where: { educatorId: user.id, id: courseId } });
+    } else {
+      course = await prisma.course.findFirst({ where: { educatorId: user.id } });
+    }
+    
     if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
 
     const dataToUpdate: any = {};

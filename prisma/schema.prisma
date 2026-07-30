@@ -16,6 +16,7 @@ model User {
   countryCode      String?  // e.g. +853, +86
   phoneNumber      String?  @unique
   authType         String   @default("EMAIL") // "EMAIL", "PHONE", "DUAL"
+  sessionToken     String?  // To enforce single active login session
   
   // Preferences & Roles
   languagePref     String   @default("EN")    // "EN", "ZH_HK", "ZH_CN"
@@ -32,9 +33,13 @@ model User {
   createdAt        DateTime @default(now())
   trialExpiresAt   DateTime
 
+  // Economy
+  tokens           Int      @default(0)
+
   // Relationships
   coursesTaught    Course[] @relation("EducatorCourses")
   enrollments      Enrollment[]
+  transactions     Transaction[]
 }
 
 model Course {
@@ -46,6 +51,17 @@ model Course {
   isActive       Boolean      @default(false)
   currentSlide   Int          @default(0)
   publishedSlide Int          @default(0)
+  createdAt      DateTime     @default(now())
+  startedAt      DateTime?
+  isArchived     Boolean      @default(false)
+  
+  // Marketplace & Quotas
+  isPublic       Boolean      @default(false)
+  priceTokens    Int          @default(10) // Price per student in tokens
+  studentQuota   Int          @default(30) // DIY default = 30 free
+  clonedFromId   String?      // If purchased/shared from another course
+  sharedQuotaGroupId String?  // Optional: points to the root Course ID whose quota is shared
+  
   educator       User         @relation("EducatorCourses", fields: [educatorId], references: [id])
   enrollments    Enrollment[]
 }
@@ -63,4 +79,14 @@ model Enrollment {
   course Course @relation(fields: [courseId], references: [id])
 
   @@unique([userId, courseId])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Int      // Positive = bought/earned, Negative = spent
+  description String
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
 }

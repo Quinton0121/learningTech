@@ -20,13 +20,16 @@ export async function POST(request: Request) {
        return NextResponse.json({ error: 'Course not found or unauthorized' }, { status: 404 });
     }
 
-    // Delete enrollment
-    await prisma.enrollment.delete({
+    // Mark enrollment as removed
+    await prisma.enrollment.update({
       where: {
         userId_courseId: {
           userId: studentId,
           courseId: course.id
         }
+      },
+      data: {
+        status: 'REMOVED'
       }
     });
 

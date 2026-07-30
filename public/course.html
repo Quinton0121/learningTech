@@ -515,8 +515,10 @@
                 if (refreshIcon) refreshIcon.classList.add('fa-spin');
                 const startTime = Date.now();
                 
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseIdParam = urlParams.get('id') ? `&courseId=${urlParams.get('id')}` : '';
                 try {
-                    const res = await fetch(`/api/courses/sync-state?slide=${currentSlideIndex}`, {
+                    const res = await fetch(`/api/courses/sync-state?slide=${currentSlideIndex}${courseIdParam}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (!res.ok) return;
@@ -607,26 +609,32 @@
             pollSyncState();
             
             document.getElementById('sync-btn')?.addEventListener('click', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseId = urlParams.get('id');
                 fetch('/api/courses/sync-state', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ isSynced: true, currentSlide: currentSlideIndex })
+                    body: JSON.stringify({ isSynced: true, currentSlide: currentSlideIndex, courseId })
                 }).then(() => pollSyncState());
             });
             
             document.getElementById('desync-btn')?.addEventListener('click', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseId = urlParams.get('id');
                 fetch('/api/courses/sync-state', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ isSynced: false, currentSlide: currentSlideIndex })
+                    body: JSON.stringify({ isSynced: false, currentSlide: currentSlideIndex, courseId })
                 }).then(() => pollSyncState());
             });
 
             document.getElementById('publish-btn')?.addEventListener('click', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseId = urlParams.get('id');
                 fetch('/api/courses/sync-state', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ publishedSlide: currentSlideIndex })
+                    body: JSON.stringify({ publishedSlide: currentSlideIndex, courseId })
                 }).then(() => {
                     publishedSlide = currentSlideIndex;
                     pollSyncState();
@@ -642,11 +650,13 @@
             });
 
             document.getElementById('unpublish-btn')?.addEventListener('click', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseId = urlParams.get('id');
                 const newPublished = Math.max(0, currentSlideIndex - 1);
                 fetch('/api/courses/sync-state', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ publishedSlide: newPublished })
+                    body: JSON.stringify({ publishedSlide: newPublished, courseId })
                 }).then(() => {
                     publishedSlide = newPublished;
                     pollSyncState();

@@ -27,10 +27,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Student email not found in system.' }, { status: 404 });
     }
     
-    // Verify course belongs to this educator
-    const course = await prisma.course.findFirst({ where: { id: courseId, educatorId: educator.id }});
-    if (!course) {
-       return NextResponse.json({ error: 'Course not found or unauthorized' }, { status: 404 });
+    // Verify course belongs to this educator and is not archived
+    const course = await prisma.course.findFirst({ where: { id: courseId, educatorId: decoded.userId }});
+    if (!course || course.isArchived) {
+       return NextResponse.json({ error: 'Course not found, unauthorized, or archived' }, { status: 404 });
     }
 
     // Enroll student if not already enrolled
@@ -42,12 +42,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Student is already enrolled.' }, { status: 400 });
     }
 
-    await prisma.enrollment.create({
-      data: {
-        userId: student.id,
-        courseId: course.id
+    // Check quota logic
+    const quotaSourceCourseId = course.sharedQuotaGroupId || course.id;
+    const quotaCourse = quotaSourceCourseId === course.id ? course : await prisma.course.findUnique({ where: { id: quotaSourceCourseId }});
+    
+    if (!quotaCourse) {
+       return NextResponse.json({ error: 'Shared quota pool not found' }, { status: 404 });
+    }
+
+    if (quotaCourse.studentQuota < 1) {
+      return NextResponse.json({ error: `You have 0 seats left for this course. Please purchase more quotas. Seats cannot be reused once spent.` }, { status: 400 });
+    }
+
+      // Deduct quota, enroll student, and set startedAt if not set
+      const updateData: any = { studentQuota: quotaCourse.studentQuota - 1 };
+      if (!course.startedAt) {
+        updateData.startedAt = new Date();
       }
-    });
+
+      await prisma.$transaction([
+        prisma.course.update({
+          where: { id: quotaSourceCourseId },
+          data: updateData
+        }),
+        ...(!course.startedAt && quotaSourceCourseId !== course.id ? [
+          prisma.course.update({
+            where: { id: course.id },
+            data: { startedAt: new Date() }
+          })
+        ] : []),
+        prisma.enrollment.upsert({
+          where: { userId_courseId: { userId: student.id, courseId: course.id } },
+          update: { status: 'APPROVED' },
+          create: { userId: student.id, courseId: course.id, status: 'APPROVED' }
+        })
+      ]);
 
     return NextResponse.json({ success: true, message: `Successfully connected ${student.name || studentEmail} to your class!` }, { status: 200 });
 

@@ -20,10 +20,27 @@ export async function POST(request: Request) {
       await prisma.enrollment.delete({ where: { userId_courseId: { userId: studentId, courseId: course.id } }});
       return NextResponse.json({ success: true, message: 'Request rejected' }, { status: 200 });
     } else {
-      await prisma.enrollment.update({
-        where: { userId_courseId: { userId: studentId, courseId: course.id } },
-        data: { status: 'APPROVED' }
-      });
+      const quotaSourceCourseId = course.sharedQuotaGroupId || course.id;
+      const quotaCourse = quotaSourceCourseId === course.id ? course : await prisma.course.findUnique({ where: { id: quotaSourceCourseId }});
+      
+      if (!quotaCourse) {
+         return NextResponse.json({ error: 'Shared quota pool not found' }, { status: 404 });
+      }
+
+      if (quotaCourse.studentQuota < 1) {
+        return NextResponse.json({ error: '0 seats left. Please purchase more quotas.' }, { status: 400 });
+      }
+
+      await prisma.$transaction([
+        prisma.course.update({
+          where: { id: quotaSourceCourseId },
+          data: { studentQuota: quotaCourse.studentQuota - 1 }
+        }),
+        prisma.enrollment.update({
+          where: { userId_courseId: { userId: studentId, courseId: course.id } },
+          data: { status: 'APPROVED' }
+        })
+      ]);
       return NextResponse.json({ success: true, message: 'Request approved' }, { status: 200 });
     }
   } catch (error) {
