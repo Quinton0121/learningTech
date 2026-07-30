@@ -2,12 +2,15 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageToggle from '@/components/LanguageToggle';
 
 export default function Home() {
   const router = useRouter();
   const [isHovering, setIsHovering] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const { t } = useLanguage();
   
   // Registration Flow State
   const [step, setStep] = useState(1); // 1 = Details, 2 = Verify Code
@@ -144,12 +147,12 @@ export default function Home() {
 
       <nav className="glass-panel" style={{ margin: '24px auto', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', borderRadius: '10px' }} />
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }}>EduSphere</h2>
+          <img src="/edusphere.png" alt="EduSphere Logo" style={{ height: '40px', objectFit: 'contain' }} />
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }}>{t('header.brand')}</h2>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer' }}>Language: 🌐 EN</span>
-          <button type="button" className="btn-secondary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); }} onTouchStart={(e) => { e.preventDefault(); resetForm(true); setShowAuthModal(true); }}>Login</button>
+          <LanguageToggle />
+          <button type="button" className="btn-secondary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); }} onTouchStart={(e) => { e.preventDefault(); resetForm(true); setShowAuthModal(true); }}>{t('header.login')}</button>
           <button type="button" className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(false); setShowAuthModal(true); }} onTouchStart={(e) => { e.preventDefault(); resetForm(false); setShowAuthModal(true); }}>Register</button>
         </div>
       </nav>
@@ -157,27 +160,23 @@ export default function Home() {
       <section className="container" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 24px', position: 'relative' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: '800px', opacity: 0 }} className="animate-fade-in-up">
           <div className="glass-panel" style={{ padding: '8px 16px', borderRadius: '30px', display: 'inline-block', marginBottom: '24px', border: '1px solid var(--primary)', color: 'var(--primary)', fontWeight: 500, fontSize: '0.9rem' }}>
-            ✨ Launching soon in Macau & Mainland China
+            {t('hero.badge')}
           </div>
-          <h1 style={{ fontSize: '4.5rem', lineHeight: 1.1, marginBottom: '24px', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Elevate Your Learning Experience
+          
+          <h1 style={{ fontSize: '4.5rem', fontWeight: 800, lineHeight: 1.1, marginBottom: '24px', letterSpacing: '-1px' }}>
+            {t('hero.title')}
           </h1>
-          <p style={{ fontSize: '1.3rem', color: 'var(--text-muted)', marginBottom: '40px', maxWidth: '600px', lineHeight: 1.6 }}>
-            A frictionless, premium platform connecting world-class educators with ambitious learners. Start today with zero barriers.
+          
+          <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', marginBottom: '40px', maxWidth: '600px', lineHeight: 1.6 }}>
+            {t('hero.subtitle')}
           </p>
+          
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <button 
-              className="btn-primary" 
-              style={{ fontSize: '1.2rem', padding: '16px 40px' }}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-              onClick={() => { resetForm(false); setShowAuthModal(true); }}
-              onTouchStart={(e) => { e.preventDefault(); resetForm(false); setShowAuthModal(true); }}
-            >
-              Start 30-Day Free Trial
-              <span style={{ transform: isHovering ? 'translateX(5px)' : 'translateX(0)', transition: 'transform 0.3s' }}>
-                →
-              </span>
+            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', minWidth: '200px' }} onClick={() => { setRole('EDUCATOR'); resetForm(true); setShowAuthModal(true); }}>
+              👨‍🏫 {t('hero.loginAsEducator')}
+            </button>
+            <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', minWidth: '200px' }} onClick={() => { setRole('LEARNER'); resetForm(true); setShowAuthModal(true); }}>
+              🎓 {t('hero.loginAsStudent')}
             </button>
           </div>
         </div>
