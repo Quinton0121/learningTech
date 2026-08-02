@@ -62,6 +62,8 @@ model Course {
   clonedFromId   String?      // If purchased/shared from another course
   sharedQuotaGroupId String?  // Optional: points to the root Course ID whose quota is shared
   
+  htmlContent    String?      // Stores the raw HTML content of the course
+  
   educator       User         @relation("EducatorCourses", fields: [educatorId], references: [id])
   enrollments    Enrollment[]
 }

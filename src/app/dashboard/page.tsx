@@ -15,6 +15,9 @@ export default function EducatorDashboard() {
   const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState<{ [key: string]: string }>({});
   const [csvFile, setCsvFile] = useState<{ [key: string]: File | null }>({});
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newCourse, setNewCourse] = useState<{title: string, description: string, slideTitle: string, slideBullets: string, htmlFile: File | null}>({ title: '', description: '', slideTitle: '', slideBullets: '', htmlFile: null });
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -186,6 +189,72 @@ export default function EducatorDashboard() {
     else alert('Error updating status');
   };
 
+  const handleDeleteCourse = async (courseId: string) => {
+    if (!confirm("Are you sure you want to permanently delete this course? This action cannot be undone.")) return;
+    const res = await fetch('/api/courses/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ courseId })
+    });
+    if (res.ok) {
+      alert("Course deleted successfully.");
+      setExpandedCourseId(null);
+      fetchCourses(token);
+    } else {
+      const data = await res.json();
+      alert("Error: " + data.error);
+    }
+  };
+
+  const handleCreateCourse = async () => {
+    if (!newCourse.title) return alert('Title is required');
+    setIsCreating(true);
+
+    try {
+      if (newCourse.htmlFile) {
+        const formData = new FormData();
+        formData.append('title', newCourse.title);
+        formData.append('description', newCourse.description);
+        formData.append('file', newCourse.htmlFile);
+
+        const res = await fetch('/api/courses/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+
+        if (res.ok) {
+          setShowCreateModal(false);
+          setNewCourse({ title: '', description: '', slideTitle: '', slideBullets: '', htmlFile: null });
+          fetchCourses(token);
+          alert('Course uploaded successfully. It is now pending admin approval.');
+        } else {
+          alert('Failed to upload course');
+        }
+      } else {
+        const slidesData = [{
+          title: newCourse.slideTitle || 'Welcome to ' + newCourse.title,
+          bullets: newCourse.slideBullets.split('\n').filter((b: string) => b.trim() !== '')
+        }];
+        const res = await fetch('/api/courses/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ title: newCourse.title, description: newCourse.description, slidesData })
+        });
+        if (res.ok) {
+          setShowCreateModal(false);
+          setNewCourse({ title: '', description: '', slideTitle: '', slideBullets: '', htmlFile: null });
+          fetchCourses(token);
+        } else {
+          alert('Failed to create course');
+        }
+      }
+    } catch (e) {
+      alert('Error creating course');
+    }
+    setIsCreating(false);
+  };
+
   if (!mounted) return null;
 
   return (
@@ -257,7 +326,7 @@ export default function EducatorDashboard() {
             <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>{t('dashboard.title')}</h1>
             <p style={{ color: 'var(--text-muted)' }}>{t('dashboard.subtitle')}</p>
           </div>
-          <button className="btn-primary" style={{ padding: '12px 24px', fontSize: '1rem' }}>{t('dashboard.createCourse')}</button>
+          <button onClick={() => setShowCreateModal(true)} className="btn-primary" style={{ padding: '12px 24px', fontSize: '1rem' }}>{t('dashboard.createCourse')}</button>
         </header>
 
         <h3 style={{ fontSize: '1.5rem', marginBottom: '24px' }}>{t('dashboard.yourCourses')}</h3>
@@ -289,7 +358,7 @@ export default function EducatorDashboard() {
               </div>
             ))}
 
-            <div className="glass-panel hover-glow" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', border: '2px dashed var(--glass-border)' }}>
+            <div onClick={() => setShowCreateModal(true)} className="glass-panel hover-glow" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', border: '2px dashed var(--glass-border)' }}>
               <span style={{ fontSize: '1.5rem', color: 'var(--text-muted)' }}>+</span>
               <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-muted)' }}>Create New Course</h3>
             </div>
@@ -302,7 +371,7 @@ export default function EducatorDashboard() {
                   <div 
                     style={{ height: '180px', background: course.isArchived ? 'linear-gradient(45deg, #475569, #64748b)' : 'linear-gradient(45deg, #0f766e, #10b981)', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: course.isArchived ? 'not-allowed' : 'pointer', filter: course.isArchived ? 'grayscale(100%)' : 'none' }}
                     onClick={(e) => {
-                      if (!course.isArchived) window.location.href = `/course.html?id=${course.id}`;
+                      if (!course.isArchived) window.location.href = `/api/course-play?id=${course.id}`;
                     }}
                   >
                      <div style={{ fontSize: '3rem', marginBottom: '8px' }}>📊</div>
@@ -364,7 +433,7 @@ export default function EducatorDashboard() {
                     
                     <div style={{ marginBottom: '16px' }}>
                       <button 
-                        onClick={() => { if (!course.isArchived) window.location.href = `/course.html?id=${course.id}` }}
+                        onClick={() => { if (!course.isArchived) window.location.href = `/api/course-play?id=${course.id}` }}
                         className="btn-primary hover-glow"
                         style={{ width: '100%', padding: '16px', fontSize: '1.2rem', fontWeight: 600, border: 'none', background: course.isArchived ? '#475569' : 'linear-gradient(90deg, #38bdf8, #818cf8)', color: 'white', cursor: course.isArchived ? 'not-allowed' : 'pointer', borderRadius: '8px', boxShadow: course.isArchived ? 'none' : '0 4px 15px rgba(56, 189, 248, 0.4)', transition: 'all 0.2s' }}
                         disabled={course.isArchived}
@@ -388,6 +457,13 @@ export default function EducatorDashboard() {
                         style={{ flex: 1, padding: '12px', fontSize: '1rem', border: '1px solid #38bdf8', color: '#38bdf8', background: 'transparent', cursor: 'pointer', borderRadius: '8px' }}
                       >
                         {t('dashboard.copyCourse')}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCourse(course.id)}
+                        className="btn-secondary"
+                        style={{ flex: 1, padding: '12px', fontSize: '1rem', border: '1px solid #ef4444', color: '#ef4444', background: 'transparent', cursor: 'pointer', borderRadius: '8px' }}
+                      >
+                        Delete
                       </button>
                     </div>
 
@@ -510,6 +586,43 @@ export default function EducatorDashboard() {
           )}
         </div>
       </main>
+
+      {showCreateModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
+          <div className="glass-panel animate-fade-in-up" style={{ width: '500px', padding: '32px', background: 'var(--surface)' }}>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '24px', color: 'var(--text-main)' }}>Create New Course (Template Builder)</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Course Title</label>
+                <input type="text" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="E.g. Advanced Excel Tips" />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Course Description</label>
+                <input type="text" value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="What is this course about?" />
+              </div>
+              <hr style={{ borderColor: 'var(--glass-border)', margin: '8px 0' }} />
+              <h3 style={{ fontSize: '1.1rem', color: '#38bdf8' }}>Option A: Build from Template</h3>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Slide Title</label>
+                <input type="text" value={newCourse.slideTitle} onChange={e => setNewCourse({...newCourse, slideTitle: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="E.g. Introduction to Formulas" disabled={!!newCourse.htmlFile} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Bullet Points (One per line)</label>
+                <textarea rows={4} value={newCourse.slideBullets} onChange={e => setNewCourse({...newCourse, slideBullets: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="Point 1...\nPoint 2..." disabled={!!newCourse.htmlFile} />
+              </div>
+              <h3 style={{ fontSize: '1.1rem', color: '#38bdf8', marginTop: '16px' }}>Option B: Upload Custom HTML</h3>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Upload an HTML file (Pending approval)</label>
+                <input type="file" accept=".html" onChange={e => setNewCourse({...newCourse, htmlFile: e.target.files ? e.target.files[0] : null})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '16px', marginTop: '32px' }}>
+              <button onClick={() => setShowCreateModal(false)} className="btn-secondary" style={{ flex: 1, padding: '12px' }}>Cancel</button>
+              <button onClick={handleCreateCourse} className="btn-primary" style={{ flex: 1, padding: '12px' }} disabled={isCreating}>{isCreating ? 'Creating...' : 'Create Course'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
