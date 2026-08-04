@@ -9,6 +9,7 @@ export default function Home() {
   const router = useRouter();
   const [isHovering, setIsHovering] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
   const { t } = useLanguage();
@@ -182,19 +183,30 @@ export default function Home() {
       <div className="bg-blob bg-blob-1" />
       <div className="bg-blob bg-blob-2" />
 
-      <nav className="glass-panel" style={{ margin: '24px auto', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px' }}>
+      <nav className="glass-panel app-nav" style={{ margin: '24px auto', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px', zIndex: 100, position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img src="/edusphere.png" alt="EduSphere Logo" style={{ height: '40px', objectFit: 'contain' }} />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }}>{t('header.brand')}</h2>
         </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <LanguageToggle />
-          <button type="button" className="btn-secondary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); }} onTouchStart={(e) => { e.preventDefault(); resetForm(true); setShowAuthModal(true); }}>{t('header.login')}</button>
-          <button type="button" className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(false); setShowAuthModal(true); }} onTouchStart={(e) => { e.preventDefault(); resetForm(false); setShowAuthModal(true); }}>Register</button>
+        <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          
+          <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle menu">
+             {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+
+          <div className={`nav-actions ${isMobileMenuOpen ? 'open' : ''}`} style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <button type="button" className="btn-secondary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>{t('header.login')}</button>
+            <button type="button" className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(false); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>Register</button>
+          </div>
         </div>
       </nav>
 
-      <section className="container" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 24px', position: 'relative' }}>
+      {/* Floating Language Toggle Below Header */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', maxWidth: '1200px', margin: '8px auto 0', padding: '0 32px', position: 'relative', zIndex: 90 }}>
+        <LanguageToggle />
+      </div>
+
+      <section className="container" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px 80px', position: 'relative' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: '800px', opacity: 0 }} className="animate-fade-in-up">
           <div className="glass-panel" style={{ padding: '8px 16px', borderRadius: '30px', display: 'inline-block', marginBottom: '24px', border: '1px solid var(--primary)', color: 'var(--primary)', fontWeight: 500, fontSize: '0.9rem' }}>
             {t('hero.badge')}

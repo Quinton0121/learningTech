@@ -9,6 +9,7 @@ export default function EducatorDashboard() {
   const { t } = useLanguage();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState('');
@@ -329,14 +330,25 @@ export default function EducatorDashboard() {
   if (!mounted) return null;
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--background)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--background)' }}>
       <div className="bg-blob bg-blob-1" style={{ opacity: 0.3 }} />
       <div className="bg-blob bg-blob-2" style={{ opacity: 0.2, right: '20%' }} />
 
-      <aside style={{ width: '280px', background: 'var(--surface)', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '32px 24px', boxShadow: '4px 0 24px rgba(0,0,0,0.2)', zIndex: 10 }}>
-        <div style={{ marginBottom: '24px' }}>
-          <LanguageToggle />
+      {/* Mobile Top Nav (Hidden on Desktop) */}
+      <div className="mobile-dashboard-nav" style={{ padding: '16px 24px', display: 'none', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--glass-border)', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/edusphere.png" alt="EduSphere Logo" style={{ height: '32px', objectFit: 'contain' }} />
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--primary)' }}>{t('header.brand')}</h2>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.8rem', cursor: 'pointer', padding: 0 }}>
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
+      <aside className={`dashboard-sidebar ${isMobileMenuOpen ? 'open' : ''}`} style={{ width: '280px', background: 'var(--surface)', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '32px 24px', boxShadow: '4px 0 24px rgba(0,0,0,0.2)', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
           <img src="/edusphere.png" alt="EduSphere Logo" style={{ height: '40px', objectFit: 'contain' }} />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', margin: 0, letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(56, 189, 248, 0.3)' }}>{t('header.brand')}</h2>
@@ -400,7 +412,13 @@ export default function EducatorDashboard() {
         </button>
       </aside>
 
-      <main style={{ flex: 1, padding: '48px', overflowY: 'auto' }}>
+      <main style={{ flex: 1, padding: '24px 48px', overflowY: 'auto' }}>
+        
+        {/* Floating Language Toggle Below Header / Top Right of Main */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginBottom: '16px' }}>
+          <LanguageToggle />
+        </div>
+
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '48px' }}>
           <div>
             <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>{t('dashboard.title')}</h1>
@@ -410,11 +428,11 @@ export default function EducatorDashboard() {
         </header>
 
         <h3 style={{ fontSize: '1.5rem', marginBottom: '24px' }}>{t('dashboard.yourCourses')}</h3>
-        <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '300px' }}>
-            {courses.map(course => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
+          {courses.map(course => (
+            <div key={course.id} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div 
-                key={course.id} 
+                 
                 className={`glass-panel animate-fade-in-up ${expandedCourseId === course.id ? '' : 'hover-glow'}`}
                 style={{ 
                   padding: '20px', 
@@ -426,7 +444,7 @@ export default function EducatorDashboard() {
                   border: expandedCourseId === course.id ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.05)',
                   background: expandedCourseId === course.id ? 'rgba(56, 189, 248, 0.1)' : 'var(--glass-bg)'
                 }}
-                onClick={() => setExpandedCourseId(course.id)}
+                onClick={() => setExpandedCourseId(expandedCourseId === course.id ? null : course.id)}
               >
                 <h3 style={{ margin: 0, fontSize: '1.2rem', color: course.isArchived ? 'var(--text-muted)' : 'white', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <span style={{ fontSize: '1.2rem' }}>📊</span>
@@ -436,18 +454,10 @@ export default function EducatorDashboard() {
                   {expandedCourseId === course.id ? '▶' : '▼'}
                 </span>
               </div>
-            ))}
-
-            <div onClick={() => setShowCreateModal(true)} className="glass-panel hover-glow" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', border: '2px dashed var(--glass-border)' }}>
-              <span style={{ fontSize: '1.5rem', color: 'var(--text-muted)' }}>+</span>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-muted)' }}>Create New Course</h3>
-            </div>
-          </div>
-
-          {expandedCourseId && (
-            <div style={{ flex: 2, position: 'sticky', top: '24px', maxHeight: 'calc(100vh - 48px)', overflowY: 'auto', borderRadius: '16px' }}>
-              {courses.filter(c => c.id === expandedCourseId).map(course => (
-                <div key={course.id} className="glass-panel animate-fade-in-up" style={{ overflow: 'hidden' }}>
+              
+              {expandedCourseId === course.id && (
+                <div style={{ paddingLeft: '16px', borderLeft: '2px solid var(--primary)', marginLeft: '16px', marginBottom: '24px' }}>
+                  <div className="glass-panel animate-fade-in-up" style={{ overflow: 'hidden' }}>
                   <div 
                     style={{ height: '180px', background: course.isArchived ? 'linear-gradient(45deg, #475569, #64748b)' : 'linear-gradient(45deg, #0f766e, #10b981)', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: course.isArchived ? 'not-allowed' : 'pointer', filter: course.isArchived ? 'grayscale(100%)' : 'none' }}
                     onClick={(e) => {
@@ -661,11 +671,18 @@ export default function EducatorDashboard() {
                     </details>
                   </div>
                 </div>
-              ))}
+                </div>
+              )}
             </div>
-          )}
+          ))}
+
+          <div onClick={() => setShowCreateModal(true)} className="glass-panel hover-glow" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', border: '2px dashed var(--glass-border)' }}>
+            <span style={{ fontSize: '1.5rem', color: 'var(--text-muted)' }}>+</span>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-muted)' }}>Create New Course</h3>
+          </div>
         </div>
-      </main>
+        </main>
+      </div>
 
       {showCreateModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
