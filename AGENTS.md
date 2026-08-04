@@ -12,3 +12,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
     - The web server is used for talking to the user.
     - **Crucial:** You MUST use English to talk to the user. Keep your communication concise (the user doesn't like to read).
 4. **Telegram server maintenance:** Every time you finish a task, you MUST check and restart the telegram server.
+5. **Report task completion:** Every time you finish a task, you MUST write a short English message to `c:\futu\Jarvis\jarvis_speech.txt` so the port 8000 web server can speak it to the user.

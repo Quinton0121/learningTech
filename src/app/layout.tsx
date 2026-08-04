@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'EduSphere | Next-Gen Learning',
+  title: 'interlectic 聚課 | Next-Gen Learning',
   description: 'A premium online teaching and learning platform.',
 }
 
@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <LanguageProvider>
           {children}
         </LanguageProvider>

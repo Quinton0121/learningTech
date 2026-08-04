@@ -14,7 +14,11 @@ export async function GET(request: Request) {
     
     const enrollments = await prisma.enrollment.findMany({
       where: { userId: decoded.userId },
-      include: { course: true }
+      include: { 
+        course: {
+          include: { educator: { select: { id: true, name: true, email: true } } }
+        }
+      }
     });
     
     const user = await prisma.user.findUnique({ where: { id: decoded.userId } });

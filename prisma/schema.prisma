@@ -40,6 +40,10 @@ model User {
   coursesTaught    Course[] @relation("EducatorCourses")
   enrollments      Enrollment[]
   transactions     Transaction[]
+
+  // Messages
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 }
 
 model Course {
@@ -91,4 +95,16 @@ model Transaction {
   createdAt   DateTime @default(now())
   
   user        User     @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  senderId    String
+  receiverId  String
+  content     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
 }

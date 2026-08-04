@@ -18,6 +18,12 @@ export default function EducatorDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCourse, setNewCourse] = useState<{title: string, description: string, slideTitle: string, slideBullets: string, htmlFile: File | null}>({ title: '', description: '', slideTitle: '', slideBullets: '', htmlFile: null });
   const [isCreating, setIsCreating] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [inboxMessages, setInboxMessages] = useState<any[]>([]);
+  const [showInbox, setShowInbox] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState<string>('ADMIN');
 
   useEffect(() => {
     setMounted(true);
@@ -37,6 +43,25 @@ export default function EducatorDashboard() {
     const data = await res.json();
     if (data.courses) setCourses(data.courses);
     if (data.user) setUser(data.user);
+
+    try {
+      const msgRes = await fetch('/api/messages/inbox', {
+        headers: { 'Authorization': `Bearer ${t}` }
+      });
+      if (msgRes.ok) {
+        const msgData = await msgRes.json();
+        const currentUser = data.user;
+        const filteredMsgs = (msgData.messages || []).filter((msg: any) => {
+          if (currentUser?.role === 'ADMIN') {
+            if (msg.senderId !== currentUser.id && msg.sender?.role !== 'STUDENT') return false;
+          }
+          return msg.senderId === currentUser?.id || msg.receiverId === currentUser?.id;
+        });
+        setInboxMessages(filteredMsgs);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleInvite = async (courseId: string) => {
@@ -255,6 +280,52 @@ export default function EducatorDashboard() {
     setIsCreating(false);
   };
 
+  const handleSendMessage = async () => {
+    if (!replyText.trim()) return alert('Message cannot be empty');
+    setIsSendingMessage(true);
+    try {
+      const res = await fetch('/api/messages/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ receiverId: selectedContactId, content: replyText })
+      });
+      if (res.ok) {
+        setReplyText('');
+        fetchCourses(token);
+      } else {
+        const data = await res.json();
+        alert('Failed to send message: ' + data.error);
+      }
+    } catch (error) {
+      alert('Network error');
+    }
+    setIsSendingMessage(false);
+  };
+
+  const contactsMap = new Map<string, { id: string, name: string, role: string }>();
+  contactsMap.set('ADMIN', { id: 'ADMIN', name: 'Admin Support', role: 'ADMIN' });
+  
+  courses.forEach(c => {
+    c.enrollments?.forEach((e: any) => {
+      if (e.student) {
+        contactsMap.set(e.student.id, { id: e.student.id, name: e.student.name || e.student.email, role: 'STUDENT' });
+      }
+    });
+  });
+  const contacts = Array.from(contactsMap.values());
+  const selectedContactMessages = inboxMessages.filter(msg => {
+    if (selectedContactId === 'ADMIN') {
+      if (user?.role === 'ADMIN') {
+        return msg.sender?.role === 'ADMIN' && msg.receiver?.role === 'ADMIN';
+      }
+      return (msg.sender?.role === 'ADMIN' || msg.receiver?.role === 'ADMIN') &&
+             (msg.senderId === user?.id || msg.receiverId === user?.id);
+    } else {
+      return (msg.senderId === selectedContactId || msg.receiverId === selectedContactId) &&
+             (msg.senderId === user?.id || msg.receiverId === user?.id);
+    }
+  });
+
   if (!mounted) return null;
 
   return (
@@ -306,6 +377,15 @@ export default function EducatorDashboard() {
           </div>
           <div onClick={() => router.push('/settings')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
             {t('sidebar.settings')}
+          </div>
+          <div onClick={() => { setSelectedContactId('ADMIN'); setShowInbox(true); }} style={{ padding: '12px 16px', color: '#f59e0b', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            ✉️ Contact Support
+          </div>
+          <div onClick={() => setShowInbox(true)} style={{ padding: '12px 16px', color: '#38bdf8', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>📥 Messages</span>
+            {inboxMessages.length > 0 && (
+              <span style={{ background: '#ef4444', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{inboxMessages.length}</span>
+            )}
           </div>
           <div onClick={() => window.open('/user-guide', '_blank')} style={{ padding: '12px 16px', color: '#10b981', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
             {t('sidebar.documentation')}
@@ -620,6 +700,87 @@ export default function EducatorDashboard() {
               <button onClick={() => setShowCreateModal(false)} className="btn-secondary" style={{ flex: 1, padding: '12px' }}>Cancel</button>
               <button onClick={handleCreateCourse} className="btn-primary" style={{ flex: 1, padding: '12px' }} disabled={isCreating}>{isCreating ? 'Creating...' : 'Create Course'}</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showInbox && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
+          <div className="glass-panel animate-fade-in-up" style={{ width: '900px', height: '70vh', display: 'flex', background: 'var(--surface)', overflow: 'hidden', padding: 0 }}>
+            
+            {/* Left Sidebar (Contacts) */}
+            <div style={{ width: '280px', borderRight: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#f59e0b' }}>Contacts</h3>
+              </div>
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                {contacts.map(contact => (
+                  <div 
+                    key={contact.id} 
+                    onClick={() => setSelectedContactId(contact.id)}
+                    style={{ padding: '16px 20px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', background: selectedContactId === contact.id ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderLeft: selectedContactId === contact.id ? '4px solid #38bdf8' : '4px solid transparent' }}
+                  >
+                    <div style={{ fontWeight: 600, color: contact.role === 'ADMIN' ? '#f59e0b' : '#38bdf8' }}>
+                      {contact.name}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {contact.role === 'ADMIN' ? 'Admin Support' : 'Student'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Main Area (Messages) */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ fontSize: '1.2rem', color: '#38bdf8', margin: 0 }}>
+                  Chat with {contacts.find(c => c.id === selectedContactId)?.name}
+                </h2>
+                <button onClick={() => setShowInbox(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+              </div>
+              
+              <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {selectedContactMessages.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '40px' }}>
+                    No messages yet. Start the conversation!
+                  </div>
+                ) : (
+                  selectedContactMessages.map(msg => {
+                    const isMyMsg = msg.senderId === user?.id;
+                    return (
+                      <div key={msg.id} style={{ alignSelf: isMyMsg ? 'flex-end' : 'flex-start', maxWidth: '80%', background: isMyMsg ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                          {isMyMsg ? 'You' : (msg.sender?.role === 'ADMIN' ? 'Admin Support' : (msg.sender?.name || msg.sender?.email))} • {new Date(msg.createdAt).toLocaleString()}
+                        </div>
+                        <div style={{ whiteSpace: 'pre-wrap', color: 'white' }}>{msg.content}</div>
+                      </div>
+                    );
+                  }).reverse()
+                )}
+              </div>
+
+              {/* Reply Box */}
+              <div style={{ padding: '20px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '12px', background: 'rgba(0,0,0,0.2)' }}>
+                <input 
+                  type="text" 
+                  placeholder="Type a message..." 
+                  value={replyText} 
+                  onChange={e => setReplyText(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                  style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white' }} 
+                />
+                <button 
+                  onClick={handleSendMessage}
+                  className="btn-primary" 
+                  style={{ padding: '12px 24px', background: '#38bdf8' }}
+                  disabled={isSendingMessage}
+                >
+                  {isSendingMessage ? 'Sending...' : 'Send'}
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

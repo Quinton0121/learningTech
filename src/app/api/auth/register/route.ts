@@ -1,15 +1,27 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, name, role, authType } = body;
+    let { email, password, name, role, authType, verificationCode, verificationToken } = body;
+    if (email) email = email.toLowerCase();
 
     // Validate request
-    if (!email || !password || !name) {
-      return NextResponse.json({ error: 'Email, password, and name are required' }, { status: 400 });
+    if (!email || !password || !name || !verificationCode || !verificationToken) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Verify the verification code using JWT
+    try {
+      const decoded = jwt.verify(verificationToken, process.env.JWT_SECRET || 'super-secret-development-key-change-in-production') as any;
+      if (decoded.purpose !== 'registration_verification' || decoded.email !== email || decoded.code !== verificationCode) {
+        return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
+      }
+    } catch (err) {
+      return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
     }
 
     // Check existing user
@@ -23,13 +35,19 @@ export async function POST(request: Request) {
     const trialExpiresAt = new Date();
     trialExpiresAt.setDate(trialExpiresAt.getDate() + 30);
 
+    // Prevent anyone from registering as ADMIN via the API
+    let assignedRole = role || 'LEARNER';
+    if (assignedRole === 'ADMIN' && email !== 'quinton0121@gmail.com') {
+      assignedRole = 'LEARNER'; // Force to learner if they try to hack it
+    }
+
     // Create user
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
         name,
-        role: role || 'LEARNER',
+        role: assignedRole,
         authType: authType || 'EMAIL',
         trialExpiresAt,
       },
@@ -43,8 +61,8 @@ export async function POST(request: Request) {
       user: userWithoutPassword 
     }, { status: 201 });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Registration error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

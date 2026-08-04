@@ -28,8 +28,8 @@ export async function GET(request: Request) {
     if (courses.length === 0) {
       const newCourse = await prisma.course.create({
         data: {
-          title: 'Mastering Excel for Business',
-          description: 'Advanced spreadsheet techniques, macros, and financial modeling designed specifically for corporate professionals.',
+          title: 'Welcome to Interlectic: Educator Guide (Demo)',
+          description: 'A quick interactive guide on how to create courses, invite students, and manage your classroom on the Interlectic platform.',
           educatorId: decoded.userId
         },
         include: { 

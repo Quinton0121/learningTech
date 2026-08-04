@@ -10,6 +10,7 @@ export default function Home() {
   const [isHovering, setIsHovering] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
   const { t } = useLanguage();
   
   // Registration Flow State
@@ -19,6 +20,7 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
+  const [verificationToken, setVerificationToken] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
 
   React.useEffect(() => {
@@ -53,6 +55,26 @@ export default function Home() {
     e.preventDefault();
     setStatusMsg('Processing...');
     
+    // FORGOT PASSWORD
+    if (isForgotPasswordMode) {
+      if (!email) {
+        setStatusMsg('Please enter your email.');
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        setStatusMsg(data.message || 'If the email exists, a reset link has been sent.');
+      } catch (err) {
+        setStatusMsg('Network error. Please try again.');
+      }
+      return;
+    }
+
     // LOGIN
     if (isLoginMode) {
       try {
@@ -84,24 +106,38 @@ export default function Home() {
     }
 
     // REGISTRATION - STEP 1 (Send Code)
-    if (!isLoginMode && step === 1) {
+    if (!isLoginMode && step === 1 && !isForgotPasswordMode) {
       if (!name || !email || !password) {
         setStatusMsg('Please fill in all fields.');
         return;
       }
       setStatusMsg('Sending verification code...');
-      // MOCK SEND EMAIL
-      setTimeout(() => {
-        setStep(2);
-        setStatusMsg('A verification code has been sent to your email. (Hint: use 123456)');
-      }, 1000);
+      
+      try {
+        const res = await fetch('/api/auth/send-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.verificationToken) {
+          setVerificationToken(data.verificationToken);
+          setStep(2);
+          setStatusMsg('A verification code has been sent to your email.');
+        } else {
+          setStatusMsg(`Error: ${data.error || 'Failed to send code'}`);
+        }
+      } catch (err) {
+        setStatusMsg('Network error while sending code.');
+      }
       return;
     }
 
     // REGISTRATION - STEP 2 (Verify & Create Account)
-    if (!isLoginMode && step === 2) {
-      if (verificationCode !== '123456') {
-        setStatusMsg('Invalid verification code.');
+    if (!isLoginMode && step === 2 && !isForgotPasswordMode) {
+      if (!verificationCode || verificationCode.length !== 6) {
+        setStatusMsg('Please enter the 6-digit verification code.');
         return;
       }
       
@@ -110,7 +146,7 @@ export default function Home() {
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, name, role, authType: 'EMAIL' })
+          body: JSON.stringify({ email, password, name, role, authType: 'EMAIL', verificationCode, verificationToken })
         });
         const data = await res.json();
         
@@ -132,6 +168,7 @@ export default function Home() {
 
   const resetForm = (loginMode: boolean) => {
     setIsLoginMode(loginMode);
+    setIsForgotPasswordMode(false);
     setStep(1);
     setStatusMsg('');
     setEmail('');
@@ -197,7 +234,7 @@ export default function Home() {
             >✕</button>
             
             <h3 style={{ fontSize: '1.8rem', marginBottom: '20px', textAlign: 'center' }}>
-              {isLoginMode ? 'Welcome Back' : 'Create Account'}
+              {isForgotPasswordMode ? 'Reset Password' : (isLoginMode ? 'Welcome Back' : 'Create Account')}
             </h3>
 
             <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -216,7 +253,7 @@ export default function Home() {
               )}
 
               {/* Email & Password (Login + Register Step 1) */}
-              {(isLoginMode || (!isLoginMode && step === 1)) && (
+              {((isLoginMode || (!isLoginMode && step === 1)) && !isForgotPasswordMode) && (
                 <>
                   <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required
                     style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
@@ -224,6 +261,12 @@ export default function Home() {
                   <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required
                     style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
                 </>
+              )}
+
+              {/* Forgot Password Field */}
+              {isForgotPasswordMode && (
+                <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required
+                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
               )}
 
               {/* Verification Code - Step 2 */}
@@ -236,14 +279,20 @@ export default function Home() {
               )}
 
               <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '10px' }}>
-                {isLoginMode ? 'Sign In' : (step === 1 ? 'Send Verification Code' : 'Verify & Register')}
+                {isForgotPasswordMode ? 'Send Reset Link' : (isLoginMode ? 'Sign In' : (step === 1 ? 'Send Verification Code' : 'Verify & Register'))}
               </button>
             </form>
             
             {statusMsg && <p style={{ marginTop: '15px', textAlign: 'center', color: 'var(--primary)', fontSize: '0.9rem' }}>{statusMsg}</p>}
             
-            <button type="button" style={{ marginTop: '20px', width: '100%', background: 'transparent', border: 'none', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer' }} onClick={() => resetForm(!isLoginMode)} onTouchStart={(e) => { e.preventDefault(); resetForm(!isLoginMode); }}>
-              {isLoginMode ? "Don't have an account? Register" : "Already have an account? Login"}
+            {isLoginMode && !isForgotPasswordMode && (
+              <button type="button" style={{ marginTop: '15px', width: '100%', background: 'transparent', border: 'none', textAlign: 'center', color: 'var(--primary)', fontSize: '0.9rem', cursor: 'pointer' }} onClick={() => setIsForgotPasswordMode(true)}>
+                Forgot Password?
+              </button>
+            )}
+
+            <button type="button" style={{ marginTop: '10px', width: '100%', background: 'transparent', border: 'none', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer' }} onClick={() => resetForm(!isLoginMode)} onTouchStart={(e) => { e.preventDefault(); resetForm(!isLoginMode); }}>
+              {isLoginMode ? (isForgotPasswordMode ? "Back to Login" : "Don't have an account? Register") : "Already have an account? Login"}
             </button>
           </div>
         </div>

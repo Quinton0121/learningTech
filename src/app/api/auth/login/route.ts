@@ -8,7 +8,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-development-key-chang
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, phoneNumber, password } = body;
+    let { email, phoneNumber, password } = body;
+    if (email) email = email.toLowerCase();
 
     if (!email && !phoneNumber) {
       return NextResponse.json({ error: 'Email or phone number is required' }, { status: 400 });
