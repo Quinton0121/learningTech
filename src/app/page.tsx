@@ -13,6 +13,8 @@ export default function Home() {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
   const { t } = useLanguage();
+  const [showPcIdModal, setShowPcIdModal] = useState(false);
+  const [tempPcId, setTempPcId] = useState('');
   
   // Registration Flow State
   const [step, setStep] = useState(1); // 1 = Details, 2 = Verify Code
@@ -184,9 +186,9 @@ export default function Home() {
       <div className="bg-blob bg-blob-2" />
 
       <nav className="glass-panel app-nav" style={{ margin: '24px auto', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px', zIndex: 100, position: 'relative' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '40px', objectFit: 'contain' }} />
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }}>{t('header.brand')}</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onDoubleClick={() => { setTempPcId(localStorage.getItem('pc_id') || ''); setShowPcIdModal(true); }}>
+          <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '40px', objectFit: 'contain' }} title="Double click to configure PC ID" />
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }} title="Double click to configure PC ID">{t('header.brand')}</h2>
         </div>
         <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           
@@ -305,6 +307,40 @@ export default function Home() {
 
             <button type="button" style={{ marginTop: '10px', width: '100%', background: 'transparent', border: 'none', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'pointer' }} onClick={() => resetForm(!isLoginMode)} onTouchStart={(e) => { e.preventDefault(); resetForm(!isLoginMode); }}>
               {isLoginMode ? (isForgotPasswordMode ? "Back to Login" : "Don't have an account? Register") : "Already have an account? Login"}
+            </button>
+          </div>
+        </div>
+      )}
+      {/* PC ID Configuration Modal */}
+      {showPcIdModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+        }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '40px', position: 'relative' }}>
+            <button 
+              onClick={() => setShowPcIdModal(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}
+            >✕</button>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '20px', textAlign: 'center' }}>Set PC ID</h3>
+            <input 
+              type="text" 
+              placeholder="Enter PC ID" 
+              value={tempPcId} 
+              onChange={e => setTempPcId(e.target.value)} 
+              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff', marginBottom: '20px' }} 
+            />
+            <button 
+              className="btn-primary" 
+              style={{ width: '100%', padding: '12px' }}
+              onClick={() => {
+                localStorage.setItem('pc_id', tempPcId);
+                setShowPcIdModal(false);
+                alert('PC ID saved successfully!');
+              }}
+            >
+              Save
             </button>
           </div>
         </div>
