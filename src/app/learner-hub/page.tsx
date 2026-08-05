@@ -142,7 +142,7 @@ export default function LearnerHub() {
       <aside className="glass-panel" style={{ width: '280px', margin: '24px', padding: '32px 24px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px' }}>
           <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, var(--secondary), var(--primary))', borderRadius: '8px' }} />
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 700 }}>EduSphere Hub</h2>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Interlectic Hub</h2>
         </div>
 
         {user && (

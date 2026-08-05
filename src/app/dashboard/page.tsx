@@ -337,7 +337,7 @@ export default function EducatorDashboard() {
       {/* Mobile Top Nav (Hidden on Desktop) */}
       <div className="mobile-dashboard-nav" style={{ padding: '16px 24px', display: 'none', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--glass-border)', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/edusphere.png" alt="EduSphere Logo" style={{ height: '32px', objectFit: 'contain' }} />
+          <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '32px', objectFit: 'contain' }} />
           <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--primary)' }}>{t('header.brand')}</h2>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -350,7 +350,7 @@ export default function EducatorDashboard() {
       <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
       <aside className={`dashboard-sidebar ${isMobileMenuOpen ? 'open' : ''}`} style={{ width: '280px', background: 'var(--surface)', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '32px 24px', boxShadow: '4px 0 24px rgba(0,0,0,0.2)', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
-          <img src="/edusphere.png" alt="EduSphere Logo" style={{ height: '40px', objectFit: 'contain' }} />
+          <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '40px', objectFit: 'contain' }} />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', margin: 0, letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(56, 189, 248, 0.3)' }}>{t('header.brand')}</h2>
         </div>
         

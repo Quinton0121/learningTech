@@ -185,7 +185,7 @@ export default function Home() {
 
       <nav className="glass-panel app-nav" style={{ margin: '24px auto', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px', zIndex: 100, position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/edusphere.png" alt="EduSphere Logo" style={{ height: '40px', objectFit: 'contain' }} />
+          <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '40px', objectFit: 'contain' }} />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }}>{t('header.brand')}</h2>
         </div>
         <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
