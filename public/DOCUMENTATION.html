@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consolidated Project Documentation</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; display: flex; height: 100vh; color: #333; }
+  #sidebar { width: 250px; background: #1e293b; color: white; padding: 20px; overflow-y: auto; flex-shrink: 0; }
+  #sidebar h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+  .nav-btn { display: block; width: 100%; text-align: left; background: none; border: none; color: #cbd5e1; padding: 10px; margin-bottom: 5px; cursor: pointer; border-radius: 5px; font-size: 1rem; }
+  .nav-btn:hover { background: #334155; color: white; }
+  .nav-btn.active { background: #3b82f6; color: white; font-weight: bold; }
+  #content { flex: 1; padding: 40px; overflow-y: auto; background: #f8fafc; }
+  .section { display: none; max-width: 900px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+  .section.active { display: block; }
+  .todo-item { display: flex; align-items: center; margin-bottom: 15px; padding: 10px; border-radius: 6px; background: #f1f5f9; }
+  .todo-item input[type="checkbox"] { margin-right: 15px; transform: scale(1.5); cursor: pointer; }
+  .todo-item label { font-size: 1.1rem; cursor: pointer; flex: 1; }
+  .todo-item input[type="checkbox"]:checked + label { text-decoration: line-through; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>Project Docs</h2>
+  <button class="nav-btn active" onclick="showSection('readme', this)">Readme</button>
+  <button class="nav-btn" onclick="showSection('knowledge', this)">Knowledge Agent</button>
+  <button class="nav-btn" onclick="showSection('business', this)">Business Plan</button>
+  <button class="nav-btn" onclick="showSection('todo', this)">Todo List</button>
+</div>
+
+<div id="content">
+  <div id="readme" class="section active">
+    
+    <h1>learningTech (EduSphere)</h1>
+    <p>A modern, full-duplex synchronized learning platform for educators and learners. Features real-time slide synchronization, presence tracking, and touch-optimized interfaces.</p>
+
+    <div class="flag" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+      <h2>Platform Features Guide</h2>
+      <h3>🌍 Public vs 🔒 Private Courses</h3>
+      <p>By default, all new courses you create are <strong>Private</strong>. Private courses are only accessible to you and the specific students you connect to them. If you want to sell or share your course materials with other educators on the Marketplace, you can toggle the course to <strong>Public</strong> directly from your dashboard!</p>
+
+      <h3>⏳ Course Expiration Rules</h3>
+      <p>To prevent quota recycling and ensure a fair ecosystem, each course has a strict 13-month lifecycle. The countdown starts the moment the <strong>first student</strong> enrolls in the course.</p>
+      <p>After 13 months, the course is permanently <strong>Archived (Expired)</strong>. You will no longer be able to start the class, bulk import students, or invite new students. To continue teaching the material for the next academic year, you must use the <strong>Copy Course</strong> feature to create a fresh instance and consume new quotas.</p>
+
+      <h3>⚡ Quick Login (Student Auto-Login)</h3>
+      <p>The Quick Login feature allows students to join your live class without typing passwords!</p>
+      <ol>
+          <li>Visit the <code>/setup</code> page on each physical student device to assign it a unique <code>PC_ID</code>.</li>
+          <li>Upload a CSV mapping your students to their assigned <code>PC_ID</code>.</li>
+          <li>Click <strong>Enable Quick Login</strong> on your dashboard. When students open the platform on their assigned PC, they will be logged in automatically!</li>
+      </ol>
+    </div>
+
+    <h2>Setup Instructions for a New Computer</h2>
+    <p>Because we use <code>.gitignore</code> to protect sensitive information, you must manually copy your sensitive files when cloning this repository to a new computer. Follow these exactly 5 steps:</p>
+    
+    <ol>
+        <li><strong>Add your Environment Variables:</strong><br>Copy your local <code>.env</code> file into the main project folder.</li>
+        <li><strong>Add your Database:</strong><br>Copy your local SQLite database file (<code>dev.db</code>) into the <code>prisma/</code> folder.</li>
+        <li><strong>Install Dependencies:</strong><br><pre><code>npm install</code></pre></li>
+        <li><strong>Generate Prisma Client:</strong><br><pre><code>npx prisma generate</code></pre></li>
+        <li><strong>Start the Development Server:</strong><br><pre><code>npm run dev</code></pre></li>
+    </ol>
+    
+    <p>Open <a href="http://localhost:3000">http://localhost:3000</a> with your browser to see the result.</p>
+
+    <h2>Architecture & Bug Fixes</h2>
+    <p>Please review the <code>agent_knowledge_base.html</code> file in the root directory for a complete development log.</p>
+
+  </div>
+  
+  <div id="knowledge" class="section">
+    
+    <h1>🤖 Agent Knowledge Base & Development Log</h1>
+    <p>This file documents critical architectural decisions, platform-specific bugs, and framework quirks encountered during development. Future AI agents must review this document to avoid repeating the same mistakes.</p>
+
+    <h2>Session: July 26, 2026</h2>
+    <div class="date">Features Built: Real-time Teacher-Learner Slide Synchronization, Presence Tracking, and Mobile Compatibility</div>
+
+    <div class="card bugfix">
+        <h3>🚨 CRITICAL FIX: Next.js 15 Local Network JS Hydration Block (Mobile Devices Dead)</h3>
+        <p><strong>The Problem:</strong> When testing the application on mobile devices (iPad, Xiaomi phone) via the local network IP (e.g., <code>192.168.31.222:3000</code>), the page loaded statically but <strong>all buttons and JavaScript were completely dead</strong>.</p>
+        <p><strong>The Cause:</strong> Next.js 15+ introduced a strict security policy in Development Mode that blocks cross-origin requests for Webpack HMR and JS chunks from other devices on the LAN. The server silently rejects the request, preventing React from hydrating on the client device.</p>
+        <p><strong>The Fix:</strong> You MUST explicitly whitelist the local network IPs in <code>next.config.ts</code>:</p>
+        <pre><code>const nextConfig: NextConfig = {
+  allowedDevOrigins: ['192.168.31.222', '192.168.31.0/24'],
+};</code></pre>
+    </div>
+
+    <div class="card bugfix">
+        <h3>🚨 CRITICAL FIX: iOS Safari Modal Clipping (Position Fixed Bug)</h3>
+        <p><strong>The Problem:</strong> The Auth modal (<code>position: fixed</code>) was not showing up on iPads/iPhones. The buttons worked, React state updated, but the modal was invisible.</p>
+        <p><strong>The Cause:</strong> Apple's WebKit engine (Safari/Chrome on iOS) has a notorious bug: If a <code>position: fixed</code> element is deeply nested inside a container (like <code>&lt;main&gt;</code>) that has <code>overflow: hidden</code> or a CSS <code>transform</code>, the fixed element gets clipped or trapped inside that container's boundaries.</p>
+        <p><strong>The Fix:</strong> Extracted the modal rendering logic OUTSIDE of the <code>&lt;main&gt;</code> tag using React fragments (<code>&lt;&gt;...&lt;/&gt;</code>), making it a direct child of the <code>&lt;body&gt;</code> where iOS cannot clip it.</p>
+    </div>
+
+    <div class="card bugfix">
+        <h3>🚨 CRITICAL FIX: iPad/iOS Touch Hover States</h3>
+        <p><strong>The Problem:</strong> Tailwind's <code>group-hover</code> utility works great for mice, but on touch devices, tapping the element did nothing, making the active students tooltip inaccessible.</p>
+        <p><strong>The Cause:</strong> iOS Safari ignores <code>:hover</code> states on taps unless the element is considered "interactive".</p>
+        <p><strong>The Fix:</strong> Added <code>tabindex="0"</code> and an empty <code>onclick=""</code> attribute to the parent <code>div.group</code>. This tricks iOS Safari into treating the element as clickable, instantly making the hover tooltip work perfectly on touch.</p>
+    </div>
+
+    <div class="card">
+        <h3>🏗️ Architecture Note: Smart Polling for Synchronization</h3>
+        <p><strong>Context:</strong> A 1-second polling interval for 35 students generates minimal bandwidth (~3 Mbps) but causes high database read volume (35 reads/sec). A 10-second polling interval saves resources but creates unbearable lag for the Teacher.</p>
+        <p><strong>Implementation:</strong> Implemented a dynamic <code>setTimeout</code> polling loop. When the class is in "Independent Mode", the client polls every 10 seconds. When the teacher clicks "Synchronize", the client instantly shifts to 1-second polling. This delivers a 0-lag presentation experience while conserving resources during downtime.</p>
+    </div>
+    
+    <div class="card">
+        <h3>🏗️ React Note: textContent vs innerHTML</h3>
+        <p><strong>Context:</strong> Using <code>.textContent</code> to inject strings that contain HTML tags (like <code>&lt;span class="lang-en"&gt;</code>) will literally render the HTML code as text on the screen.</p>
+        <p><strong>Implementation:</strong> When dynamically updating bilingual text via JS, use JS ternaries to select the plain text string based on <code>localStorage.getItem('courseLang')</code> rather than injecting raw HTML. This avoids both XSS risks and broken UI.</p>
+    </div>
+
+    <div class="card">
+        <h3>🏗️ Architecture Note: PC Identification via Local Storage (Option A)</h3>
+        <p><strong>Context:</strong> For school computer labs, the teacher needs to know which PC is mapped to which student without requiring students to log in with passwords.</p>
+        <p><strong>Implementation:</strong> Implement a Local Storage setup mechanism. Before the term starts, an admin opens the website on each PC and inputs a unique PC identifier (e.g., "PC-01"). This is saved in <code>localStorage.setItem('pc_id', 'PC-01')</code>. During class, the website reads this ID and authenticates. The teacher can then upload a CSV mapping PC IDs to student accounts to automatically log them in.</p>
+    </div>
+
+
+  </div>
+  
+  <div id="business" class="section">
+    
+    <div class="container">
+        <h1>EduSphere Business Plan & Platform Logic</h1>
+        <p>This document outlines the core business logic, pricing structures, and features for the EduSphere platform.</p>
+
+        <h2>1. Custom Course Creation (Order System)</h2>
+        <p>Educators can order custom interactive courses to be built by the platform team. Pricing is dynamic based on user-selected sliders.</p>
+        
+        <div class="card">
+            <h3>Pricing Bounds</h3>
+            <ul>
+                <li><strong>Max Price:</strong> $1000</li>
+                <li><strong>Min Price:</strong> $100</li>
+            </ul>
+            
+            <h3>Dynamic Variables (Sliders)</h3>
+            <ul>
+                <li><strong>Delivery Time:</strong> 5 days (Expensive) to 90 days (Cheaper)</li>
+                <li><strong>Number of Free Students:</strong> 10 to 60+</li>
+                <li><strong>Number of Total Pages:</strong> e.g., 5 to 50+</li>
+                <li><strong>Number of Interactive Pages:</strong> 1 to 20+</li>
+                <li><strong>Interactivity Complexity:</strong> Basic (Quizzes) to Advanced (Physics/Chemistry Simulations)</li>
+            </ul>
+        </div>
+
+        <h3>Revisions (Changes)</h3>
+        <ul>
+            <li>Orders closer to $1000 include up to <strong>10 free revisions</strong>.</li>
+            <li>Orders closer to $100 include <strong>1 free revision</strong>.</li>
+            <li><strong>Purchasing Extra Revisions:</strong> $20 for 5 extra revisions.</li>
+        </ul>
+
+        <h3>Refund Policy</h3>
+        <ul>
+            <li>If an educator is unsatisfied, they can reject the course for a refund.</li>
+            <li>The refund percentage is proportional to the price (e.g., $1000 order = 90% refund, $100 order = 10% refund).</li>
+        </ul>
+
+        <h2>2. Course Marketplace & Privacy</h2>
+        <p>Courses can be either <strong>Public (公開)</strong> or <strong>Private (不公開)</strong>.</p>
+
+        <div class="card">
+            <h3>Public Courses</h3>
+            <ul>
+                <li><strong>Visibility:</strong> Anyone on the marketplace can purchase and enroll as a self-paced student.</li>
+                <li><strong>Pricing:</strong> ~$10 per 20 pages.</li>
+                <li><strong>Revenue Split:</strong> 50% to the Course Creator ($5), 50% to the Platform ($5).</li>
+                <li><strong>Community Editing:</strong> Public courses can receive "Change Requests" (similar to Pull Requests) from other teachers.</li>
+                <li><strong>Conversion:</strong> Public courses can be converted to Private courses.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>Private Courses</h3>
+            <ul>
+                <li><strong>Visibility:</strong> Hidden from the public marketplace.</li>
+                <li><strong>Usage:</strong> The course owner can purchase access for their own students (~$10 per 20 pages).</li>
+                <li><strong>Sharing:</strong> The owner can share a private course via a link/code to <em>specific</em> other teachers.</li>
+                <li><strong>Shared Teacher Usage:</strong> If Teacher B receives a shared private course, they must still pay ~$10 per 20 pages for each of <em>their</em> students.</li>
+            </ul>
+        </div>
+
+        <h3>Anti-Piracy / Sharing Loopholes</h3>
+        <ul>
+            <li><strong>Risk:</strong> A person pretends to be a teacher, receives a shared course, and projects it on a screen for free.</li>
+            <li><strong>Solution 1 (Mandatory Purchase):</strong> To unlock the "Teacher Presentation Mode", the receiving teacher must purchase at least 1 student license.</li>
+            <li><strong>Solution 2 (Loss of Interactivity):</strong> If they only project it, their students cannot use the interactive tablets. The core value of EduSphere requires student licenses to sync data.</li>
+        </ul>
+
+        <div class="card">
+            <h3>Student Quota Management (Consumable Seats)</h3>
+            <ul>
+                <li><strong>Finite Resource:</strong> Student quotas are treated as <em>consumable tickets</em> rather than a maximum concurrent limit.</li>
+                <li><strong>Permanent Deduction:</strong> When a student is enrolled (manually, via CSV, or by approval), a seat ticket is permanently deducted from the course's quota.</li>
+                <li><strong>No Refunds on Removal:</strong> Removing a student from a course <strong>does not refund</strong> the seat. This strictly prevents teachers from reusing a single pool of 30 free seats year after year for new classes.</li>
+                <li><strong>Recurring Revenue:</strong> To teach a new batch of students the following year, educators must purchase additional seat quotas.</li>
+            </ul>
+        </div>
+
+        <h2>3. DIY Uploads (Self-Service)</h2>
+        <ul>
+            <li>Educators with technical skills can write their own HTML/Interactive code and upload it directly.</li>
+            <li><strong>Incentive:</strong> They receive <strong>30 free student enrollments</strong> for uploading their own content.</li>
+        </ul>
+
+        <h2>4. Monetization Strategy: Token System</h2>
+        <p>The platform will use a Virtual Token System (e.g., "EduCoins") instead of direct Fiat payments.</p>
+
+        <ul>
+            <li><strong>Reduced Transaction Fees:</strong> Buying a $4 student license directly loses 10% to credit card fees. Buying a $50 Token Bundle reduces the fee impact.</li>
+            <li><strong>Psychology:</strong> Spending virtual tokens encourages more microtransactions.</li>
+            <li><strong>Ecosystem Lock-in:</strong> Leftover tokens encourage users to return to the platform.</li>
+            <li><strong>Rewards:</strong> Tokens can be given away easily (e.g., "Get 300 Tokens for uploading a course!").</li>
+            <li><strong>Note on Refunds:</strong> Refunds will be issued in Tokens, or if real money is required, fiat value will be tracked strictly.</li>
+        </ul>
+
+        <h2>5. Future Features List</h2>
+        <ol>
+            <li>Token System implementation (Buy tokens, spend tokens on students).</li>
+            <li>Public/Private toggle in Course creation.</li>
+            <li>Marketplace for Public Courses.</li>
+            <li>Homework & Exercises System.</li>
+            <li>Exams System.</li>
+            <li>Exporting student learning hours, attendance, and scores.</li>
+            <li>Interactive Physics/Chemistry Levels.</li>
+            <li><strong>Course Ratings & Reviews:</strong> Allow students and teachers to rate and review courses in the marketplace.</li>
+            <li><strong>Developer Role:</strong> A new user role ('DEVELOPER') that can accept and fulfill "Custom Course Orders" from teachers.</li>
+        </ol>
+    </div>
+
+  </div>
+  
+  <div id="todo" class="section">
+    <h1>Project Todo List</h1>
+    <p>Track your remaining tasks here. Your progress will be saved in the browser.</p>
+    <div id="todo-list">
+        <!-- JS will render todos here -->
+    </div>
+    
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <input type="text" id="new-task" placeholder="Add a new task..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
+        <button onclick="addTask()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSection(id, btn) {
+    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // Simple LocalStorage Todo List
+  let todos = JSON.parse(localStorage.getItem('my_todos')) || [
+      { id: 1, text: "Check Quick Login functionality", done: false },
+      { id: 2, text: "Verify course expiration rules", done: false },
+      { id: 3, text: "Organize HTML documentation", done: true },
+      { id: 4, text: "Integrate Gumroad & Mianbaoduo for Payments", done: false }
+  ];
+  
+  if (!todos.find(t => t.id === 4)) {
+      todos.push({ id: 4, text: "Integrate Gumroad & Mianbaoduo for Payments", done: false });
+  }
+
+  function renderTodos() {
+      const list = document.getElementById('todo-list');
+      list.innerHTML = '';
+      todos.forEach(todo => {
+          list.innerHTML += `
+            <div class="todo-item">
+                <input type="checkbox" id="task-${todo.id}" ${todo.done ? 'checked' : ''} onchange="toggleTask(${todo.id})">
+                <label for="task-${todo.id}">${todo.text}</label>
+                <button onclick="deleteTask(${todo.id})" style="background:transparent; border:none; color:#ef4444; cursor:pointer;">✖</button>
+            </div>
+          `;
+      });
+      localStorage.setItem('my_todos', JSON.stringify(todos));
+  }
+
+  function toggleTask(id) {
+      const todo = todos.find(t => t.id === id);
+      if (todo) todo.done = !todo.done;
+      renderTodos();
+  }
+
+  function addTask() {
+      const input = document.getElementById('new-task');
+      if (!input.value.trim()) return;
+      todos.push({ id: Date.now(), text: input.value.trim(), done: false });
+      input.value = '';
+      renderTodos();
+  }
+
+  function deleteTask(id) {
+      todos = todos.filter(t => t.id !== id);
+      renderTodos();
+  }
+
+  // Initial render
+  renderTodos();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is Excel? | Interactive Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc;
+            overflow: hidden; /* Prevent scrolling, we control transitions */
+        }
+
+        /* Slide Container */
+        .slide-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease-in-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translateY(20px);
+            padding: 2rem;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .slide-container.previous {
+            transform: translateY(-20px);
+        }
+
+        /* Visual Grid Animations */
+        .demo-grid {
+            display: grid;
+            gap: 2px;
+            background-color: #334155;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        .demo-cell {
+            background-color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .demo-header {
+            background-color: #0f172a;
+            color: #cbd5e1;
+            font-weight: bold;
+        }
+
+        /* Specific Highlight Classes triggered by JS */
+        .highlight-col { background-color: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #e0f2fe; }
+        .highlight-row { background-color: rgba(167, 139, 250, 0.2); border: 1px solid #a78bfa; color: #ede9fe; }
+        .highlight-cell { 
+            background-color: #10b981; 
+            color: white; 
+            font-weight: bold; 
+            transform: scale(1.1); 
+            z-index: 10; 
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+        
+        .pulse-cell {
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Formula Animation */
+        .formula-beam {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            width: 100px;
+            opacity: 0;
+            z-index: 20;
+        }
+
+        @keyframes shootBeam {
+            0% { transform: translateX(-50px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(150px); opacity: 0; }
+        }
+
+        /* Slide 6 Excel Interaction Styles */
+        .excel-selected-blue { border: 2px dashed #38bdf8 !important; background-color: rgba(56, 189, 248, 0.1); z-index: 5; }
+        .excel-selected-red { border: 2px dashed #f87171 !important; background-color: rgba(248, 113, 113, 0.1); z-index: 5; }
+        .active-typing { border: 2px solid #10b981 !important; box-shadow: inset 0 0 10px rgba(16,185,129,0.2); background-color: #1e293b; color: white;}
+        
+        /* Slide 7 Range Selection Styles */
+        .range-selected { 
+            background-color: rgba(56, 189, 248, 0.3) !important; 
+            border: 1px solid #38bdf8 !important;
+            color: #fff;
+        }
+    
+/* Sandbox CSS */
+
+        
+
+        .layout-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .instructions-pane {
+            width: 35%;
+            min-width: 300px;
+            background-color: #1e293b;
+            border-right: 1px solid #334155;
+            padding: 2rem;
+            overflow-y: auto;
+            box-shadow: inset -10px 0 20px rgba(0,0,0,0.2);
+        }
+
+        .spreadsheet-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #0f172a;
+        }
+
+        /* Formula Bar */
+        .formula-bar-container {
+            display: flex;
+            align-items: center;
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 0.5rem 1rem;
+            gap: 1rem;
+        }
+
+        .active-cell-indicator {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: #cbd5e1;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            min-width: 3rem;
+            text-align: center;
+        }
+
+        .formula-input {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: #f8fafc;
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        .formula-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Grid Styles */
+        .grid-wrapper {
+            flex: 1;
+            overflow: auto;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .spreadsheet {
+            display: grid;
+            border-collapse: collapse;
+            background-color: #334155;
+            border: 1px solid #475569;
+            width: max-content;
+        }
+
+        .cell {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            min-width: 100px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            color: #e2e8f0;
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            user-select: none;
+            position: relative;
+            cursor: cell;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .cell.header {
+            background-color: #0f172a;
+            color: #94a3b8;
+            justify-content: center;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .cell.row-header {
+            min-width: 40px;
+            justify-content: center;
+        }
+
+        /* Selection States */
+        .cell.selected {
+            border: 2px solid #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+            z-index: 10;
+        }
+
+        .cell-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: none;
+            outline: none;
+            padding: 0 0.5rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            z-index: 20;
+        }
+
+        /* Challenge Checkmarks */
+        .task-item { transition: all 0.3s ease; }
+        .task-done { color: #10b981; text-decoration: line-through; opacity: 0.7; }
+        .task-done i { color: #10b981; }
+
+    
+</style>
+</head>
+<body>
+
+    <!-- Progress Indicator -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-800 z-50">
+        <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-500 w-0"></div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50 bg-slate-800/80 backdrop-blur-md px-6 py-3 rounded-full border border-slate-700 shadow-xl">
+        <button id="prev-btn" class="text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors" disabled>
+            <i class="fa-solid fa-chevron-left text-xl"></i>
+        </button>
+        <div class="text-slate-300 font-mono text-sm tracking-widest">
+            <span id="current-slide-num">1</span> / <span id="total-slide-num">7</span>
+        </div>
+        <button id="next-btn" class="text-emerald-400 hover:text-emerald-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            <i class="fa-solid fa-chevron-right text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Slide 1 -->
+    <div class="slide-container active" id="slide-1">
+        <div class="text-center max-w-3xl">
+            <div class="w-24 h-24 bg-emerald-600 rounded-2xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-emerald-900/50 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                <i class="fa-solid fa-file-excel text-5xl text-white"></i>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+                What is a Spreadsheet?
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-400 mb-12 leading-relaxed">
+                Before we write formulas, we need to understand the grid. It's simpler than you think.
+            </p>
+            <p class="text-slate-500 text-sm uppercase tracking-widest animate-pulse">
+                Press Right Arrow or Click Next to begin
+            </p>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide-2">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 1: THE STRUCTURE
+                </div>
+                <h2 class="text-4xl font-bold mb-6">It's just Columns and Rows.</h2>
+                <div class="space-y-6">
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-cyan-500/50 transition-colors cursor-pointer group" onmouseenter="highlightColumn()" onmouseleave="resetGrid1()">
+                        <h3 class="text-xl font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-down"></i> Columns go down
+                        </h3>
+                        <p class="text-slate-400">They are named with letters. Hover here to see Column B.</p>
+                    </div>
+                    
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-purple-500/50 transition-colors cursor-pointer group" onmouseenter="highlightRow()" onmouseleave="resetGrid1()">
+                        <h3 class="text-xl font-semibold text-purple-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-right"></i> Rows go across
+                        </h3>
+                        <p class="text-slate-400">They are named with numbers. Hover here to see Row 3.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex justify-center perspective-1000">
+                <!-- Grid 1 -->
+                <div id="grid-structure" class="demo-grid" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide-3">
+        <div class="flex flex-col md:flex-row-reverse items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 2: THE ADDRESS
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Where they meet is a <span class="text-emerald-400">Cell</span>.</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    Every box on the screen has a unique name, created by combining its Column Letter and Row Number.
+                </p>
+                
+                <div class="bg-slate-800 p-8 rounded-2xl border border-emerald-900/50 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl rounded-full"></div>
+                    <p class="text-slate-400 mb-4">Try it! Type a cell address (like B2 or D3):</p>
+                    <div class="flex items-center gap-4">
+                        <input type="text" id="cell-input" class="bg-slate-900 border-2 border-slate-600 rounded-lg px-4 py-2 text-2xl font-mono text-white w-32 uppercase focus:outline-none focus:border-emerald-500 transition-colors" placeholder="C2" maxlength="2">
+                        <button onclick="triggerCustomAnimation()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                            Find Cell
+                        </button>
+                    </div>
+                    <div id="cell-error" class="text-red-400 mt-2 text-sm hidden">Please enter a valid cell between A1 and D3.</div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex justify-center">
+                <!-- Grid 2 -->
+                <div id="grid-intersection" class="demo-grid" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide-4">
+        <div class="flex flex-col items-center max-w-5xl w-full text-center">
+            <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-4 tracking-wide">
+                STEP 3: THE MAGIC
+            </div>
+            <h2 class="text-4xl font-bold mb-4">Cells talk to each other.</h2>
+            <p class="text-xl text-slate-400 mb-12 max-w-2xl">
+                Instead of adding numbers together, you add the <em>Cells</em> together. If the numbers inside change, the total updates automatically.
+            </p>
+
+            <div class="w-full max-w-3xl bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+                
+                <div class="flex justify-between items-center mb-8">
+                    <!-- Value 1 -->
+                    <div class="text-center">
+                        <div class="text-sm font-mono text-slate-500 mb-2">Cell A1</div>
+                        <div id="demo-cell-a1" class="w-24 h-24 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
+                            100
+                        </div>
+                    </div>
+                    
+                    <div class="text-4xl text-slate-600"><i class="fa-solid fa-plus"></i></div>
+                    
+                    <!-- Value 2 -->
+                    <div class="text-center">
+                        <div class="text-sm font-mono text-slate-500 mb-2">Cell B1</div>
+                        <div id="demo-cell-b1" class="w-24 h-24 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
+                            50
+                        </div>
+                    </div>
+
+                    <div class="text-4xl text-slate-600"><i class="fa-solid fa-equals"></i></div>
+
+                    <!-- Result -->
+                    <div class="text-center relative">
+                        <div class="text-sm font-mono text-amber-400 mb-2 font-bold animate-pulse">=A1+B1</div>
+                        <div id="calc-result" class="w-32 h-24 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-4xl font-bold text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all duration-500">
+                            150
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="changeValues()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-rotate"></i> Change Numbers Automatically
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Syntax -->
+    <div class="slide-container" id="slide-5">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-pink-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 4: THE SECRET KEY
+                </div>
+                <h2 class="text-5xl font-bold mb-6">The Magic <span class="text-pink-400">Equals</span> Sign</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    By default, if you type "5+5" into a cell, Excel just thinks it's a piece of text. 
+                </p>
+                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                    To tell Excel you want it to act as a calculator, you <strong>must</strong> start with an equals sign (<code>=</code>). This is called <strong>Syntax</strong>.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-pink-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold">Try it out in the Formula Bar below:</p>
+                    <ol class="list-decimal list-inside text-slate-300 space-y-2 mb-6 ml-2">
+                        <li>Type <code class="bg-slate-900 px-2 py-1 rounded text-pink-400">10+20</code></li>
+                        <li>Then, add an equals sign at the front: <code class="bg-slate-900 px-2 py-1 rounded text-pink-400">=10+20</code></li>
+                    </ol>
+                    
+                    <div class="flex items-center gap-4 bg-slate-900 p-2 rounded-lg border border-slate-700">
+                        <div class="text-slate-500 px-3 font-mono border-r border-slate-700 italic">fx</div>
+                        <input type="text" id="syntax-input" class="bg-transparent w-full px-2 py-2 text-xl font-mono text-white focus:outline-none placeholder-slate-600" placeholder="Type here...">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-center items-center w-full">
+                <h3 class="text-slate-400 uppercase tracking-widest text-sm mb-4">What you see in the cell:</h3>
+                <div class="relative w-full max-w-sm">
+                    <div id="syntax-badge" class="absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 transition-colors shadow-lg z-10">
+                        Empty
+                    </div>
+                    <div id="syntax-result" class="w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-slate-300 relative transition-all duration-300">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Point and Click Formula -->
+    <div class="slide-container" id="slide-6">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-indigo-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 5: POINT AND CLICK
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Building Formulas by Clicking</h2>
+                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                    You don't have to type cell addresses manually. It's much faster to just click them! Let's try calculating <code>=A2-B1</code>.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-indigo-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
+                    <ul id="step-list" class="space-y-4 text-lg">
+                        <li id="s6-step-1" class="text-indigo-400 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>C2</strong></li>
+                        <li id="s6-step-2" class="text-slate-500 transition-all duration-300">2. Type the equal sign (<strong>=</strong>)</li>
+                        <li id="s6-step-3" class="text-slate-500 transition-all duration-300">3. Click cell <strong>A2</strong> (320)</li>
+                        <li id="s6-step-4" class="text-slate-500 transition-all duration-300">4. Type the minus sign (<strong>-</strong>)</li>
+                        <li id="s6-step-5" class="text-slate-500 transition-all duration-300">5. Click cell <strong>B1</strong> (39)</li>
+                        <li id="s6-step-6" class="text-slate-500 transition-all duration-300">6. Hit the <strong>Enter</strong> button</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full">
+                <!-- Grid 6 -->
+                <div id="grid-s6" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(3, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+
+                <!-- Success Message (Hidden initially) -->
+                <div id="s6-success" class="mt-12 hidden flex-col items-center animate-fade-in transition-all duration-500">
+                     <p class="text-emerald-400 font-bold text-xl mb-4"><i class="fa-solid fa-check-circle"></i> You did it! 281 is correct.</p>
+                     <p class="text-slate-400">Press the Right Arrow to continue.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Entire Rows and Columns -->
+    <div class="slide-container" id="slide-7">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 6: ENTIRE ROWS & COLUMNS
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Selecting Everything</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    Need to select an entire line of data? You can click the <strong>Column Letter</strong> or the <strong>Row Number</strong> at the edges of the grid. Excel uses a colon without numbers to indicate a full column (like <code>A:A</code>).
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-cyan-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-hand-pointer text-cyan-400"></i> Click on a Letter (A-D) or Number (1-4) on the grid:</p>
+                    
+                    <div class="flex flex-col items-center justify-center bg-slate-900 p-6 rounded-xl border border-slate-700 mt-6">
+                        <span class="text-slate-500 text-sm mb-2 uppercase tracking-widest">Excel Syntax</span>
+                        <div id="s7-range-display" class="text-5xl font-mono font-bold text-cyan-400 transition-all duration-200">
+                            -
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 7 -->
+                <div id="grid-s7" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Ranges -->
+    <div class="slide-container" id="slide-8">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-sky-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 7: RANGES
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Grouping Cells Together</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    A <strong>Range</strong> is a collection of two or more cells. Instead of writing <code>=A1+A2+A3+A4</code>, Excel uses a colon (<strong>:</strong>) to connect the first and last cells.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-sky-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-sky-400"></i> Click and drag on the grid to create a range:</p>
+                    
+                    <div class="flex flex-col items-center justify-center bg-slate-900 p-6 rounded-xl border border-slate-700 mt-6">
+                        <span class="text-slate-500 text-sm mb-2 uppercase tracking-widest">Selected Range</span>
+                        <div id="range-display" class="text-5xl font-mono font-bold text-sky-400 transition-all duration-200">
+                            A1
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 8 -->
+                <div id="grid-s8" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px; cursor: crosshair;">
+                    <!-- JS will populate this -->
+                </div>
+                
+                <!-- Success indicator for Slide 8 -->
+                <div id="s8-success" class="mt-8 text-sky-400 font-bold opacity-0 transition-opacity duration-500">
+                    <i class="fa-solid fa-check-circle"></i> Range Selected! Press Right Arrow to continue.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Math Operators -->
+    <div class="slide-container" id="slide-9">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-yellow-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 8: THE MATH OPERATORS
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Excel's Calculator Keys</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    Excel can do any math you want, but the symbols might look a little different than a math textbook.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-yellow-900/50 shadow-xl space-y-4">
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-900 text-xl">+</kbd>
+                        <span class="text-slate-300 text-lg">Addition</span>
+                    </div>
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-900 text-xl">-</kbd>
+                        <span class="text-slate-300 text-lg">Subtraction</span>
+                    </div>
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-yellow-500/10"></div>
+                        <kbd class="bg-yellow-600 text-white font-mono px-3 py-1 rounded border-b-2 border-yellow-800 text-xl relative z-10">*</kbd>
+                        <span class="text-slate-200 text-lg font-bold relative z-10">Multiplication (Asterisk)</span>
+                    </div>
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
+                         <div class="absolute inset-0 bg-yellow-500/10"></div>
+                        <kbd class="bg-yellow-600 text-white font-mono px-3 py-1 rounded border-b-2 border-yellow-800 text-xl relative z-10">/</kbd>
+                        <span class="text-slate-200 text-lg font-bold relative z-10">Division (Forward Slash)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full">
+                <div class="w-full max-w-md bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+                    <p class="text-slate-400 mb-6 text-center font-semibold uppercase tracking-wider text-sm">Try the different operators:</p>
+                    <div class="flex justify-center gap-3 mb-8">
+                        <button id="btn-op-add" onclick="setOperator('+')" class="s9-op-btn w-12 h-12 bg-emerald-600 border-2 border-emerald-400 rounded-lg text-2xl font-mono text-white transition-colors">+</button>
+                        <button id="btn-op-sub" onclick="setOperator('-')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">-</button>
+                        <button id="btn-op-mul" onclick="setOperator('*')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">*</button>
+                        <button id="btn-op-div" onclick="setOperator('/')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">/</button>
+                    </div>
+
+                    <div class="flex justify-center items-center gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-sm font-mono text-slate-500 mb-1">A1</div>
+                            <div class="w-16 h-16 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-xl font-bold text-white">120</div>
+                        </div>
+                        <div id="s9-formula-op" class="text-3xl text-emerald-400 font-mono font-bold">+</div>
+                        <div class="text-center">
+                            <div class="text-sm font-mono text-slate-500 mb-1">B1</div>
+                            <div class="w-16 h-16 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-xl font-bold text-white">10</div>
+                        </div>
+                        <div class="text-3xl text-slate-600 font-mono">=</div>
+                    </div>
+
+                    <div class="text-center">
+                        <div id="s9-result" class="w-full h-20 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-5xl font-bold text-emerald-400 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.2)]">130</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Formulas Application -->
+    <div class="slide-container" id="slide-10">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 9: PUTTING IT TOGETHER
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Calculate the Cost</h2>
+                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                    Let's use multiplication in a real scenario. Find the Total Cost of the Apples by multiplying Quantity by Price (<code>=B2*C2</code>).
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-amber-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
+                    <ul id="s10-step-list" class="space-y-4 text-lg">
+                        <li id="s10-step-1" class="text-amber-400 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>D2</strong></li>
+                        <li id="s10-step-2" class="text-slate-500 transition-all duration-300">2. Type the equal sign (<strong>=</strong>)</li>
+                        <li id="s10-step-3" class="text-slate-500 transition-all duration-300">3. Click cell <strong>B2</strong> (5)</li>
+                        <li id="s10-step-4" class="text-slate-500 transition-all duration-300">4. Type the multiply sign (<strong>*</strong>)</li>
+                        <li id="s10-step-5" class="text-slate-500 transition-all duration-300">5. Click cell <strong>C2</strong> (20)</li>
+                        <li id="s10-step-6" class="text-slate-500 transition-all duration-300">6. Hit the <strong>Enter</strong> button</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full">
+                <!-- Grid 10 -->
+                <div id="grid-s10" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+
+                <button id="final-sandbox-btn" class="mt-12 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-105 flex items-center gap-3 opacity-0 pointer-events-none" onclick="document.getElementById('sandbox-wrapper').style.display = 'flex';">
+                    Start Coding in the Sandbox <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide-container');
+            const totalSlides = slides.length;
+            let currentSlideIndex = 0;
+
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const currentNumSpan = document.getElementById('current-slide-num');
+            const progressBar = document.getElementById('progress-bar');
+
+            // Initialize Grids
+            buildGrid('grid-structure', 5, 4); // Cols A-D, Rows 1-3
+            buildGrid('grid-intersection', 5, 4);
+            buildSlide6Grid();
+            buildSlide7Grid();
+            buildSlide8Grid();
+            buildSlide10Grid();
+            
+            // Automatically sync total slide display with actual DOM elements
+            document.getElementById('total-slide-num').textContent = totalSlides;
+
+            function updateUI() {
+                // Update slides visibility
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'previous');
+                    if (index === currentSlideIndex) {
+                        slide.classList.add('active');
+                    } else if (index < currentSlideIndex) {
+                        slide.classList.add('previous');
+                    }
+                });
+
+                // Update controls
+                prevBtn.disabled = currentSlideIndex === 0;
+                nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+                currentNumSpan.textContent = currentSlideIndex + 1;
+                
+                // Update Progress bar
+                progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
+
+                // Trigger specific slide animations
+                if (currentSlideIndex === 2) {
+                    setTimeout(animateIntersection, 500);
+                }
+            }
+
+            function nextSlide() {
+                if (currentSlideIndex < totalSlides - 1) {
+                    currentSlideIndex++;
+                    updateUI();
+                }
+            }
+
+            function prevSlide() {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    updateUI();
+                }
+            }
+
+            // Event Listeners
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                // Prevent slide navigation when typing in inputs
+                if (e.target.tagName === 'INPUT') return;
+
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            });
+
+            // --- Grid Building Utilities ---
+            function buildGrid(containerId, cols, rows) {
+                const container = document.getElementById(containerId);
+                const letters = ['A', 'B', 'C', 'D'];
+
+                // Top left empty
+                container.appendChild(createCell('', 'demo-header'));
+
+                // Col Headers
+                for (let i = 0; i < cols - 1; i++) {
+                    container.appendChild(createCell(letters[i], 'demo-header'));
+                }
+
+                // Rows
+                for (let r = 1; r < rows; r++) {
+                    container.appendChild(createCell(r, 'demo-header')); // Row Header
+                    for (let c = 0; c < cols - 1; c++) {
+                        const cell = createCell('', 'demo-cell');
+                        cell.id = `${containerId}-${letters[c]}${r}`;
+                        container.appendChild(cell);
+                    }
+                }
+            }
+
+            function createCell(text, className) {
+                const div = document.createElement('div');
+                div.className = className;
+                div.textContent = text;
+                return div;
+            }
+
+            // --- Slide 2 Interactions ---
+            window.highlightColumn = function() {
+                resetGrid1();
+                const containerId = 'grid-structure';
+                // Highlight Col B (Header + cells)
+                const cells = document.getElementById(containerId).children;
+                // Hardcoded indices based on grid structure (5 cols)
+                // Header B is index 2. Cells below are 2+5, 2+10, 2+15
+                cells[2].classList.add('highlight-col');
+                cells[7].classList.add('highlight-col');
+                cells[12].classList.add('highlight-col');
+                cells[17].classList.add('highlight-col');
+            }
+
+            window.highlightRow = function() {
+                resetGrid1();
+                const containerId = 'grid-structure';
+                const cells = document.getElementById(containerId).children;
+                // Highlight Row 3
+                // Header 3 is index 15. Cells are 16, 17, 18, 19
+                for(let i=15; i<=19; i++) {
+                    cells[i].classList.add('highlight-row');
+                }
+            }
+
+            window.resetGrid1 = function() {
+                const containerId = 'grid-structure';
+                const cells = document.getElementById(containerId).children;
+                for (let cell of cells) {
+                    cell.classList.remove('highlight-col', 'highlight-row');
+                }
+            }
+
+            // --- Slide 3 Animations ---
+            function animateIntersection(targetCol = 'C', targetRow = '2') {
+                const containerId = 'grid-intersection';
+                const cells = document.getElementById(containerId).children;
+                
+                // Clear previous
+                for (let cell of cells) {
+                    cell.classList.remove('highlight-col', 'highlight-row', 'highlight-cell');
+                    if (cell.classList.contains('demo-cell')) {
+                        cell.textContent = '';
+                    }
+                }
+
+                const columns = ['A', 'B', 'C', 'D'];
+                const colIndex = columns.indexOf(targetCol);
+                const rowIndex = parseInt(targetRow);
+
+                if (colIndex === -1 || isNaN(rowIndex) || rowIndex < 1 || rowIndex > 3) {
+                     document.getElementById('cell-error').classList.remove('hidden');
+                     return;
+                }
+                
+                document.getElementById('cell-error').classList.add('hidden');
+
+                // Calculate Indices based on a 5x4 grid (0-indexed)
+                // Col Header is at index: colIndex + 1
+                // Cells in that col are at: (row * 5) + (colIndex + 1)
+                
+                const colHeaderIndex = colIndex + 1;
+                const colCells = [
+                    colHeaderIndex,
+                    1 * 5 + colHeaderIndex,
+                    2 * 5 + colHeaderIndex,
+                    3 * 5 + colHeaderIndex
+                ];
+
+                // Row Header is at index: rowIndex * 5
+                // Cells in that row are at: (rowIndex * 5) + 1 to 4
+                const rowHeaderIndex = rowIndex * 5;
+                const rowCells = [
+                    rowHeaderIndex,
+                    rowHeaderIndex + 1,
+                    rowHeaderIndex + 2,
+                    rowHeaderIndex + 3,
+                    rowHeaderIndex + 4
+                ];
+                
+                const targetCellIndex = (rowIndex * 5) + colIndex + 1;
+
+                // Highlight Column
+                colCells.forEach((idx, i) => {
+                     setTimeout(() => {
+                         if(cells[idx]) cells[idx].classList.add('highlight-col');
+                     }, i * 200);
+                });
+
+                // Highlight Row
+                setTimeout(() => {
+                    rowCells.forEach((idx, i) => {
+                         setTimeout(() => {
+                             if(cells[idx]) cells[idx].classList.add('highlight-row');
+                         }, i * 200);
+                    });
+                    
+                    // Highlight Intersection
+                    setTimeout(() => {
+                        if (cells[targetCellIndex]) {
+                            cells[targetCellIndex].classList.remove('highlight-col'); 
+                            cells[targetCellIndex].classList.add('highlight-cell'); 
+                            cells[targetCellIndex].textContent = `${targetCol}${targetRow}`;
+                        }
+                    }, rowCells.length * 200 + 200);
+                }, colCells.length * 200 + 200);
+            }
+
+            window.triggerCustomAnimation = function() {
+                const input = document.getElementById('cell-input').value.toUpperCase();
+                if (input.length >= 2) {
+                    const col = input.charAt(0);
+                    const row = input.charAt(1);
+                    animateIntersection(col, row);
+                } else {
+                     document.getElementById('cell-error').classList.remove('hidden');
+                }
+            }
+            
+            // Allow pressing Enter in the input
+            document.getElementById('cell-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    triggerCustomAnimation();
+                }
+            });
+
+            // --- Slide 4 Interactions ---
+            window.changeValues = function() {
+                const val1 = document.getElementById('demo-cell-a1');
+                const val2 = document.getElementById('demo-cell-b1');
+                const result = document.getElementById('calc-result');
+
+                // Generate new random numbers
+                const newNum1 = Math.floor(Math.random() * 500);
+                const newNum2 = Math.floor(Math.random() * 500);
+                
+                // Animate change to cells
+                val1.style.transform = 'scale(0.9)';
+                val2.style.transform = 'scale(0.9)';
+                result.style.transform = 'scale(0.9)';
+                result.style.backgroundColor = '#1e293b'; 
+                
+                setTimeout(() => {
+                    // Update numbers
+                    val1.textContent = newNum1;
+                    val2.textContent = newNum2;
+                    val1.style.transform = 'scale(1)';
+                    val2.style.transform = 'scale(1)';
+                    
+                    // Force re-calculation based on the generated numbers
+                    const sum = newNum1 + newNum2;
+                    
+                    // Update result with delay for visual effect
+                    setTimeout(() => {
+                        result.textContent = sum;
+                        result.style.transform = 'scale(1.1)';
+                        result.style.backgroundColor = 'rgba(16, 185, 129, 0.4)';
+                        setTimeout(() => result.style.transform = 'scale(1)', 200);
+                    }, 400); 
+                }, 200);
+            }
+
+            const syntaxInput = document.getElementById('syntax-input');
+            const syntaxResult = document.getElementById('syntax-result');
+            const syntaxBadge = document.getElementById('syntax-badge');
+
+            if (syntaxInput) {
+                syntaxInput.addEventListener('input', (e) => {
+                    const val = e.target.value.trim();
+                    
+                    if (val === '') {
+                        syntaxResult.textContent = '';
+                        syntaxBadge.textContent = 'Empty';
+                        syntaxBadge.className = 'absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 transition-colors shadow-lg';
+                        syntaxResult.className = 'w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-slate-300 relative transition-all duration-300';
+                        return;
+                    }
+
+                    if (val.startsWith('=')) {
+                        const mathExpression = val.substring(1);
+                        try {
+                            // Using a simple regex to allow only numbers and basic math operators for safety
+                            if (/^[0-9+\-*/.\s()]+$/.test(mathExpression)) {
+                                // Evaluate the safe string 
+                                const result = new Function('return ' + mathExpression)();
+                                syntaxResult.textContent = result !== undefined ? result : '#ERROR!';
+                                
+                                if (result !== undefined && !isNaN(result) && result !== Infinity) {
+                                    syntaxBadge.innerHTML = '<i class="fa-solid fa-bolt text-yellow-300 mr-1"></i> Formula Active!';
+                                    syntaxBadge.className = 'absolute -top-3 -right-3 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 shadow-[0_0_15px_rgba(16,185,129,0.8)] z-10';
+                                    syntaxResult.className = 'w-full h-32 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-6xl font-bold text-emerald-400 relative transition-all duration-300 scale-105 shadow-[0_0_30px_rgba(16,185,129,0.2)]';
+                                } else {
+                                    throw new Error();
+                                }
+                            } else if (mathExpression === '') {
+                                 syntaxResult.textContent = '';
+                                 syntaxBadge.textContent = 'Waiting for math...';
+                                 syntaxBadge.className = 'absolute -top-3 -right-3 bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 shadow-lg';
+                                 syntaxResult.className = 'w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-white relative transition-all duration-300';
+                            } else {
+                                throw new Error();
+                            }
+                        } catch (err) {
+                            // Trigger Error State (e.g., if they divide by zero or type bad syntax like =+-)
+                            syntaxResult.textContent = '#NAME?';
+                            syntaxBadge.textContent = 'Syntax Error';
+                            syntaxBadge.className = 'absolute -top-3 -right-3 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 shadow-lg';
+                            syntaxResult.className = 'w-full h-32 bg-rose-900/20 rounded-xl border-2 border-rose-500 flex items-center justify-center text-4xl font-bold text-rose-400 relative transition-all duration-300';
+                        }
+                    } else {
+                        // Standard Text State
+                        syntaxResult.textContent = val;
+                        syntaxBadge.textContent = 'Just Text';
+                        syntaxBadge.className = 'absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 transition-colors shadow-lg';
+                        syntaxResult.className = 'w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-slate-300 relative transition-all duration-300';
+                    }
+                });
+            }
+            
+            // --- Slide 6 Utilities ---
+            function buildSlide6Grid() {
+                const container = document.getElementById('grid-s6');
+                const cols = ['A', 'B', 'C'];
+
+                // Header Row
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+
+                // Row 1
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('', 'demo-cell')); // A1
+                const b1 = createCell('39', 'demo-cell font-bold text-white');
+                b1.id = 's6-b1';
+                b1.style.cursor = 'pointer';
+                container.appendChild(b1);
+                container.appendChild(createCell('', 'demo-cell')); // C1
+
+                // Row 2
+                container.appendChild(createCell('2', 'demo-header'));
+                const a2 = createCell('320', 'demo-cell font-bold text-white');
+                a2.id = 's6-a2';
+                a2.style.cursor = 'pointer';
+                container.appendChild(a2);
+                container.appendChild(createCell('', 'demo-cell')); // B2
+                
+                // Transformed C2 into a true input field container
+                const c2Container = createCell('', 'demo-cell relative p-0');
+                c2Container.id = 's6-c2-container';
+                
+                const c2Input = document.createElement('input');
+                c2Input.type = 'text';
+                c2Input.id = 's6-c2';
+                c2Input.className = 'absolute inset-0 w-full h-full bg-transparent text-center font-bold text-emerald-400 focus:outline-none cursor-pointer';
+                c2Input.readOnly = true; // Readonly until clicked
+                c2Container.appendChild(c2Input);
+                
+                container.appendChild(c2Container);
+
+                // Row 3
+                container.appendChild(createCell('3', 'demo-header'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                
+                initSlide6Interaction();
+            }
+
+            window.s6State = 0;
+            
+            window.updateS6State = function(newState) {
+                window.s6State = newState;
+                for(let i=1; i<=6; i++) {
+                    const stepEl = document.getElementById('s6-step-'+i);
+                    if (!stepEl) continue;
+                    
+                    if(i === newState + 1) {
+                        stepEl.className = 'text-indigo-400 font-bold scale-105 origin-left transform transition-all duration-300';
+                    } else if (i <= newState) {
+                        stepEl.className = 'text-emerald-500 opacity-60 transition-all duration-300 flex items-center gap-2';
+                        if (!stepEl.innerHTML.includes('fa-check')) {
+                             stepEl.innerHTML = '<i class="fa-solid fa-check"></i> ' + stepEl.innerHTML;
+                        }
+                    } else {
+                        stepEl.className = 'text-slate-500 transition-all duration-300';
+                    }
+                }
+            }
+
+            function initSlide6Interaction() {
+                const c2Input = document.getElementById('s6-c2');
+                const c2Container = document.getElementById('s6-c2-container');
+                const a2 = document.getElementById('s6-a2');
+                const b1 = document.getElementById('s6-b1');
+
+                c2Container.addEventListener('click', () => {
+                    if (window.s6State === 0) {
+                        c2Container.classList.add('active-typing');
+                        c2Input.readOnly = false;
+                        c2Input.focus();
+                        updateS6State(1);
+                    } else if (window.s6State === 1 || window.s6State === 3 || window.s6State === 5) {
+                        c2Input.focus();
+                    }
+                });
+
+                // Listen to actual typing instead of global keystrokes
+                c2Input.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    if (window.s6State === 1) {
+                        if (val.includes('=')) {
+                            e.target.value = '=';
+                            updateS6State(2);
+                        } else {
+                            e.target.value = ''; // Enforce strict tutorial logic
+                        }
+                    } else if (window.s6State === 3) {
+                        if (val.includes('-')) {
+                            e.target.value = '=A2-';
+                            updateS6State(4);
+                        } else {
+                            e.target.value = '=A2';
+                        }
+                    } else if (window.s6State === 5) {
+                        e.target.value = '=A2-B1'; // Don't allow changing before enter
+                    }
+                });
+                
+                c2Input.addEventListener('keydown', (e) => {
+                    if (window.s6State === 5 && e.key === 'Enter') {
+                        e.preventDefault();
+                        c2Input.value = '281';
+                        c2Input.readOnly = true;
+                        c2Input.blur();
+                        
+                        c2Input.classList.remove('text-emerald-400');
+                        c2Input.classList.add('text-white');
+                        
+                        c2Container.classList.remove('active-typing');
+                        c2Container.classList.add('highlight-cell');
+                        a2.classList.remove('excel-selected-blue');
+                        b1.classList.remove('excel-selected-red');
+                        updateS6State(6);
+                        document.getElementById('s6-success').classList.remove('hidden');
+                        document.getElementById('s6-success').classList.add('flex');
+                    }
+                });
+
+                a2.addEventListener('click', () => {
+                    if (window.s6State === 2) {
+                        a2.classList.add('excel-selected-blue');
+                        c2Input.value = '=A2';
+                        c2Input.readOnly = false;
+                        c2Input.focus(); // Keep focus active to type the minus sign
+                        updateS6State(3);
+                    }
+                });
+                
+                b1.addEventListener('click', () => {
+                    if (window.s6State === 4) {
+                        b1.classList.add('excel-selected-red');
+                        c2Input.value = '=A2-B1';
+                        c2Input.readOnly = false;
+                        c2Input.focus(); // Keep focus active to press Enter
+                        updateS6State(5);
+                    }
+                });
+            }
+
+            // --- Slide 7 logic (Rows & Cols) ---
+            function buildSlide7Grid() {
+                const container = document.getElementById('grid-s7');
+                const cols = ['A', 'B', 'C', 'D'];
+                const numRows = 4;
+
+                // Top-left empty
+                container.appendChild(createCell('', 'demo-header'));
+                
+                // Col Headers
+                cols.forEach(c => {
+                    const th = createCell(c, 'demo-header hover:bg-slate-600 hover:text-white cursor-pointer transition-colors');
+                    th.addEventListener('click', () => selectFullColumn(c));
+                    container.appendChild(th);
+                });
+
+                for (let r = 1; r <= numRows; r++) {
+                    const rh = createCell(r, 'demo-header hover:bg-slate-600 hover:text-white cursor-pointer transition-colors');
+                    rh.addEventListener('click', () => selectFullRow(r));
+                    container.appendChild(rh);
+                    
+                    for (let c = 0; c < cols.length; c++) {
+                        const cell = createCell('', 'demo-cell transition-colors duration-200');
+                        cell.id = `s7-cell-${cols[c]}${r}`;
+                        cell.dataset.colName = cols[c];
+                        cell.dataset.row = r;
+                        container.appendChild(cell);
+                    }
+                }
+            }
+
+            function selectFullColumn(colName) {
+                clearS7Selection();
+                const display = document.getElementById('s7-range-display');
+                display.textContent = `${colName}:${colName}`;
+                
+                document.querySelectorAll('#grid-s7 .demo-cell').forEach(cell => {
+                    if (cell.dataset.colName === colName) {
+                        cell.classList.add('range-selected');
+                    }
+                });
+            }
+
+            function selectFullRow(rowNum) {
+                clearS7Selection();
+                const display = document.getElementById('s7-range-display');
+                display.textContent = `${rowNum}:${rowNum}`;
+                
+                document.querySelectorAll('#grid-s7 .demo-cell').forEach(cell => {
+                    if (parseInt(cell.dataset.row) === rowNum) {
+                        cell.classList.add('range-selected');
+                    }
+                });
+            }
+
+            function clearS7Selection() {
+                document.querySelectorAll('#grid-s7 .demo-cell').forEach(cell => {
+                    cell.classList.remove('range-selected');
+                });
+            }
+
+            // --- Slide 8 Range Logic ---
+            let isDragging = false;
+            let rangeStart = null;
+            let rangeEnd = null;
+
+            function buildSlide8Grid() {
+                const container = document.getElementById('grid-s8');
+                const cols = ['A', 'B', 'C', 'D'];
+                const numRows = 5;
+
+                // Header Row
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+
+                // Rows
+                for (let r = 1; r <= numRows; r++) {
+                    container.appendChild(createCell(r, 'demo-header'));
+                    
+                    for (let c = 0; c < cols.length; c++) {
+                        const cell = createCell('', 'demo-cell transition-colors duration-100');
+                        // Store coordinates for easy math later
+                        cell.dataset.col = c;
+                        cell.dataset.row = r;
+                        cell.dataset.colName = cols[c];
+                        cell.id = `s8-${cols[c]}${r}`;
+                        
+                        // Event Listeners for dragging
+                        cell.addEventListener('mousedown', (e) => startRangeSelect(e, c, r, cols[c]));
+                        cell.addEventListener('mouseenter', (e) => updateRangeSelect(e, c, r, cols[c]));
+                        
+                        container.appendChild(cell);
+                    }
+                }
+                
+                // Stop dragging when mouse goes up anywhere on the window
+                window.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        document.getElementById('s8-success').classList.remove('opacity-0');
+                    }
+                });
+            }
+
+            function startRangeSelect(e, colIdx, rowIdx, colName) {
+                isDragging = true;
+                rangeStart = { colIdx, rowIdx, colName };
+                rangeEnd = { colIdx, rowIdx, colName };
+                renderRange();
+            }
+
+            function updateRangeSelect(e, colIdx, rowIdx, colName) {
+                if (!isDragging) return;
+                rangeEnd = { colIdx, rowIdx, colName };
+                renderRange();
+            }
+
+            function renderRange() {
+                if (!rangeStart || !rangeEnd) return;
+
+                const minCol = Math.min(rangeStart.colIdx, rangeEnd.colIdx);
+                const maxCol = Math.max(rangeStart.colIdx, rangeEnd.colIdx);
+                const minRow = Math.min(rangeStart.rowIdx, rangeEnd.rowIdx);
+                const maxRow = Math.max(rangeStart.rowIdx, rangeEnd.rowIdx);
+
+                const cols = ['A', 'B', 'C', 'D'];
+                const displayArea = document.getElementById('range-display');
+
+                // Clear previous selection
+                document.querySelectorAll('#grid-s8 .demo-cell').forEach(cell => {
+                    cell.classList.remove('range-selected');
+                });
+
+                // Apply new selection
+                for (let r = minRow; r <= maxRow; r++) {
+                    for (let c = minCol; c <= maxCol; c++) {
+                        const cellId = `s8-${cols[c]}${r}`;
+                        const cell = document.getElementById(cellId);
+                        if (cell) {
+                            cell.classList.add('range-selected');
+                        }
+                    }
+                }
+
+                // Update text display
+                const startLabel = `${cols[minCol]}${minRow}`;
+                const endLabel = `${cols[maxCol]}${maxRow}`;
+                
+                if (startLabel === endLabel) {
+                    displayArea.textContent = startLabel;
+                } else {
+                    displayArea.textContent = `${startLabel}:${endLabel}`;
+                }
+            }
+
+            // --- Slide 9 Logic ---
+            window.setOperator = function(op) {
+                const resultEl = document.getElementById('s9-result');
+                const formulaEl = document.getElementById('s9-formula-op');
+                
+                document.querySelectorAll('.s9-op-btn').forEach(btn => {
+                    btn.classList.remove('bg-emerald-600', 'border-emerald-400');
+                    btn.classList.add('bg-slate-700', 'border-slate-600');
+                });
+                
+                const activeBtn = document.getElementById('btn-op-' + (op === '*' ? 'mul' : op === '/' ? 'div' : op === '+' ? 'add' : 'sub'));
+                activeBtn.classList.remove('bg-slate-700', 'border-slate-600');
+                activeBtn.classList.add('bg-emerald-600', 'border-emerald-400');
+                
+                formulaEl.textContent = op;
+                
+                let val1 = 120;
+                let val2 = 10;
+                let res = 0;
+                
+                if (op === '+') res = val1 + val2;
+                if (op === '-') res = val1 - val2;
+                if (op === '*') res = val1 * val2;
+                if (op === '/') res = val1 / val2;
+                
+                resultEl.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    resultEl.textContent = res;
+                    resultEl.style.transform = 'scale(1.1)';
+                    setTimeout(() => resultEl.style.transform = 'scale(1)', 200);
+                }, 150);
+            }
+
+            // --- Slide 10 Logic ---
+            function buildSlide10Grid() {
+                const container = document.getElementById('grid-s10');
+                const cols = ['A', 'B', 'C', 'D'];
+
+                // Header Row
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+
+                // Row 1 (Headers)
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('Item', 'demo-cell font-bold text-slate-400 text-sm')); 
+                container.appendChild(createCell('Qty', 'demo-cell font-bold text-slate-400 text-sm')); 
+                container.appendChild(createCell('Price', 'demo-cell font-bold text-slate-400 text-sm')); 
+                container.appendChild(createCell('Total', 'demo-cell font-bold text-amber-400 text-sm')); 
+
+                // Row 2 (Data)
+                container.appendChild(createCell('2', 'demo-header'));
+                container.appendChild(createCell('Apples', 'demo-cell text-slate-300 text-sm')); 
+                
+                const b2 = createCell('5', 'demo-cell font-bold text-white');
+                b2.id = 's10-b2';
+                b2.style.cursor = 'pointer';
+                container.appendChild(b2);
+                
+                const c2 = createCell('20', 'demo-cell font-bold text-white');
+                c2.id = 's10-c2';
+                c2.style.cursor = 'pointer';
+                container.appendChild(c2);
+                
+                // D2 Input
+                const d2Container = createCell('', 'demo-cell relative p-0');
+                d2Container.id = 's10-d2-container';
+                
+                const d2Input = document.createElement('input');
+                d2Input.type = 'text';
+                d2Input.id = 's10-d2';
+                d2Input.className = 'absolute inset-0 w-full h-full bg-transparent text-center font-bold text-amber-400 focus:outline-none cursor-pointer';
+                d2Input.readOnly = true; 
+                d2Container.appendChild(d2Input);
+                
+                container.appendChild(d2Container);
+
+                // Row 3 (Empty)
+                container.appendChild(createCell('3', 'demo-header'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                
+                initSlide10Interaction();
+            }
+
+            window.s10State = 0;
+            
+            window.updateS10State = function(newState) {
+                window.s10State = newState;
+                for(let i=1; i<=6; i++) {
+                    const stepEl = document.getElementById('s10-step-'+i);
+                    if (!stepEl) continue;
+                    
+                    if(i === newState + 1) {
+                        stepEl.className = 'text-amber-400 font-bold scale-105 origin-left transform transition-all duration-300';
+                    } else if (i <= newState) {
+                        stepEl.className = 'text-emerald-500 opacity-60 transition-all duration-300 flex items-center gap-2';
+                        if (!stepEl.innerHTML.includes('fa-check')) {
+                             stepEl.innerHTML = '<i class="fa-solid fa-check"></i> ' + stepEl.innerHTML;
+                        }
+                    } else {
+                        stepEl.className = 'text-slate-500 transition-all duration-300';
+                    }
+                }
+            }
+
+            function initSlide10Interaction() {
+                const d2Input = document.getElementById('s10-d2');
+                const d2Container = document.getElementById('s10-d2-container');
+                const b2 = document.getElementById('s10-b2');
+                const c2 = document.getElementById('s10-c2');
+
+                d2Container.addEventListener('click', () => {
+                    if (window.s10State === 0) {
+                        d2Container.classList.add('active-typing');
+                        // Use !important rules matching slide 6 behavior
+                        d2Container.style.border = '2px solid #10b981';
+                        d2Input.readOnly = false;
+                        d2Input.focus();
+                        updateS10State(1);
+                    } else if (window.s10State === 1 || window.s10State === 3 || window.s10State === 5) {
+                        d2Input.focus();
+                    }
+                });
+
+                d2Input.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    if (window.s10State === 1) {
+                        if (val.includes('=')) {
+                            e.target.value = '=';
+                            updateS10State(2);
+                        } else {
+                            e.target.value = '';
+                        }
+                    } else if (window.s10State === 3) {
+                        if (val.includes('*')) {
+                            e.target.value = '=B2*';
+                            updateS10State(4);
+                        } else {
+                            e.target.value = '=B2';
+                        }
+                    } else if (window.s10State === 5) {
+                        e.target.value = '=B2*C2'; 
+                    }
+                });
+                
+                d2Input.addEventListener('keydown', (e) => {
+                    if (window.s10State === 5 && e.key === 'Enter') {
+                        e.preventDefault();
+                        d2Input.value = '100';
+                        d2Input.readOnly = true;
+                        d2Input.blur();
+                        
+                        d2Input.classList.remove('text-amber-400');
+                        d2Input.classList.add('text-white');
+                        
+                        d2Container.style.border = 'none';
+                        d2Container.classList.remove('active-typing');
+                        d2Container.classList.add('highlight-cell'); 
+                        b2.classList.remove('excel-selected-blue');
+                        c2.classList.remove('excel-selected-red');
+                        updateS10State(6);
+                        
+                        document.getElementById('final-sandbox-btn').classList.remove('opacity-0', 'pointer-events-none');
+                        document.getElementById('final-sandbox-btn').classList.add('opacity-100');
+                    }
+                });
+
+                b2.addEventListener('click', () => {
+                    if (window.s10State === 2) {
+                        b2.classList.add('excel-selected-blue');
+                        d2Input.value = '=B2';
+                        d2Input.readOnly = false;
+                        d2Input.focus();
+                        updateS10State(3);
+                    }
+                });
+                
+                c2.addEventListener('click', () => {
+                    if (window.s10State === 4) {
+                        c2.classList.add('excel-selected-red');
+                        d2Input.value = '=B2*C2';
+                        d2Input.readOnly = false;
+                        d2Input.focus();
+                        updateS10State(5);
+                    }
+                });
+            }
+
+            // Init first UI state
+            updateUI();
+        });
+    </script>
+
+    <!-- MERGED SANDBOX -->
+    <div id="sandbox-wrapper" class="absolute top-0 left-0 w-full h-full z-50 bg-[#0f172a] flex-col" style="display: none;">
+        
+
+    <!-- Top Navigation -->
+    <header class="bg-slate-900 border-b border-slate-700 py-3 px-6 flex justify-between items-center z-10">
+        <div class="flex items-center gap-3">
+            <button onclick="document.getElementById('sandbox-wrapper').style.display = 'none';" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Back to Lesson
+            </button>
+            <div class="h-6 w-px bg-slate-700 mx-2"></div>
+            <div class="text-emerald-400 font-bold text-xl flex items-center gap-2">
+                <i class="fa-solid fa-flask"></i> Interactive Sandbox
+            </div>
+        </div>
+        <div class="text-slate-400 text-sm">
+            W3Schools Style Practice
+        </div>
+    </header>
+
+    <!-- Split Pane Container -->
+    <div class="layout-container">
+        
+        <!-- Left Pane: Instructions -->
+        <div class="instructions-pane flex flex-col">
+            <h1 class="text-3xl font-bold text-white mb-2">Exercise: Revenue Total</h1>
+            <p class="text-slate-400 mb-8 leading-relaxed">
+                Use the grid on the right to calculate the total revenue for our fruit stand. Remember to start all formulas with an equals sign (<code class="text-emerald-400 bg-slate-800 px-1 rounded">=</code>).
+            </p>
+
+            <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700 mb-8 flex-1">
+                <h2 class="text-lg font-semibold text-white mb-4 uppercase tracking-wider text-sm">Your Tasks:</h2>
+                <ul class="space-y-4">
+                    <!-- Task 1 -->
+                    <li id="task-1" class="task-item flex items-start gap-3 text-slate-300">
+                        <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
+                        <div>
+                            <strong>Apples Total:</strong> In cell <code>D2</code>, multiply the Quantity (B2) by the Price (C2).
+                            <div class="text-sm text-slate-500 mt-1">Hint: Type =B2*C2</div>
+                        </div>
+                    </li>
+                    <!-- Task 2 -->
+                    <li id="task-2" class="task-item flex items-start gap-3 text-slate-300">
+                        <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
+                        <div>
+                            <strong>Oranges Total:</strong> In cell <code>D4</code>, multiply the Quantity (B4) by the Price (C4).
+                        </div>
+                    </li>
+                    <!-- Task 3 -->
+                    <li id="task-3" class="task-item flex items-start gap-3 text-slate-300">
+                        <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
+                        <div>
+                            <strong>Grand Total:</strong> In cell <code>D5</code>, use the SUM function to add up all the totals in column D.
+                            <div class="text-sm text-slate-500 mt-1">Hint: Type =SUM(D2:D4)</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Success Message (Hidden default) -->
+            <div id="success-banner" class="bg-emerald-900/40 border border-emerald-500 rounded-xl p-6 text-center transform scale-95 opacity-0 transition-all duration-500 hidden">
+                <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-[0_0_20px_rgba(16,185,129,0.5)]">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-emerald-400 mb-2">Excellent Work!</h3>
+                <p class="text-slate-300 mb-6">You've successfully mastered cell references, math operators, and functions.</p>
+                <button class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-2 rounded-lg font-bold transition-colors w-full">
+                    Continue to Next Topic <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Pane: Spreadsheet -->
+        <div class="spreadsheet-pane">
+            <!-- Formula Bar -->
+            <div class="formula-bar-container">
+                <div id="active-cell-label" class="active-cell-indicator">A1</div>
+                <div class="text-slate-500 font-mono italic px-2">fx</div>
+                <input type="text" id="main-formula-input" class="formula-input" placeholder="Select a cell to start typing...">
+            </div>
+
+            <!-- Grid Area -->
+            <div class="grid-wrapper">
+                <div id="grid-container" class="spreadsheet">
+                    <!-- JavaScript will generate the grid here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    </div>
+
+<script>
+/* Sandbox JS */
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. Grid Configuration & State ---
+            const COLS = ['A', 'B', 'C', 'D', 'E'];
+            const ROWS = 8;
+            
+            // The central brain of our spreadsheet. Stores { value: "calculated result", formula: "what user typed" }
+            const cellData = {
+                'A1': { value: 'Item', formula: 'Item', readonly: true },
+                'B1': { value: 'Quantity', formula: 'Quantity', readonly: true },
+                'C1': { value: 'Price ($)', formula: 'Price ($)', readonly: true },
+                'D1': { value: 'Total ($)', formula: 'Total ($)', readonly: true },
+                
+                'A2': { value: 'Apples', formula: 'Apples' },
+                'B2': { value: '10', formula: '10' },
+                'C2': { value: '2', formula: '2' },
+                'D2': { value: '', formula: '' }, // User fills this
+                
+                'A3': { value: 'Bananas', formula: 'Bananas' },
+                'B3': { value: '5', formula: '5' },
+                'C3': { value: '3', formula: '3' },
+                'D3': { value: '15', formula: '=B3*C3' }, // Pre-filled example
+                
+                'A4': { value: 'Oranges', formula: 'Oranges' },
+                'B4': { value: '8', formula: '8' },
+                'C4': { value: '4', formula: '4' },
+                'D4': { value: '', formula: '' }, // User fills this
+
+                'C5': { value: 'GRAND TOTAL:', formula: 'GRAND TOTAL:', readonly: true },
+                'D5': { value: '', formula: '' } // User fills this
+            };
+
+            let activeCellId = null;
+            let isEditing = false;
+
+            const gridContainer = document.getElementById('grid-container');
+            const formulaBar = document.getElementById('main-formula-input');
+            const activeCellLabel = document.getElementById('active-cell-label');
+
+            // --- 2. Build the DOM Grid ---
+            function buildGrid() {
+                // Set CSS Grid Template Columns (Row header + 5 letter columns)
+                gridContainer.style.gridTemplateColumns = `40px repeat(${COLS.length}, 120px)`;
+
+                // Top Left Empty Corner
+                gridContainer.appendChild(createDiv('cell header', ''));
+
+                // Column Headers (A, B, C...)
+                COLS.forEach(col => {
+                    gridContainer.appendChild(createDiv('cell header', col));
+                });
+
+                // Generate Rows
+                for (let r = 1; r <= ROWS; r++) {
+                    // Row Header (1, 2, 3...)
+                    gridContainer.appendChild(createDiv('cell header row-header', r));
+                    
+                    // Cells for this row
+                    COLS.forEach(col => {
+                        const cellId = `${col}${r}`;
+                        const cellEl = createDiv('cell', '');
+                        cellEl.id = `cell-${cellId}`;
+                        cellEl.dataset.id = cellId;
+                        
+                        // Populate initial data if exists
+                        if (cellData[cellId]) {
+                            cellEl.textContent = cellData[cellId].value;
+                            if (cellData[cellId].readonly) {
+                                cellEl.classList.add('bg-slate-800', 'font-semibold');
+                            }
+                        } else {
+                            // Initialize empty state in data object
+                            cellData[cellId] = { value: '', formula: '' };
+                        }
+
+                        // Interaction Listeners
+                        cellEl.addEventListener('mousedown', () => selectCell(cellId));
+                        cellEl.addEventListener('dblclick', () => startEditing(cellId));
+
+                        gridContainer.appendChild(cellEl);
+                    });
+                }
+            }
+
+            function createDiv(className, text) {
+                const div = document.createElement('div');
+                div.className = className;
+                div.textContent = text;
+                return div;
+            }
+
+            // --- 3. Interaction Logic ---
+            function selectCell(cellId) {
+                if (isEditing) finishEditing();
+
+                // Remove previous selection
+                if (activeCellId) {
+                    const prev = document.getElementById(`cell-${activeCellId}`);
+                    if(prev) prev.classList.remove('selected');
+                }
+
+                activeCellId = cellId;
+                const activeCellEl = document.getElementById(`cell-${activeCellId}`);
+                activeCellEl.classList.add('selected');
+
+                // Sync UI
+                activeCellLabel.textContent = cellId;
+                formulaBar.value = cellData[cellId].formula || '';
+                
+                // Readonly check for formula bar
+                formulaBar.disabled = cellData[cellId].readonly === true;
+            }
+
+            function startEditing(cellId) {
+                if (cellData[cellId].readonly) return; // Prevent editing headers
+                
+                isEditing = true;
+                const cellEl = document.getElementById(`cell-${cellId}`);
+                
+                // Create inline input
+                const input = document.createElement('input');
+                input.className = 'cell-input';
+                input.value = cellData[cellId].formula; // Show formula when editing
+                
+                // Clear cell text and append input
+                cellEl.textContent = '';
+                cellEl.appendChild(input);
+                input.focus();
+
+                // Save on Enter or Blur
+                input.addEventListener('blur', () => saveCell(cellId, input.value));
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        saveCell(cellId, input.value);
+                        // Move selection down one row like real Excel
+                        const col = cellId.charAt(0);
+                        const row = parseInt(cellId.substring(1));
+                        if (row < ROWS) selectCell(`${col}${row + 1}`);
+                    }
+                });
+            }
+
+            function finishEditing() {
+                if (!activeCellId || !isEditing) return;
+                const cellEl = document.getElementById(`cell-${activeCellId}`);
+                const input = cellEl.querySelector('input');
+                if (input) {
+                    saveCell(activeCellId, input.value);
+                }
+            }
+
+            // Sync Formula Bar edits back to cell
+            formulaBar.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && activeCellId) {
+                    saveCell(activeCellId, formulaBar.value);
+                    // Force blur to remove focus from bar
+                    formulaBar.blur(); 
+                    selectCell(activeCellId); // Re-focus grid cell
+                }
+            });
+
+            // --- 4. The Calculation Engine ---
+            function saveCell(cellId, rawInput) {
+                isEditing = false;
+                
+                // 1. Save the formula typed by the user
+                cellData[cellId].formula = rawInput;
+                
+                // 2. Evaluate it to get the display value
+                const displayValue = evaluateFormula(rawInput);
+                cellData[cellId].value = displayValue;
+
+                // 3. Update the DOM
+                const cellEl = document.getElementById(`cell-${cellId}`);
+                cellEl.innerHTML = ''; // Clear inline input if exists
+                cellEl.textContent = displayValue;
+                
+                // Sync formula bar
+                formulaBar.value = rawInput;
+
+                // 4. Trigger a recalculation of the entire grid (in case other cells depend on this one)
+                recalculateGrid();
+                
+                // 5. Check if user passed the exercise
+                checkTasks();
+            }
+
+            function recalculateGrid() {
+                // In a production app, you need a dependency graph. 
+                // For this sandbox, evaluating all formulas once is enough for simple challenges.
+                Object.keys(cellData).forEach(id => {
+                    if (cellData[id].formula && cellData[id].formula.toString().startsWith('=')) {
+                        const newVal = evaluateFormula(cellData[id].formula);
+                        cellData[id].value = newVal;
+                        document.getElementById(`cell-${id}`).textContent = newVal;
+                    }
+                });
+            }
+
+            function evaluateFormula(expr) {
+                if (!expr) return '';
+                expr = expr.toString().trim().toUpperCase();
+                
+                // If it doesn't start with '=', it's just plain text/number
+                if (!expr.startsWith('=')) {
+                    return expr;
+                }
+
+                // Strip the '='
+                let mathString = expr.substring(1);
+
+                try {
+                    // Handle SUM(A1:B3) function specifically
+                    if (mathString.startsWith('SUM(')) {
+                        const sumRegex = /SUM\(([A-Z])([0-9]+):([A-Z])([0-9]+)\)/;
+                        const match = mathString.match(sumRegex);
+                        
+                        if (match) {
+                            const startCol = match[1];
+                            const startRow = parseInt(match[2]);
+                            const endCol = match[3];
+                            const endRow = parseInt(match[4]);
+                            
+                            let total = 0;
+                            // Simplification: only supporting 1D ranges (same column) for this sandbox
+                            if (startCol === endCol) {
+                                for (let r = startRow; r <= endRow; r++) {
+                                    const refId = `${startCol}${r}`;
+                                    const val = parseFloat(cellData[refId]?.value) || 0;
+                                    total += val;
+                                }
+                                return total;
+                            } else {
+                                return '#REF!'; // Too complex for simple engine
+                            }
+                        } else {
+                            return '#SYNTAX!';
+                        }
+                    }
+
+                    // Handle basic math (e.g. A1+B2)
+                    // Replace cell references with their actual numerical values
+                    const cellRefRegex = /[A-Z][0-9]+/g;
+                    mathString = mathString.replace(cellRefRegex, (match) => {
+                        const val = parseFloat(cellData[match]?.value);
+                        return isNaN(val) ? 0 : val; // Treat text as 0 in math
+                    });
+
+                    // Evaluate the resulting math string safely using Function instead of direct eval
+                    // Make sure string only contains numbers and math operators
+                    if (/^[0-9+\-*/.\s()]+$/.test(mathString)) {
+                        const result = new Function('return ' + mathString)();
+                        // Round to 2 decimal places if needed to avoid floating point weirdness
+                        return Math.round(result * 100) / 100;
+                    } else {
+                        throw new Error("Invalid characters");
+                    }
+
+                } catch (error) {
+                    return '#ERROR!';
+                }
+            }
+
+            // --- 5. Game / Validation Logic ---
+            let task1Done = false;
+            let task2Done = false;
+            let task3Done = false;
+
+            function checkTasks() {
+                // Task 1: D2 should be 20 (and ideally use a formula)
+                if (!task1Done && cellData['D2'].value == 20 && cellData['D2'].formula.startsWith('=')) {
+                    completeTask('task-1');
+                    task1Done = true;
+                }
+                
+                // Task 2: D4 should be 32
+                if (!task2Done && cellData['D4'].value == 32 && cellData['D4'].formula.startsWith('=')) {
+                    completeTask('task-2');
+                    task2Done = true;
+                }
+
+                // Task 3: D5 should be 67 (20 + 15 + 32)
+                // Wait for task 1 and 2 to be done first to avoid false positives
+                if (task1Done && task2Done && !task3Done && cellData['D5'].value == 67) {
+                    // Enforce using the SUM function
+                    if (cellData['D5'].formula.includes('SUM')) {
+                        completeTask('task-3');
+                        task3Done = true;
+                        
+                        // Show Success Banner
+                        setTimeout(() => {
+                            const banner = document.getElementById('success-banner');
+                            banner.classList.remove('hidden');
+                            // Trigger reflow for transition
+                            void banner.offsetWidth;
+                            banner.classList.remove('opacity-0', 'scale-95');
+                            banner.classList.add('opacity-100', 'scale-100');
+                        }, 500);
+                    }
+                }
+            }
+
+            function completeTask(taskId) {
+                const li = document.getElementById(taskId);
+                li.classList.add('task-done');
+                li.querySelector('i').className = 'fa-solid fa-check-circle';
+            }
+
+            // --- Initialize Everything ---
+            buildGrid();
+            // Select A1 by default
+            selectCell('A1');
+            
+            // Allow arrow keys to navigate the grid
+            document.addEventListener('keydown', (e) => {
+                if (isEditing || !activeCellId) return;
+                
+                // Don't navigate if user is typing in the formula bar at the top
+                if (document.activeElement === formulaBar && e.key !== 'Enter') return;
+                
+                const col = activeCellId.charCodeAt(0);
+                const row = parseInt(activeCellId.substring(1));
+                let nextCellId = null;
+
+                if (e.key === 'ArrowRight' && col < COLS[COLS.length-1].charCodeAt(0)) {
+                    nextCellId = String.fromCharCode(col + 1) + row;
+                } else if (e.key === 'ArrowLeft' && col > COLS[0].charCodeAt(0)) {
+                    nextCellId = String.fromCharCode(col - 1) + row;
+                } else if (e.key === 'ArrowDown' && row < ROWS) {
+                    nextCellId = String.fromCharCode(col) + (row + 1);
+                } else if (e.key === 'ArrowUp' && row > 1) {
+                    nextCellId = String.fromCharCode(col) + (row - 1);
+                }
+
+                if (nextCellId) {
+                    e.preventDefault(); // Prevent page scrolling
+                    selectCell(nextCellId);
+                }
+            });
+        });
+    
+</script>
+</body>
+</html>
