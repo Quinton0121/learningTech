@@ -73,6 +73,23 @@ export default function TokenStorePage() {
           </div>
 
         </div>
+
+        {/* Legal & Policy Notice */}
+        <div className="glass-panel" style={{ marginTop: '48px', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h4 style={{ color: '#fff', fontSize: '1rem', marginBottom: '4px' }}>🛡️ Purchase Protection & Policies</h4>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>All token transactions are encrypted and secured. Unused tokens are covered by our 14-day policy.</p>
+          </div>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <a href="/refund-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '0.9rem', textDecoration: 'none' }}>
+              💳 Refund Policy
+            </a>
+            <span style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
+            <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '0.9rem', textDecoration: 'none' }}>
+              🔒 Privacy Policy
+            </a>
+          </div>
+        </div>
       </main>
     </div>
   );

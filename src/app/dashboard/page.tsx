@@ -402,6 +402,15 @@ export default function EducatorDashboard() {
           <div onClick={() => window.open('/user-guide', '_blank')} style={{ padding: '12px 16px', color: '#10b981', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
             {t('sidebar.documentation')}
           </div>
+          <div style={{ display: 'flex', justifyContent: 'space-around', padding: '8px 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <span onClick={() => window.open('/refund-policy', '_blank')} style={{ cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-sky-400">
+              {t('footer.refundPolicy')}
+            </span>
+            <span>•</span>
+            <span onClick={() => window.open('/privacy-policy', '_blank')} style={{ cursor: 'pointer', transition: 'color 0.2s' }} className="hover:text-sky-400">
+              {t('footer.privacyPolicy')}
+            </span>
+          </div>
         </nav>
 
         <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', borderColor: 'rgba(255,100,100,0.3)', color: '#ff8a8a' }} onClick={() => {

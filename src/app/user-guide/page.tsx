@@ -4,6 +4,7 @@ import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 export default function UserGuide() {
   const { language } = useLanguage();
@@ -216,6 +217,7 @@ export default function UserGuide() {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }

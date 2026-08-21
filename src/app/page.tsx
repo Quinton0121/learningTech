@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   const router = useRouter();
@@ -233,6 +234,7 @@ export default function Home() {
         </div>
       </section>
 
+      <Footer />
     </main>
       {/* Auth Modal overlay */}
       {showAuthModal && (
