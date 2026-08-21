@@ -38,3 +38,12 @@
 - **Airwallex Approval**: Integrate Airwallex payment API once approval is completed.
 - **Database Scaling**: Plan migration from SQLite (`dev.db`) to PostgreSQL / Prisma Postgres for high concurrent write performance.
 - **Backups & Security**: Configure daily automated DB/asset backups and Cloudflare WAF/security rules.
+
+---
+
+## 6. Payment Compliance Documents & Action Items (2026-08-21)
+- **LianLian / Payment Gateway Scenario Samples**: Created and pushed to `lianlian_samples/` (including `interlectic_user_agreement.pdf` and `interlectic_course_purchase_settlement.pdf`).
+- ⚠️ **CRITICAL REMINDER TO USER**:
+  - **Confirm & Rewrite Before Use**: You **MUST** review, confirm, and rewrite the final clauses of both documents (`interlectic_user_agreement.pdf` and `interlectic_course_purchase_settlement.pdf`) before deploying to production or finalizing the payment gateway application.
+  - Check corporate entity details (珠海安得兴贸易有限公司 / USCC: `91440402MA56UATA95`), course prices, refund conditions, and payment processing terms to ensure exact alignment with actual production operations.
+
