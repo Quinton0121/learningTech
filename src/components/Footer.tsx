@@ -67,6 +67,9 @@ export default function Footer() {
             <h4 style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.5px' }}>
               {t('footer.legal')}
             </h4>
+            <Link href="/user-agreement" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}>
+              {t('footer.userAgreement')}
+            </Link>
             <Link href="/refund-policy" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}>
               {t('footer.refundPolicy')}
             </Link>
@@ -102,7 +105,11 @@ export default function Footer() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             © {currentYear} Interlectic. {t('footer.rights')}
           </p>
-          <div style={{ display: 'flex', gap: '20px' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <Link href="/user-agreement" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none' }}>
+              {t('footer.userAgreement')}
+            </Link>
+            <span style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
             <Link href="/refund-policy" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none' }}>
               {t('footer.refundPolicy')}
             </Link>

@@ -45,18 +45,6 @@ export default function RefundPolicyPage() {
       },
       {
         title: {
-          en: 'Token Policy',
-          'zh-TW': '代幣與儲值保障',
-          'zh-CN': '代币与充值保障'
-        },
-        desc: {
-          en: 'Unused platform tokens purchased within 14 days may be eligible for partial or full refund.',
-          'zh-TW': '14 天內購買且完全未經消耗之平台代幣，可申請全額或扣除手續費退還。',
-          'zh-CN': '14 天内购买且完全未经消耗的平台代币，可申请全额或扣除手续费退还。'
-        }
-      },
-      {
-        title: {
           en: 'Transparent Review',
           'zh-TW': '透明審核機制',
           'zh-CN': '透明审核机制'
@@ -72,14 +60,14 @@ export default function RefundPolicyPage() {
       {
         num: '01',
         title: {
-          en: '1. Overview & Applicability',
-          'zh-TW': '1. 適用範圍與政策總則',
-          'zh-CN': '1. 适用范围与政策总则'
+          en: '1. Overview, User Agreement & Applicability',
+          'zh-TW': '1. 適用範圍、用戶協議約束與政策總則',
+          'zh-CN': '1. 适用范围、用户协议约束与政策总则'
         },
         text: {
-          en: 'This Refund & Cancellation Policy applies to all purchases made on the Interlectic platform, including digital courses, student seat licenses, platform token packs, educator subscriptions, and custom curriculum development services. By completing a transaction on Interlectic, you acknowledge and agree to the terms outlined below.',
-          'zh-TW': '本《退款與取消政策》適用於在 Interlectic 平台進行之所有交易行為，包含數位課件、學生席位授權、平台代幣包、教師訂閱服務以及客製化課程開發等。當您在 Interlectic 完成任何購買或儲值程序時，即代表您已充分閱讀並同意遵守本政策之所有約定條款。',
-          'zh-CN': '本《退款与取消政策》适用于在 Interlectic 平台进行的所有交易行为，包含数字课件、学生席位授权、平台代币包、教师订阅服务以及定制课程开发等。当您在 Interlectic 完成任何购买或充值程序时，即代表您已充分阅读并同意遵守本政策的所有约定条款。'
+          en: 'This Refund & Cancellation Policy forms an integral part of the Interlectic User Service & Platform Registration Agreement. It applies to all purchases made on the Interlectic platform (operated by Zhuhai Andexing Trading Co., Ltd.), including digital courses, student seat licenses, platform token packs, educator subscriptions, and custom curriculum development services. By checking the agreement box during registration or completing a transaction, you acknowledge and agree to these terms.',
+          'zh-TW': '本《退款與取消政策》為 Interlectic《用戶服務與平台註冊協議》不可分割之重要組成部分。本政策適用於在 Interlectic 平台（運營主體：珠海安得興貿易有限公司）進行之所有交易行為，包含數位課件、學生席位授權、平台代幣包、教師訂閱服務以及客製化課程開發等。當您於註冊時勾選同意條款或完成任何購買儲值程序時，即代表您已充分閱讀並同意遵守本政策之所有約定。',
+          'zh-CN': '本《退款与取消政策》为 Interlectic《用户服务与平台注册协议》不可分割的重要组成部分。本政策适用于在 Interlectic 平台（运营主体：珠海安得兴贸易有限公司）进行的所有交易行为，包含数字课件、学生席位授权、平台代币包、教师订阅服务以及定制课程开发等。当您于注册时勾选同意条款或完成任何购买充值程序时，即代表您已充分阅读并同意遵守本政策的所有约定。'
         }
       },
       {

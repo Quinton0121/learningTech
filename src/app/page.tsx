@@ -28,7 +28,7 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showPcIdModal, setShowPcIdModal] = useState(false);
   const [tempPcId, setTempPcId] = useState('');
   
@@ -38,6 +38,7 @@ export default function Home() {
   const [role, setRole] = useState('LEARNER'); // 'LEARNER', 'EDUCATOR'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationToken, setVerificationToken] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
@@ -128,6 +129,14 @@ export default function Home() {
     if (!isLoginMode && step === 1 && !isForgotPasswordMode) {
       if (!name || !email || !password) {
         setStatusMsg('Please fill in all fields.');
+        return;
+      }
+      if (!hasAgreedToTerms) {
+        setStatusMsg(
+          language === 'en' 
+            ? 'Please read and agree to the User Agreement, Privacy Policy, and Refund Policy.' 
+            : (language === 'zh-TW' ? '請先閱讀並勾選同意《用戶協議》、《隱私政策》及《退款政策》。' : '请先阅读并勾选同意《用户协议》、《隐私政策》及《退款政策》。')
+        );
         return;
       }
       setStatusMsg('Sending verification code...');
@@ -534,6 +543,28 @@ export default function Home() {
                   <input type="text" placeholder="Verification Code" value={verificationCode} onChange={e => setVerificationCode(e.target.value)} required
                     style={{ padding: '12px', width: '100%', borderRadius: '8px', border: '1px solid var(--primary)', background: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '4px' }} maxLength={6} />
                 </div>
+              )}
+
+              {/* Legal Terms Checkbox - Step 1 Register */}
+              {!isLoginMode && step === 1 && !isForgotPasswordMode && (
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.82rem', color: '#a1a1a6', cursor: 'pointer', lineHeight: 1.45, marginTop: '2px', padding: '0 2px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={hasAgreedToTerms} 
+                    onChange={e => setHasAgreedToTerms(e.target.checked)} 
+                    required
+                    style={{ marginTop: '3px', accentColor: '#2997ff', cursor: 'pointer' }}
+                  />
+                  <span>
+                    {language === 'en' ? (
+                      <>I have read and agree to the <Link href="/user-agreement" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>User Agreement</Link>, <Link href="/privacy-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>Privacy Policy</Link>, and <Link href="/refund-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>Refund Policy</Link>.</>
+                    ) : (language === 'zh-TW' ? (
+                      <>我已閱讀並同意遵守 <Link href="/user-agreement" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《用戶服務協議》</Link>、<Link href="/privacy-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《隱私政策》</Link> 及 <Link href="/refund-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《退款政策》</Link>。</>
+                    ) : (
+                      <>我已阅读并同意遵守 <Link href="/user-agreement" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《用户服务协议》</Link>、<Link href="/privacy-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《隐私政策》</Link> 及 <Link href="/refund-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《退款政策》</Link>。</>
+                    ))}
+                  </span>
+                </label>
               )}
 
               <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '10px' }}>
