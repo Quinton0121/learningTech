@@ -507,3 +507,23 @@ h1, h2, h3, h4 {
     gap: 16px;
   }
 }
+
+/* =========================================================================
+   Apple-Style Scroll-Triggered Color Reveal & Focus Effect (漸現聚焦效果)
+   ========================================================================= */
+.scroll-focus-section {
+  opacity: 0.28;
+  filter: grayscale(80%) brightness(0.65) contrast(0.92) blur(1px);
+  transform: translateY(28px) scale(0.98);
+  transition: 
+    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+}
+
+.scroll-focus-section.is-visible {
+  opacity: 1;
+  filter: grayscale(0%) brightness(1) contrast(1) blur(0px);
+  transform: translateY(0) scale(1);
+}

@@ -72,6 +72,25 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [router]);
 
+  // Apple-style Scroll Focus & Color Reveal Observer
+  React.useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    }, {
+      threshold: 0.12,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    const sections = document.querySelectorAll('.scroll-focus-section');
+    sections.forEach((sec) => observer.observe(sec));
+
+    return () => observer.disconnect();
+  }, []);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatusMsg('Processing...');
@@ -234,7 +253,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px 60px', position: 'relative', textAlign: 'center' }}>
+      <section className="scroll-focus-section is-visible" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px 60px', position: 'relative', textAlign: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '850px' }} className="animate-fade-in-up">
           <div style={{ padding: '6px 16px', borderRadius: '980px', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '28px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#2997ff', fontWeight: 500, fontSize: '0.85rem', letterSpacing: '0.02em' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2997ff', display: 'inline-block' }} />
@@ -262,7 +281,7 @@ export default function Home() {
       </section>
 
       {/* Interactive Whiteboard Brands Marquee Section */}
-      <section style={{ width: '100%', padding: '40px 0 20px', position: 'relative', zIndex: 10 }}>
+      <section className="scroll-focus-section" style={{ width: '100%', padding: '40px 0 20px', position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', textAlign: 'center', marginBottom: '28px' }}>
           <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
             HARDWARE ECOSYSTEM
@@ -322,7 +341,7 @@ export default function Home() {
       </section>
 
       {/* Compatible Devices & Operating Systems Grid */}
-      <section style={{ maxWidth: '1200px', margin: '60px auto 20px', padding: '0 24px', width: '100%', position: 'relative', zIndex: 10 }}>
+      <section className="scroll-focus-section" style={{ maxWidth: '1200px', margin: '60px auto 20px', padding: '0 24px', width: '100%', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
             CROSS-PLATFORM INTEGRATION
@@ -395,8 +414,10 @@ export default function Home() {
             )
           ))}
         </div>
+      </section>
 
-        {/* Feature Highlights & Technology Introductions (Big 1 Card Per Row Bento) */}
+      {/* Feature Highlights & Technology Introductions (Big 1 Card Per Row Bento) */}
+      <section className="scroll-focus-section" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', width: '100%', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
             ENGINEERED CAPABILITIES
