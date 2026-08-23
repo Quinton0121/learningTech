@@ -219,35 +219,18 @@ export function ViewSonicLogo({ height = 24 }: { height?: number }) {
 }
 
 export function HuaweiLogo({ height = 24 }: { height?: number }) {
-  // Official Classic Huawei 8-Petal Fan Blossom & Clean Bold HUAWEI Wordmark
   return (
     <svg height={height} viewBox="0 0 115 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      {/* Huawei 8-Petal Fan Flower in Huawei Red (#CF0A2C) */}
       <g transform="translate(12, 14) scale(0.65)">
-        <path d="M0 0C-1.5 -5 -1 -12 0 -15C1 -12 1.5 -5 0 0Z" fill="#CF0A2C" />
-        <path d="M0 0C-3.5 -4.5 -5.5 -10.5 -5 -13.5C-3.5 -12 -1.5 -7 0 0Z" fill="#CF0A2C" />
-        <path d="M0 0C3.5 -4.5 5.5 -10.5 5 -13.5C3.5 -12 1.5 -7 0 0Z" fill="#CF0A2C" />
-        <path d="M0 0C-5.5 -3.5 -9.5 -7.5 -10.5 -10.5C-8.5 -10 -4.5 -6 0 0Z" fill="#CF0A2C" />
-        <path d="M0 0C5.5 -3.5 9.5 -7.5 10.5 -10.5C8.5 -10 4.5 -6 0 0Z" fill="#CF0A2C" />
-        <path d="M0 0C-7 -2 -12 -3.5 -14 -5.5C-12.5 -6 -7 -4 0 0Z" fill="#CF0A2C" />
-        <path d="M0 0C7 -2 12 -3.5 14 -5.5C12.5 -6 7 -4 0 0Z" fill="#CF0A2C" />
-        <path d="M0 0C-8 -0.5 -14 -0.5 -16 -1.5C-15 -3 -8 -2 0 0Z" fill="#CF0A2C" />
+        <ellipse cx="0" cy="-12" rx="3" ry="7" fill="#EF4444" />
+        <ellipse cx="8" cy="-8" rx="3" ry="7" transform="rotate(45, 8, -8)" fill="#EF4444" />
+        <ellipse cx="-8" cy="-8" rx="3" ry="7" transform="rotate(-45, -8, -8)" fill="#EF4444" />
+        <ellipse cx="12" cy="0" rx="3" ry="7" transform="rotate(90, 12, 0)" fill="#EF4444" />
+        <ellipse cx="-12" cy="0" rx="3" ry="7" transform="rotate(-90, -12, 0)" fill="#EF4444" />
       </g>
-      {/* HUAWEI Clean Bold Typography */}
-      <g fill="#F5F5F7" transform="translate(28, 6)">
-        {/* H */}
-        <path d="M2 15V0H5.5V6H11.5V0H15V15H11.5V9H5.5V15H2Z" />
-        {/* U */}
-        <path d="M18 0H21.5V10C21.5 12.2 22.8 13 24.8 13C26.8 13 28 12.2 28 10V0H31.5V10C31.5 13.8 29 15.5 24.8 15.5C20.5 15.5 18 13.8 18 10V0Z" />
-        {/* A */}
-        <path d="M38 0H41.5L47.5 15H43.8L42.5 11.5H37L35.8 15H32L38 0ZM38 8.8H41.5L39.8 4.2L38 8.8Z" />
-        {/* W */}
-        <path d="M49 0H52.5L55 9L57.5 0H61L63.5 9L66 0H69.5L65.5 15H62.2L59.2 5.5L56.2 15H53L49 0Z" />
-        {/* E */}
-        <path d="M72 0H82V3.2H75.5V6H81V9.2H75.5V11.8H82V15H72V0Z" />
-        {/* I */}
-        <path d="M85 0H88.5V15H85V0Z" />
-      </g>
+      <text x="28" y="20" fontFamily="'Arial Black', 'Helvetica Black', sans-serif" fontWeight="900" fontSize="15" fill="#F5F5F7" letterSpacing="1">
+        HUAWEI
+      </text>
     </svg>
   );
 }
