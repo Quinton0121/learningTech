@@ -16,9 +16,9 @@ export default function RefundPolicyPage() {
       'zh-CN': '退款与取消政策'
     },
     subtitle: {
-      en: 'Learn about our refund eligibility, digital asset conditions, token balance rules, and request process.',
-      'zh-TW': '了解我們的退款資格條件、數位資產使用規範、代幣餘額處理準則及退款申請流程。',
-      'zh-CN': '了解我们的退款资格条件、数字资产使用规范、代币余额处理准则及退款申请流程。'
+      en: 'Learn about our 24-hour review eligibility, digital asset conditions, token balance rules, and request process.',
+      'zh-TW': '了解我們的 24 小時審閱資格條件、數位資產使用規範、代幣餘額處理準則及退款申請流程。',
+      'zh-CN': '了解我们的 24 小时审阅资格条件、数字资产使用规范、代币余额处理准则及退款申请流程。'
     },
     lastUpdated: {
       en: 'Last updated: August 2026',
@@ -33,26 +33,38 @@ export default function RefundPolicyPage() {
     summaryCards: [
       {
         title: {
-          en: '7-Day Review Period',
-          'zh-TW': '7 天審閱期保障',
-          'zh-CN': '7 天审阅期保障'
+          en: '24-Hour Review Window',
+          'zh-TW': '24 小時審閱期保障',
+          'zh-CN': '24 小时审阅期保障'
         },
         desc: {
-          en: 'Standard digital course orders qualify for evaluation if unused or below the access threshold.',
-          'zh-TW': '未開啟或學習進度低於門檻之標準數位課程，享有 7 天內申請評估權益。',
-          'zh-CN': '未开启或学习进度低于门槛的标准数字课程，享有 7 天内申请评估权益。'
+          en: 'Digital courseware and unconsumed token packs qualify for evaluation and cancellation within 24 hours of purchase.',
+          'zh-TW': '購買後 24 小時內未開啟或未經消耗之數位課件與代幣，享有申請撤銷與退款評估權益。',
+          'zh-CN': '购买后 24 小时内未开启或未经消耗的数字课件与代币，享有申请撤销与退款评估权益。'
+        }
+      },
+      {
+        title: {
+          en: 'Unconsumed Tokens',
+          'zh-TW': '未消耗代幣保障',
+          'zh-CN': '未消耗代币保障'
+        },
+        desc: {
+          en: 'Unused platform tokens requested within 24 hours are eligible for 100% direct refund.',
+          'zh-TW': '24 小時內購買且完全未經消耗（0 消耗）之平台代幣，享有 100% 全額退款保障。',
+          'zh-CN': '24 小时内购买且完全未经消耗（0 消耗）的平台代币，享有 100% 全额退款保障。'
         }
       },
       {
         title: {
           en: 'Transparent Review',
-          'zh-TW': '透明審核機制',
-          'zh-CN': '透明审核机制'
+          'zh-TW': '快速審核機制',
+          'zh-CN': '快速审核机制'
         },
         desc: {
-          en: 'Requests are reviewed within 3-5 business days with direct status updates.',
-          'zh-TW': '所有退款申請均於 3 至 5 個工作天內完成查驗並通知處理結果。',
-          'zh-CN': '所有退款申请均于 3 至 5 个工作日内完成查验并通知处理结果。'
+          en: 'Requests are audited within 24-48 business hours with direct status updates.',
+          'zh-TW': '所有退款申請均於 24 至 48 小時內完成查驗並即時通知處理結果。',
+          'zh-CN': '所有退款申请均于 24 至 48 小时内完成查验并实时通知处理结果。'
         }
       }
     ],
@@ -73,9 +85,9 @@ export default function RefundPolicyPage() {
       {
         num: '02',
         title: {
-          en: '2. Token Purchases & Balance Refunds',
-          'zh-TW': '2. 平台代幣與儲值退款規範',
-          'zh-CN': '2. 平台代币与充值退款规范'
+          en: '2. Token Purchases & Balance Refunds (24-Hour Rule)',
+          'zh-TW': '2. 平台代幣與儲值退款規範（24 小時準則）',
+          'zh-CN': '2. 平台代币与充值退款规范（24 小时准则）'
         },
         text: {
           en: 'Platform tokens are virtual units used to unlock courses, license seats, and custom tools:',
@@ -84,9 +96,9 @@ export default function RefundPolicyPage() {
         },
         items: [
           {
-            en: 'Unused Token Packs: If a purchased token pack has not been used (0 tokens spent), you may request a 100% refund within 14 calendar days of purchase.',
-            'zh-TW': '完全未使用之代幣包：自購買日起 14 個日曆天內，若該筆代幣完全未使用（消耗額為 0），可申請 100% 全額退款。',
-            'zh-CN': '完全未使用之代币包：自购买日起 14 个日历天内，若该笔代币完全未使用（消耗额为 0），可申请 100% 全额退款。'
+            en: 'Unused Token Packs: If a purchased token pack has not been used (0 tokens spent), you may request a 100% refund within 24 hours of purchase.',
+            'zh-TW': '完全未使用之代幣包：自購買完成起 24 小時內，若該筆代幣完全未使用（消耗額為 0），可申請 100% 全額退款。',
+            'zh-CN': '完全未使用之代币包：自购买完成起 24 小时内，若该笔代币完全未使用（消耗额为 0），可申请 100% 全额退款。'
           },
           {
             en: 'Partially Consumed Tokens: Token packs that have been partially spent cannot be refunded, except where mandated by local consumer protection statutes in Macau or the purchase jurisdiction.',
@@ -103,9 +115,9 @@ export default function RefundPolicyPage() {
       {
         num: '03',
         title: {
-          en: '3. Digital Courses & Courseware License Refunds',
-          'zh-TW': '3. 數位課程與課件授權退款條件',
-          'zh-CN': '3. 数字课程与课件授权退款条件'
+          en: '3. Digital Courses & Courseware License Refunds (24-Hour Review)',
+          'zh-TW': '3. 數位課程與課件授權退款條件（24 小時審閱）',
+          'zh-CN': '3. 数字课程与课件授权退款条件（24 小时审阅）'
         },
         text: {
           en: 'Due to the immediate delivery nature of digital educational assets, refunds for courseware and student licenses are governed by the following criteria:',
@@ -114,9 +126,9 @@ export default function RefundPolicyPage() {
         },
         items: [
           {
-            en: 'Eligibility Window: Refund requests must be submitted within 7 calendar days of the course purchase date.',
-            'zh-TW': '申請時效：退款申請必須於課程購買完成日起 7 個日曆天內正式提出。',
-            'zh-CN': '申请时效：退款申请必须于课程购买完成日起 7 个日历天内正式提出。'
+            en: 'Eligibility Window: Refund requests must be submitted within 24 hours of the course purchase timestamp.',
+            'zh-TW': '申請時效：退款申請必須於課程購買完成時間戳記起 24 小時內正式提出。',
+            'zh-CN': '申请时效：退款申请必须于课程购买完成时间戳记起 24 小时内正式提出。'
           },
           {
             en: 'Usage Limitation: The course must have been accessed for less than 15% of total interactive slides/modules, and no offline teaching kits or bundled resources have been downloaded.',
@@ -124,9 +136,9 @@ export default function RefundPolicyPage() {
             'zh-CN': '进度限制：课件互动模块开启与浏览比例须低于总内容的 15%，且尚未下载配套的离线教案或专用课件包。'
           },
           {
-            en: 'Student Seat Packages: If you purchased student seat licenses in bulk, unassigned and inactivated seats may be refunded on a pro-rata basis within 14 days.',
-            'zh-TW': '批量學生席位：若購買多席位學生授權，自購買日起 14 天內，完全未指派且未啟動之席位可按比例申請退還代幣或原款項。',
-            'zh-CN': '批量学生席位：若购买多席位学生授权，自购买日起 14 天内，完全未指派且未启动的席位可按比例申请退还代币或原款项。'
+            en: 'Student Seat Packages: If you purchased student seat licenses in bulk, unassigned and inactivated seats may be refunded within 24 hours of purchase.',
+            'zh-TW': '批量學生席位：若購買多席位學生授權，自購買日起 24 小時內，完全未指派且未啟動之席位可申請退還代幣或原款項。',
+            'zh-CN': '批量学生席位：若购买多席位学生授权，自购买日起 24 小时内，完全未指派且未启动的席位可申请退还代币或原款项。'
           }
         ]
       },
@@ -144,9 +156,9 @@ export default function RefundPolicyPage() {
         },
         items: [
           {
-            en: 'Pre-Development Phase: A full refund minus a 5% administrative fee is available if the project is cancelled before our engineering and instructional design teams commence production.',
-            'zh-TW': '開發前階段：若於工程與教材設計團隊正式啟動製作前提出取消，可申請退款，惟須扣除 5% 行政與金流手續費。',
-            'zh-CN': '开发前阶段：若于工程与教材设计团队正式启动制作前提出取消，可申请退款，惟须扣除 5% 行政与金流手续费。'
+            en: 'Pre-Development Phase: A full refund minus a 5% administrative fee is available if cancelled within 24 hours and before our engineering and design teams commence production.',
+            'zh-TW': '開發前階段：若於 24 小時內且工程與教材設計團隊正式啟動製作前提出取消，可申請退款，惟須扣除 5% 行政與金流手續費。',
+            'zh-CN': '开发前阶段：若于 24 小时内且工程与教材设计团队正式启动制作前提出取消，可申请退款，惟须扣除 5% 行政与金流手续费。'
           },
           {
             en: 'Post-Commencement Phase: Once custom prototype development or scripting has begun, milestone payments correspond to completed deliverables and are non-refundable.',
@@ -169,9 +181,9 @@ export default function RefundPolicyPage() {
         },
         items: [
           {
-            en: 'The refund request was submitted after the expiration of the eligible review window.',
-            'zh-TW': '超過本政策規定之 7 天或 14 天退款申請期限者。',
-            'zh-CN': '超过本政策规定的 7 天或 14 天退款申请期限者。'
+            en: 'The refund request was submitted after the expiration of the 24-hour review window.',
+            'zh-TW': '超過本政策規定之 24 小時審閱退款申請時限者。',
+            'zh-CN': '超过本政策规定的 24 小时审阅退款申请时限者。'
           },
           {
             en: 'The account has violated our Community Guidelines, Acceptable Use Policy, or is found sharing unauthorized access/pirating course materials.',
@@ -199,139 +211,122 @@ export default function RefundPolicyPage() {
         },
         items: [
           {
-            en: '1. Send an email to support@interlectic.com with the subject "Refund Request - [Your Order / Account Email]".',
-            'zh-TW': '1. 請發送電子郵件至 support@interlectic.com，郵件主旨註明「退款申請 - [您的訂單編號 / 帳號電郵]」。',
-            'zh-CN': '1. 请发送电子邮件至 support@interlectic.com，邮件主旨注明“退款申请 - [您的订单编号 / 账号邮箱]”。'
+            en: '1. Contact our official support team at support@interlectic.com within 24 hours of transaction completion.',
+            'zh-TW': '1. 於交易完成後 24 小時內，寄信至官方客服信箱 support@interlectic.com。',
+            'zh-CN': '1. 于交易完成后 24 小时内，发信至官方客服邮箱 support@interlectic.com。'
           },
           {
-            en: '2. Include your registered email address, transaction date, course or token package name, and a clear reason for the request.',
-            'zh-TW': '2. 內文請附上註冊電郵、購買日期、品項名稱（如代幣包名稱或課程標題）及退款原因說明。',
-            'zh-CN': '2. 内文请附上注册邮箱、购买日期、品项名称（如代币包名称或课程标题）及退款原因说明。'
+            en: '2. Include your registered account email, Order/Transaction ID, purchased item name, and specific reason for the request.',
+            'zh-TW': '2. 信件中請提供您的註冊帳號、訂單/交易編號、所購項目名稱及具體退款事由。',
+            'zh-CN': '2. 邮件中请提供您的注册账号、订单/交易编号、所购项目名称及具体退款事由。'
           },
           {
-            en: '3. Our support team will review your account activity and respond within 3 to 5 business days.',
-            'zh-TW': '3. 我們的客戶支援團隊將核對學習與代幣紀錄，並於 3 至 5 個工作天內回覆審核結果。',
-            'zh-CN': '3. 我们的客户支持团队将核对学习与代币记录，并于 3 至 5 个工作日内回复审核结果。'
+            en: '3. Our billing verification department will review usage telemetry and respond within 24-48 business hours.',
+            'zh-TW': '3. 財務審核部門將核對後台課件連線日誌，並於 24 至 48 小時內回覆審核結論。',
+            'zh-CN': '3. 财务审核部门将核对后台课件连接日志，并于 24 至 48 小时内回复审核结论。'
           },
           {
-            en: '4. Approved refunds will be credited back to your original payment method (or as platform tokens, upon your choice) within 5 to 10 banking days depending on your payment provider.',
-            'zh-TW': '4. 經核准之退款將於 5 至 10 個銀行工作天內原路刷退至您的付款卡片或退回平台代幣（依您指定之方式）。',
-            'zh-CN': '4. 经核准的退款将于 5 至 10 个银行工作日内原路退回至您的付款卡片或退回平台代币（依您指定的方式）。'
+            en: '4. Approved refunds will be credited back via the original payment method or returned as platform tokens within 5-7 business days.',
+            'zh-TW': '4. 審核通過之退款將於 5 至 7 個工作天內依原支付路徑（或折返平台代幣）退回。',
+            'zh-CN': '4. 审核通过的退款将于 5 至 7 个工作日内依原支付路径（或折返平台代币）退回。'
           }
         ]
-      },
-      {
-        num: '07',
-        title: {
-          en: '7. Policy Amendments & Contact Info',
-          'zh-TW': '7. 政策修訂與聯絡資訊',
-          'zh-CN': '7. 政策修订与联系信息'
-        },
-        text: {
-          en: 'Interlectic reserves the right to modify or update this Refund Policy at any time to reflect operational, legal, or regulatory changes. Continued use of the platform after updates indicates acceptance of the revised policy. If you have questions regarding this policy, please reach out to support@interlectic.com.',
-          'zh-TW': 'Interlectic 保留因應業務調整或法規變更而隨時修改本政策之權利。修訂後的條款發布於本頁面即刻生效。如您對退款或取消條款有任何疑問，歡迎隨時透過 support@interlectic.com 與我們聯絡。',
-          'zh-CN': 'Interlectic 保留因应业务调整或法规变更而随时修改本政策的权利。修订后的条款发布于本页面即刻生效。如您对退款或取消条款有任何疑问，欢迎随时通过 support@interlectic.com 与我们联系。'
-        }
       }
     ]
   };
 
-  const getLocalized = (obj: any) => {
-    if (!obj) return '';
-    return obj[language] || obj['en'] || '';
-  };
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--background)', position: 'relative' }}>
-      <div className="bg-blob bg-blob-1" style={{ opacity: 0.2 }} />
-      <div className="bg-blob bg-blob-2" style={{ opacity: 0.15, top: '40%', right: '-100px' }} />
-
-      {/* Top Navigation */}
-      <header className="glass-panel" style={{ margin: '24px auto 0', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px', zIndex: 100 }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
-          <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '36px', objectFit: 'contain' }} />
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#fff', letterSpacing: '-0.5px' }}>
-            Interlectic
-          </h2>
-        </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.95rem', transition: 'color 0.2s' }}>
-            ← Back to Home
+    <div style={{ minHeight: '100vh', background: '#000', color: '#f5f5f7', fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', sans-serif" }}>
+      {/* Header */}
+      <header style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#fff', fontWeight: 600, fontSize: '1.1rem' }}>
+            <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '32px', width: 'auto' }} />
+            <span>Interlectic</span>
           </Link>
-          <LanguageToggle />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <LanguageToggle />
+            <Link href="/dashboard" style={{ padding: '6px 14px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.1)', color: '#fff', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500 }}>
+              {language === 'en' ? 'Dashboard' : (language === 'zh-TW' ? '進入控制台' : '进入控制台')}
+            </Link>
+          </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main style={{ maxWidth: '1000px', margin: '40px auto 80px', padding: '0 24px', flex: 1, zIndex: 10, width: '100%' }}>
-        
-        {/* Title Header */}
-        <div style={{ textAlign: 'center', marginBottom: '48px' }} className="animate-fade-in-up">
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '20px', background: 'rgba(56, 189, 248, 0.12)', border: '1px solid var(--primary)', color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '20px' }}>
-            {getLocalized(content.badge)}
+      {/* Hero */}
+      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px 100px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 14px', borderRadius: '980px', background: 'rgba(41, 151, 255, 0.12)', border: '1px solid rgba(41, 151, 255, 0.3)', color: '#2997ff', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '16px' }}>
+            {content.badge[language]}
           </div>
-          <h1 style={{ fontSize: '3.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '16px', letterSpacing: '-1px' }}>
-            {getLocalized(content.title)}
+          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', margin: '0 0 16px', lineHeight: 1.2 }}>
+            {content.title[language]}
           </h1>
-          <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: '720px', margin: '0 auto 12px', lineHeight: 1.6 }}>
-            {getLocalized(content.subtitle)}
+          <p style={{ color: '#86868b', fontSize: '1.15rem', maxWidth: '680px', margin: '0 auto 16px', lineHeight: 1.5 }}>
+            {content.subtitle[language]}
           </p>
-          <div style={{ color: '#64748b', fontSize: '0.9rem' }}>
-            {getLocalized(content.lastUpdated)}
+          <div style={{ fontSize: '0.82rem', color: '#6e6e73' }}>
+            {content.lastUpdated[language]}
           </div>
         </div>
 
-        {/* Highlight Summary Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginBottom: '48px' }}>
+        {/* Summary Highlights */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '56px' }}>
           {content.summaryCards.map((card, idx) => (
-            <div key={idx} className="glass-panel" style={{ padding: '24px', borderTop: '4px solid var(--primary)' }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
-                {getLocalized(card.title)}
+            <div key={idx} style={{ background: '#161617', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '24px', boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.06)' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#f5f5f7', margin: '0 0 8px' }}>
+                {card.title[language]}
               </h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                {getLocalized(card.desc)}
+              <p style={{ fontSize: '0.88rem', color: '#86868b', lineHeight: 1.45, margin: 0 }}>
+                {card.desc[language]}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Detailed Sections */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-          {content.sections.map((section, idx) => (
-            <section key={idx} className="glass-panel" style={{ padding: '36px', borderRadius: '16px' }}>
-              <h2 style={{ fontSize: '1.45rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {getLocalized(section.title)}
-              </h2>
-              <p style={{ color: 'var(--text-main)', fontSize: '1.02rem', lineHeight: 1.7, marginBottom: section.items ? '16px' : '0' }}>
-                {getLocalized(section.text)}
+        {/* Policy Sections */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {content.sections.map((sec, idx) => (
+            <div key={idx} style={{ background: '#161617', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '20px', padding: '32px', boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.06)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#2997ff', padding: '3px 8px', borderRadius: '6px', background: 'rgba(41, 151, 255, 0.12)' }}>
+                  {sec.num}
+                </span>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#f5f5f7', margin: 0, letterSpacing: '-0.02em' }}>
+                  {sec.title[language]}
+                </h2>
+              </div>
+              <p style={{ fontSize: '0.96rem', color: '#a1a1a6', lineHeight: 1.65, margin: '0 0 16px' }}>
+                {sec.text[language]}
               </p>
-              {section.items && (
-                <ul style={{ listStyleType: 'none', paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {section.items.map((item, itemIdx) => (
-                    <li key={itemIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', color: 'var(--text-muted)', fontSize: '0.98rem', lineHeight: 1.6, background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: '8px', borderLeft: '3px solid rgba(56, 189, 248, 0.4)' }}>
-                      <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>•</span>
-                      <span>{getLocalized(item)}</span>
+              {sec.items && (
+                <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {sec.items.map((item, itemIdx) => (
+                    <li key={itemIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.92rem', color: '#86868b', lineHeight: 1.5 }}>
+                      <span style={{ color: '#2997ff', fontWeight: 'bold' }}>•</span>
+                      <span>{item[language]}</span>
                     </li>
                   ))}
                 </ul>
               )}
-            </section>
+            </div>
           ))}
         </div>
 
-        {/* Contact Support Banner */}
-        <div className="glass-panel" style={{ marginTop: '48px', padding: '36px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(16, 185, 129, 0.1))', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px', color: '#fff' }}>
-            {language === 'zh-TW' ? '仍有退款或訂單疑問？' : language === 'zh-CN' ? '仍有退款或订单疑问？' : 'Have questions about refunds?'}
+        {/* Contact CTA */}
+        <div style={{ textAlign: 'center', marginTop: '60px', padding: '40px', background: 'radial-gradient(ellipse at center, rgba(41, 151, 255, 0.1) 0%, rgba(0,0,0,0) 70%)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '24px' }}>
+          <h3 style={{ fontSize: '1.4rem', fontWeight: 600, color: '#f5f5f7', margin: '0 0 10px' }}>
+            {language === 'en' ? 'Need Help with a Billing Inquiry?' : (language === 'zh-TW' ? '需要退款或帳務協助？' : '需要退款或账务协助？')}
           </h3>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '24px', fontSize: '1rem' }}>
-            {language === 'zh-TW' ? '我們的專屬客服團隊將隨時為您提供協助與指引。' : language === 'zh-CN' ? '我们的专属客服团队将随时为您提供协助与指引。' : 'Our support team is ready to assist you with order inquiries and policy questions.'}
+          <p style={{ color: '#86868b', fontSize: '0.95rem', maxWidth: '500px', margin: '0 auto 24px' }}>
+            {language === 'en' 
+              ? 'Our finance and customer protection team is available to assist you within 24-48 business hours.' 
+              : (language === 'zh-TW' ? '我們的財務與客戶權益保護團隊將於 24 至 48 小時內為您提供專業解答。' : '我们的财务与客户权益保护团队将于 24 至 48 小时内为您提供专业解答。')}
           </p>
-          <a href="mailto:support@interlectic.com" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex' }}>
-            Contact Support
+          <a href="mailto:support@interlectic.com" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 28px', borderRadius: '980px', background: '#2997ff', color: '#fff', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none', transition: 'all 0.2s' }}>
+            <span>support@interlectic.com</span>
           </a>
         </div>
-
       </main>
 
       <Footer />
