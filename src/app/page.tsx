@@ -280,15 +280,15 @@ export default function Home() {
           <div className="marquee-track">
             {/* First Set of Brands */}
             {[
-              { id: 'benq', desc: 'RP / RM Interactive Displays', logo: <BenQLogo height={22} /> },
-              { id: 'maxhub', desc: 'V5 / V6 Interactive Panels', logo: <MaxhubLogo height={20} /> },
-              { id: 'seewo', desc: 'Interactive Touch Boards', logo: <SeewoLogo height={20} /> },
-              { id: 'newline', desc: 'Touch Collaboration Displays', logo: <NewlineLogo height={20} /> },
-              { id: 'promethean', desc: 'ActivPanel Series', logo: <PrometheanLogo height={20} /> },
-              { id: 'smart', desc: 'Interactive Learning Ecosystem', logo: <SmartBoardLogo height={20} /> },
-              { id: 'viewsonic', desc: 'ViewBoard 4K Panels', logo: <ViewSonicLogo height={20} /> },
-              { id: 'huawei', desc: 'IdeaHub Board Education', logo: <HuaweiLogo height={20} /> },
-              { id: 'samsung', desc: 'Interactive Digital Whiteboard', logo: <SamsungLogo height={18} /> },
+              { id: 'benq', desc: 'RP / RM Interactive Displays', logo: <BenQLogo height={24} /> },
+              { id: 'maxhub', desc: 'V5 / V6 Interactive Panels', logo: <MaxhubLogo height={24} /> },
+              { id: 'seewo', desc: 'Interactive Touch Boards', logo: <SeewoLogo height={24} /> },
+              { id: 'newline', desc: 'Touch Collaboration Displays', logo: <NewlineLogo height={24} /> },
+              { id: 'promethean', desc: 'ActivPanel Series', logo: <PrometheanLogo height={24} /> },
+              { id: 'smart', desc: 'Interactive Learning Ecosystem', logo: <SmartBoardLogo height={24} /> },
+              { id: 'viewsonic', desc: 'ViewBoard 4K Panels', logo: <ViewSonicLogo height={24} /> },
+              { id: 'huawei', desc: 'IdeaHub Board Education', logo: <HuaweiLogo height={24} /> },
+              { id: 'samsung', desc: 'Interactive Digital Whiteboard', logo: <SamsungLogo height={24} /> },
             ].map((brand, idx) => (
               <div key={`brand-1-${idx}`} className="brand-pill" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '12px 26px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>{brand.logo}</div>
@@ -300,15 +300,15 @@ export default function Home() {
 
             {/* Duplicate Set for Seamless Continuous Infinite Scrolling */}
             {[
-              { id: 'benq', desc: 'RP / RM Interactive Displays', logo: <BenQLogo height={22} /> },
-              { id: 'maxhub', desc: 'V5 / V6 Interactive Panels', logo: <MaxhubLogo height={20} /> },
-              { id: 'seewo', desc: 'Interactive Touch Boards', logo: <SeewoLogo height={20} /> },
-              { id: 'newline', desc: 'Touch Collaboration Displays', logo: <NewlineLogo height={20} /> },
-              { id: 'promethean', desc: 'ActivPanel Series', logo: <PrometheanLogo height={20} /> },
-              { id: 'smart', desc: 'Interactive Learning Ecosystem', logo: <SmartBoardLogo height={20} /> },
-              { id: 'viewsonic', desc: 'ViewBoard 4K Panels', logo: <ViewSonicLogo height={20} /> },
-              { id: 'huawei', desc: 'IdeaHub Board Education', logo: <HuaweiLogo height={20} /> },
-              { id: 'samsung', desc: 'Interactive Digital Whiteboard', logo: <SamsungLogo height={18} /> },
+              { id: 'benq', desc: 'RP / RM Interactive Displays', logo: <BenQLogo height={24} /> },
+              { id: 'maxhub', desc: 'V5 / V6 Interactive Panels', logo: <MaxhubLogo height={24} /> },
+              { id: 'seewo', desc: 'Interactive Touch Boards', logo: <SeewoLogo height={24} /> },
+              { id: 'newline', desc: 'Touch Collaboration Displays', logo: <NewlineLogo height={24} /> },
+              { id: 'promethean', desc: 'ActivPanel Series', logo: <PrometheanLogo height={24} /> },
+              { id: 'smart', desc: 'Interactive Learning Ecosystem', logo: <SmartBoardLogo height={24} /> },
+              { id: 'viewsonic', desc: 'ViewBoard 4K Panels', logo: <ViewSonicLogo height={24} /> },
+              { id: 'huawei', desc: 'IdeaHub Board Education', logo: <HuaweiLogo height={24} /> },
+              { id: 'samsung', desc: 'Interactive Digital Whiteboard', logo: <SamsungLogo height={24} /> },
             ].map((brand, idx) => (
               <div key={`brand-2-${idx}`} className="brand-pill" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '12px 26px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>{brand.logo}</div>
