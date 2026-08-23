@@ -45,9 +45,9 @@ export function MaxhubLogo({ height = 24 }: { height?: number }) {
 }
 
 export function SeewoLogo({ height = 24 }: { height?: number }) {
-  // Official 希沃 (seewo) Logo: 'seewo' with the green leaf accent on the 'w' + '希沃' Chinese wordmark
+  // Official seewo Logo: English wordmark with green leaf accent on the 'w'
   return (
-    <svg height={height} viewBox="0 0 135 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <svg height={height} viewBox="0 0 105 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
       {/* 'seewo' in Seewo Cyan-Blue with Green V accent */}
       <g transform="translate(2, 4)">
         {/* s */}
@@ -62,13 +62,6 @@ export function SeewoLogo({ height = 24 }: { height?: number }) {
         <path d="M66.5 2H70.5L73.5 12L76.5 2H79.5L75.5 18H71.5L66.5 2Z" fill="#52C41A" />
         {/* o */}
         <path d="M82 10.5C82 5.2 86 1.5 91 1.5C96 1.5 100 5.2 100 10.5C100 15.8 96 19.5 91 19.5C86 19.5 82 15.8 82 10.5ZM96 10.5C96 7 93.8 4.8 91 4.8C88.2 4.8 86 7 86 10.5C86 14 88.2 16.2 91 16.2C93.8 16.2 96 14 96 10.5Z" fill="#0084FF" />
-      </g>
-      {/* '希沃' Chinese characters in bold white */}
-      <g fill="#F5F5F7" transform="translate(106, 6)">
-        {/* 希 */}
-        <path d="M5.5 0H7.5V3H12V5H8V7H12.5V9H1V7H5.5V5H1.5V3H5.5V0ZM2.5 11H11.5V17H9.5V12.8H4.5V18H2.5V11ZM6.5 12.8H7.5V16H6.5V12.8Z" />
-        {/* 沃 */}
-        <path d="M16 1C17.5 2 18.5 3 18.5 4C18.5 4.5 17.5 5 16 5L15 4C15 3 15.5 2 16 1ZM14.5 7C16 8 17 9 17 10C17 10.5 16 11 14.5 11L13.8 10C13.8 9 14 8 14.5 7ZM14.8 17L13.5 15.8C14.5 14.5 15.5 13 16.5 11.5L18 12.8C17 14.5 15.8 16 14.8 17ZM19.5 5H25.5V7H23.5V9.5H25.8V11.5H23.5V18H21.5V11.5H19.2V9.5H21.5V7H19.5V5Z" />
       </g>
     </svg>
   );
