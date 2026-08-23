@@ -325,7 +325,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '64px' }}>
+        <div className="devices-grid">
           {[
             {
               logo: <AppleLogo height={26} fill="#F5F5F7" />,
@@ -352,22 +352,37 @@ export default function Home() {
               desc: 'MacBook, iMac, dual-display teacher control & staging'
             },
             {
-              logo: <ChromeOSLogo height={25} />,
+              logo: <ChromeOSLogo height={28} />,
               os: 'ChromeOS & Linux',
-              badge: 'Web-Native',
-              desc: 'Classroom Chromebook fleets & open-source lab workstations'
+              badge: 'Web-Native Kiosk',
+              desc: 'Classroom Chromebook fleets, touch kiosks, and open-source lab workstations'
             }
           ].map((device, idx) => (
-            <div key={idx} className="device-badge">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>{device.logo}</div>
-                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.08)', color: '#2997ff', fontWeight: 500, border: '1px solid rgba(41, 151, 255, 0.25)' }}>
-                  {device.badge}
-                </span>
+            idx === 4 ? (
+              <div key={idx} className="device-badge-full">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '260px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>{device.logo}</div>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#f5f5f7', margin: 0, letterSpacing: '-0.02em' }}>{device.os}</h3>
+                </div>
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
+                  <p style={{ fontSize: '0.92rem', color: '#86868b', lineHeight: 1.5, margin: 0 }}>{device.desc}</p>
+                  <span style={{ fontSize: '0.72rem', padding: '4px 12px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.08)', color: '#2997ff', fontWeight: 500, border: '1px solid rgba(41, 151, 255, 0.25)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    {device.badge}
+                  </span>
+                </div>
               </div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#f5f5f7', margin: '8px 0 0', letterSpacing: '-0.02em' }}>{device.os}</h3>
-              <p style={{ fontSize: '0.85rem', color: '#86868b', lineHeight: 1.45, margin: 0 }}>{device.desc}</p>
-            </div>
+            ) : (
+              <div key={idx} className="device-badge">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>{device.logo}</div>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.08)', color: '#2997ff', fontWeight: 500, border: '1px solid rgba(41, 151, 255, 0.25)' }}>
+                    {device.badge}
+                  </span>
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#f5f5f7', margin: '6px 0 0', letterSpacing: '-0.02em' }}>{device.os}</h3>
+                <p style={{ fontSize: '0.9rem', color: '#86868b', lineHeight: 1.5, margin: 0 }}>{device.desc}</p>
+              </div>
+            )
           ))}
         </div>
 
