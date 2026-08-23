@@ -44,6 +44,9 @@ model User {
   // Messages
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
+
+  @@index([role])
+  @@index([createdAt])
 }
 
 model Course {
@@ -70,6 +73,11 @@ model Course {
   
   educator       User         @relation("EducatorCourses", fields: [educatorId], references: [id])
   enrollments    Enrollment[]
+
+  @@index([educatorId, isArchived])
+  @@index([isPublic, isArchived])
+  @@index([clonedFromId])
+  @@index([sharedQuotaGroupId])
 }
 
 model Enrollment {
@@ -85,6 +93,10 @@ model Enrollment {
   course Course @relation(fields: [courseId], references: [id])
 
   @@unique([userId, courseId])
+  @@index([courseId, status])
+  @@index([pcId])
+  @@index([userId, status])
+  @@index([lastSeenAt])
 }
 
 model Transaction {
@@ -95,6 +107,8 @@ model Transaction {
   createdAt   DateTime @default(now())
   
   user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
 }
 
 model Message {
@@ -107,4 +121,7 @@ model Message {
 
   sender      User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@index([receiverId, isRead])
+  @@index([senderId, createdAt])
 }
