@@ -1,163 +1,148 @@
 import React from 'react';
 
-// ==========================================
-// 1. Interactive Whiteboard & Display Brands
-// ==========================================
+// =========================================================================
+// 1. Interactive Whiteboard & Classroom Display Brands (Authentic Vectors)
+// =========================================================================
 
 export function BenQLogo({ height = 24 }: { height?: number }) {
   // Official BenQ Wordmark with iconic typography and signature BenQ purple dot
   return (
-    <svg height={height} viewBox="0 0 110 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <svg height={height} viewBox="0 0 110 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
       {/* 'B' */}
-      <path d="M6 5.5H16.5C19.8 5.5 22 7.2 22 9.8C22 11.5 20.8 12.8 19.2 13.4C21.4 14.1 22.8 15.6 22.8 18C22.8 21.2 20.2 23.5 16.2 23.5H6V5.5ZM11.2 12.6H15.8C16.8 12.6 17.5 11.9 17.5 10.9C17.5 9.9 16.8 9.2 15.8 9.2H11.2V12.6ZM11.2 19.8H16.2C17.4 19.8 18.2 19 18.2 17.9C18.2 16.8 17.4 16 16.2 16H11.2V19.8Z" fill="#541477" />
+      <path d="M4 4H15C18.5 4 21 5.8 21 8.5C21 10.2 19.8 11.6 18.2 12.2C20.5 13 22 14.6 22 17.2C22 20.6 19.2 23 15 23H4V4ZM9.5 11.2H14.5C15.8 11.2 16.5 10.4 16.5 9.2C16.5 8.2 15.8 7.5 14.5 7.5H9.5V11.2ZM9.5 19.5H14.8C16.2 19.5 17.2 18.6 17.2 17.2C17.2 16 16.2 15 14.8 15H9.5V19.5Z" fill="#A855F7" />
       {/* 'e' */}
-      <path d="M26 14.5C26 9.8 29.5 6.5 34.2 6.5C38.8 6.5 42 9.8 42 14.8V15.8H30.8C31.1 18.5 32.8 20 35.2 20C36.8 20 38.1 19.2 38.8 18.2L41.5 19.8C40.2 22 38 23.5 35 23.5C30 23.5 26 19.8 26 14.5ZM37.2 12.6C36.8 10.6 35.5 9.6 34 9.6C32.4 9.6 31.2 10.6 30.9 12.6H37.2Z" fill="#541477" />
+      <path d="M26 13.5C26 8.5 29.5 5 34.5 5C39.2 5 42.5 8.5 42.5 13.8V14.8H31C31.2 17.5 33 19.2 35.5 19.2C37.2 19.2 38.5 18.4 39.2 17.2L42 19C40.5 21.5 38 23 34.8 23C29.8 23 26 18.8 26 13.5ZM37.2 11.5C36.8 9.5 35.5 8.2 34 8.2C32.2 8.2 31.2 9.5 31 11.5H37.2Z" fill="#A855F7" />
       {/* 'n' */}
-      <path d="M46.5 7H51.2V9.8C52.4 7.8 54.6 6.5 57.5 6.5C61.8 6.5 64.5 9.2 64.5 14V23.5H59.5V14.8C59.5 12.2 58.2 10.8 56 10.8C53.5 10.8 51.5 12.5 51.5 15.2V23.5H46.5V7Z" fill="#541477" />
+      <path d="M47 5.5H52V8.2C53.2 6.2 55.5 5 58.5 5C63 5 66 7.8 66 12.8V23H60.5V13.8C60.5 11 59 9.5 56.8 9.5C54.2 9.5 52.2 11.2 52.2 14.2V23H47V5.5Z" fill="#A855F7" />
       {/* 'Q' */}
-      <path d="M68 14.5C68 8.8 72.8 4.2 79.2 4.2C85.6 4.2 90.5 8.8 90.5 14.5C90.5 17.2 89.2 19.8 87.2 21.5L91.2 25.5L88 27.5L84.2 23.8C82.8 24.5 81 24.8 79.2 24.8C72.8 24.8 68 20.2 68 14.5ZM85.5 14.5C85.5 11.2 82.8 8.8 79.2 8.8C75.6 8.8 73 11.2 73 14.5C73 17.8 75.6 20.2 79.2 20.2C82.8 20.2 85.5 17.8 85.5 14.5Z" fill="#F5F5F7" />
-      {/* Signature BenQ Purple Dot */}
-      <circle cx="97.5" cy="8" r="4.5" fill="#A855F7" />
+      <path d="M70 13.5C70 7.8 74.8 3.5 81.5 3.5C88.2 3.5 93 7.8 93 13.5C93 16.5 91.5 19.2 89.2 21L93.5 25.2L89.8 27.2L86 23.2C84.5 23.8 82.8 24 81.2 24C74.8 24 70 19.2 70 13.5ZM87.5 13.5C87.5 10 84.8 7.5 81.2 7.5C77.5 7.5 75 10 75 13.5C75 17 77.5 19.5 81.2 19.5C84.8 19.5 87.5 17 87.5 13.5Z" fill="#F5F5F7" />
+      {/* Signature BenQ Purple Accent Dot */}
+      <circle cx="101" cy="7" r="4.5" fill="#A855F7" />
     </svg>
   );
 }
 
 export function MaxhubLogo({ height = 24 }: { height?: number }) {
-  // Official MAXHUB Logo: Red geometric M-badge + Bold MAXHUB logotype
+  // Official MAXHUB Logo: Clean, modern, high-end geometric all-caps wordmark
   return (
-    <svg height={height} viewBox="0 0 135 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      {/* MAXHUB Red Chevron/M Icon */}
-      <g transform="translate(2, 4)">
-        <rect width="24" height="24" rx="5" fill="#E60012" />
-        <path d="M5 19L9.5 8.5L12 13.8L14.5 8.5L19 19H15.8L13.8 14L12 17.5L10.2 14L8.2 19H5Z" fill="#FFFFFF" />
-      </g>
-      {/* MAXHUB Typography */}
-      <g fill="#F5F5F7" transform="translate(32, 6)">
+    <svg height={height} viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      <g fill="#F5F5F7" transform="translate(2, 4)">
         {/* M */}
-        <path d="M2 18V2H6.2L10 10.5L13.8 2H18V18H14.5V7.5L11.2 14.8H8.8L5.5 7.5V18H2Z" />
+        <path d="M0 20V0H4.2L9.5 11.5L14.8 0H19V20H15.2V7.8L10.8 16.8H8.2L3.8 7.8V20H0Z" />
         {/* A */}
-        <path d="M25 2H29.5L35.5 18H31.5L30 13.8H24.5L23 18H19L25 2ZM25.5 10.8H29L27.2 5.5L25.5 10.8Z" />
+        <path d="M26 0H31L37.5 20H33L31.2 15H25.8L24 20H19.5L26 0ZM27 11.5H30L28.5 5.5L27 11.5Z" />
         {/* X */}
-        <path d="M37 2H41L44.5 8L48 2H52L46.8 10L52.5 18H48.2L44.5 12L40.8 18H36.5L42.2 10L37 2Z" />
+        <path d="M39 0H43.5L48 7.5L52.5 0H57L50.5 10L57.5 20H53L48 12.5L43 20H38.5L45.5 10L39 0Z" />
         {/* H */}
-        <path d="M54 2H57.8V8.2H65.2V2H69V18H65.2V11.8H57.8V18H54V2Z" />
+        <path d="M60 0H64.2V8.5H72.8V0H77V20H72.8V12.2H64.2V20H60V0Z" />
         {/* U */}
-        <path d="M72 2H75.8V12C75.8 14.5 77.2 15.5 79.5 15.5C81.8 15.5 83.2 14.5 83.2 12V2H87V12C87 16.5 84 18.5 79.5 18.5C75 18.5 72 16.5 72 12V2Z" />
+        <path d="M80 0H84.2V13C84.2 15.8 85.8 17 88.5 17C91.2 17 92.8 15.8 92.8 13V0H97V13C97 17.8 93.8 20.2 88.5 20.2C83.2 20.2 80 17.8 80 13V0Z" />
         {/* B */}
-        <path d="M90 2H96.5C99.2 2 101 3.5 101 5.8C101 7.2 100 8.5 98.8 9C100.5 9.5 101.5 11 101.5 13C101.5 15.8 99.2 18 96.2 18H90V2ZM93.8 7.5H96C97 7.5 97.6 7 97.6 6.2C97.6 5.5 97 5 96 5H93.8V7.5ZM93.8 15H96.2C97.2 15 97.9 14.4 97.9 13.5C97.9 12.5 97.2 12 96.2 12H93.8V15Z" />
+        <path d="M100 0H107.5C110.8 0 113 1.8 113 4.5C113 6.2 111.8 7.5 110.5 8.2C112.2 9 113.5 10.5 113.5 13C113.5 16.2 110.8 20 107 20H100V0ZM104.2 7.8H107C108.2 7.8 109 7 109 6C109 5 108.2 4 107 4H104.2V7.8ZM104.2 16.2H107.2C108.5 16.2 109.5 15.2 109.5 14C109.5 12.8 108.5 12 107.2 12H104.2V16.2Z" />
       </g>
     </svg>
   );
 }
 
 export function SeewoLogo({ height = 24 }: { height?: number }) {
-  // Official Seewo (希沃) Logo: Cyan-green gradient emblem with interactive leaf + rounded 'seewo' logotype
+  // Official 希沃 (seewo) Logo: 'seewo' with the green leaf accent on the 'w' + '希沃' Chinese wordmark
   return (
-    <svg height={height} viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      <defs>
-        <linearGradient id="seewoGrad" x1="0" y1="0" x2="26" y2="26" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#00C292" />
-          <stop offset="1" stopColor="#009688" />
-        </linearGradient>
-      </defs>
-      {/* Seewo Emblem */}
-      <g transform="translate(2, 3)">
-        <circle cx="13" cy="13" r="12" fill="url(#seewoGrad)" />
-        <path d="M8 13.5C8 10.5 10.5 8 13.5 8C16.8 8 19 10.8 17.5 14C16.2 16.8 12.5 18 9.5 17.2" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" />
-        <circle cx="16.5" cy="9.5" r="1.8" fill="#FFFFFF" />
-      </g>
-      {/* 'seewo' Modern Fluid Typography */}
-      <g fill="#F5F5F7" transform="translate(34, 7)">
+    <svg height={height} viewBox="0 0 135 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      {/* 'seewo' in Seewo Cyan-Blue with Green V accent */}
+      <g transform="translate(2, 4)">
         {/* s */}
-        <path d="M2.5 13.8C3.5 14.8 5 15.5 7 15.5C9.5 15.5 11 14.2 11 12.5C11 10.2 7.8 9.8 5.8 9C3.2 8 2.2 6.8 2.2 4.8C2.2 2.2 4.5 0.5 7.2 0.5C9.5 0.5 11.2 1.5 12.2 2.8L10 4.8C9.2 4 8.2 3.5 7 3.5C5.8 3.5 4.8 4 4.8 5C4.8 6.5 7.5 7 9.8 7.8C12.5 8.8 13.5 10.2 13.5 12.5C13.5 15.5 10.8 17.5 7 17.5C4 17.5 1.5 16.2 0.2 14.5L2.5 13.8Z" />
+        <path d="M2.5 15C4 16.5 6 17.2 8.5 17.2C11.5 17.2 13.5 15.8 13.5 13.5C13.5 10.8 9.8 10.2 7.5 9.5C4.5 8.5 3.2 7.2 3.2 5C3.2 2.5 5.5 0.5 8.5 0.5C11 0.5 13 1.5 14.2 3L11.8 5.2C10.8 4.2 9.8 3.5 8.5 3.5C7 3.5 6 4.2 6 5.2C6 6.8 9 7.2 11.5 8.2C14.8 9.2 16.2 11 16.2 13.5C16.2 17 13 19.5 8.5 19.5C5 19.5 2 18 0.5 15.8L2.5 15Z" fill="#0084FF" />
         {/* e */}
-        <path d="M16 9C16 4.8 19 1.5 23.5 1.5C27.8 1.5 30.5 4.8 30.5 9.5V10.5H19.5C19.8 13 21.5 14.5 24 14.5C25.5 14.5 26.8 13.8 27.5 12.8L29.8 14.2C28.5 16.2 26.2 17.5 23.5 17.5C18.8 17.5 16 14 16 9ZM27 8C26.5 6 25.2 4.5 23.5 4.5C21.8 4.5 20.5 6 20 8H27Z" />
+        <path d="M19 10C19 5.2 22.5 1.5 27.5 1.5C32.2 1.5 35.5 5.2 35.5 10.5V11.5H23C23.2 14.2 25.2 16 28 16C29.8 16 31.2 15.2 32 14.2L34.5 15.8C33 18 30.5 19.5 27.5 19.5C22.2 19.5 19 15.5 19 10ZM31.5 8.8C31 7 29.5 5 27.5 5C25.5 5 24 7 23.5 8.8H31.5Z" fill="#0084FF" />
         {/* e */}
-        <path d="M33 9C33 4.8 36 1.5 40.5 1.5C44.8 1.5 47.5 4.8 47.5 9.5V10.5H36.5C36.8 13 38.5 14.5 41 14.5C42.5 14.5 43.8 13.8 44.5 12.8L46.8 14.2C45.5 16.2 43.2 17.5 40.5 17.5C35.8 17.5 33 14 33 9ZM44 8C43.5 6 42.2 4.5 40.5 4.5C38.8 4.5 37.5 6 37 8H44Z" />
-        {/* w */}
-        <path d="M50 2H53.5L56 11.5L58.8 2H61.8L64.5 11.5L67 2H70.5L66.5 17H63L60.2 7.5L57.5 17H54L50 2Z" />
+        <path d="M38 10C38 5.2 41.5 1.5 46.5 1.5C51.2 1.5 54.5 5.2 54.5 10.5V11.5H42C42.2 14.2 44.2 16 47 16C48.8 16 50.2 15.2 51 14.2L53.5 15.8C52 18 49.5 19.5 46.5 19.5C41.2 19.5 38 15.5 38 10ZM50.5 8.8C50 7 48.5 5 46.5 5C44.5 5 43 7 42.5 8.8H50.5Z" fill="#0084FF" />
+        {/* w - First V (Blue) */}
+        <path d="M57 2H61L64 12L67 2H70L66 18H62L57 2Z" fill="#0084FF" />
+        {/* w - Second V (Official Seewo Green Accent #52C41A) */}
+        <path d="M66.5 2H70.5L73.5 12L76.5 2H79.5L75.5 18H71.5L66.5 2Z" fill="#52C41A" />
         {/* o */}
-        <path d="M72.5 9.5C72.5 4.8 76 1.5 80.5 1.5C85 1.5 88.5 4.8 88.5 9.5C88.5 14.2 85 17.5 80.5 17.5C76 17.5 72.5 14.2 72.5 9.5ZM85 9.5C85 6.2 83 4.2 80.5 4.2C78 4.2 76 6.2 76 9.5C76 12.8 78 14.8 80.5 14.8C83 14.8 85 12.8 85 9.5Z" />
+        <path d="M82 10.5C82 5.2 86 1.5 91 1.5C96 1.5 100 5.2 100 10.5C100 15.8 96 19.5 91 19.5C86 19.5 82 15.8 82 10.5ZM96 10.5C96 7 93.8 4.8 91 4.8C88.2 4.8 86 7 86 10.5C86 14 88.2 16.2 91 16.2C93.8 16.2 96 14 96 10.5Z" fill="#0084FF" />
+      </g>
+      {/* '希沃' Chinese characters in bold white */}
+      <g fill="#F5F5F7" transform="translate(106, 6)">
+        {/* 希 */}
+        <path d="M5.5 0H7.5V3H12V5H8V7H12.5V9H1V7H5.5V5H1.5V3H5.5V0ZM2.5 11H11.5V17H9.5V12.8H4.5V18H2.5V11ZM6.5 12.8H7.5V16H6.5V12.8Z" />
+        {/* 沃 */}
+        <path d="M16 1C17.5 2 18.5 3 18.5 4C18.5 4.5 17.5 5 16 5L15 4C15 3 15.5 2 16 1ZM14.5 7C16 8 17 9 17 10C17 10.5 16 11 14.5 11L13.8 10C13.8 9 14 8 14.5 7ZM14.8 17L13.5 15.8C14.5 14.5 15.5 13 16.5 11.5L18 12.8C17 14.5 15.8 16 14.8 17ZM19.5 5H25.5V7H23.5V9.5H25.8V11.5H23.5V18H21.5V11.5H19.2V9.5H21.5V7H19.5V5Z" />
       </g>
     </svg>
   );
 }
 
 export function NewlineLogo({ height = 24 }: { height?: number }) {
-  // Official Newline Interactive Logo: Orange loop icon + cyan accent dot
+  // Official Newline Interactive Wordmark: Clean lowercase 'newline' in Newline Blue (#0084D6)
   return (
-    <svg height={height} viewBox="0 0 125 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      {/* Newline Ribbon Emblem */}
-      <g transform="translate(2, 4)">
-        <path d="M3 21L12 4L21 21H16L12 12L8 21H3Z" fill="#F15A24" />
-        <circle cx="12" cy="7" r="3.2" fill="#00AEEF" />
-      </g>
-      {/* 'newline' Typography */}
-      <g fill="#F5F5F7" transform="translate(28, 7)">
+    <svg height={height} viewBox="0 0 115 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      <g fill="#0084D6" transform="translate(2, 5)">
         {/* n */}
-        <path d="M2 2H5.2V4.5C6.2 3 7.8 2 9.8 2C13 2 15 3.8 15 7.5V16H11.8V8C11.8 6 10.8 5 9 5C7.2 5 5.8 6.2 5.2 8V16H2V2Z" />
+        <path d="M2 3.5H6.2V6.2C7.5 4.2 9.8 3 12.5 3C16.8 3 19.5 5.5 19.5 10.5V19H15.2V11.2C15.2 8.5 13.8 7.2 11.5 7.2C9.2 7.2 7.5 8.8 6.5 11.2V19H2V3.5Z" />
         {/* e */}
-        <path d="M17 9C17 5 19.5 2 23.5 2C27.2 2 29.5 5 29.5 9.2V10H20.2C20.5 12.2 21.8 13.5 24 13.5C25.2 13.5 26.2 13 26.8 12.2L29 13.5C27.8 15.2 26 16.2 23.8 16.2C19.5 16.2 17 13 17 9ZM26.2 8C26 6.2 24.8 4.8 23.2 4.8C21.8 4.8 20.5 6.2 20.2 8H26.2Z" />
+        <path d="M22.5 11.2C22.5 6 25.8 3 30.8 3C35.5 3 38.5 6.2 38.5 11.5V12.5H26.8C27 15 28.8 16.5 31.2 16.5C33 16.5 34.2 15.8 35 14.8L37.8 16.2C36.2 18.5 33.8 19.8 30.8 19.8C25.5 19.8 22.5 16 22.5 11.2ZM34.5 9.8C34.2 8 33 6.8 31 6.8C29 6.8 27.5 8 27.2 9.8H34.5Z" />
         {/* w */}
-        <path d="M31 2H34.2L36.5 10.5L39 2H41.5L44 10.5L46.2 2H49.5L46 16H43L40.2 7.5L37.5 16H34.5L31 2Z" />
+        <path d="M40.5 3.5H44.8L47.5 13L50.5 3.5H54.2L57.2 13L60 3.5H64.2L59.5 19H55.5L52.5 9.5L49.5 19H45.5L40.5 3.5Z" />
         {/* l */}
-        <path d="M52 0H55.2V16H52V0Z" />
+        <path d="M67 0H71.2V19H67V0Z" />
         {/* i */}
-        <path d="M58 5H61.2V16H58V5Z" />
-        <circle cx="59.6" cy="1.8" r="1.8" fill="#00AEEF" />
+        <path d="M74.5 4.5H78.8V19H74.5V4.5Z" />
+        <circle cx="76.6" cy="1.2" r="1.8" fill="#0084D6" />
         {/* n */}
-        <path d="M64 5H67.2V7.5C68.2 6 69.8 5 71.8 5C75 5 77 6.8 77 10.5V16H73.8V11C73.8 9 72.8 8 71 8C69.2 8 67.8 9.2 67.2 11V16H64V5Z" />
+        <path d="M82 4.5H86.2V7.2C87.5 5.2 89.8 4 92.5 4C96.8 4 99.5 6.5 99.5 11.5V19H95.2V12.2C95.2 9.5 93.8 8.2 91.5 8.2C89.2 8.2 87.5 9.8 86.5 12.2V19H82V4.5Z" />
         {/* e */}
-        <path d="M79 10.5C79 6.5 81.5 5 85.5 5C89.2 5 91.5 8 91.5 12.2V13H82.2C82.5 15.2 83.8 16.2 86 16.2C87.2 16.2 88.2 15.8 88.8 15L91 16.2C89.8 18 88 19 85.8 19C81.5 19 79 15.5 79 10.5ZM88.2 11C88 9.2 86.8 7.8 85.2 7.8C83.8 7.8 82.5 9.2 82.2 11H88.2Z" />
+        <path d="M102 12.2C102 7 105.2 4 110.2 4C115 4 118 7.2 118 12.5V13.5H106.2C106.5 16 108.2 17.5 110.8 17.5C112.5 17.5 113.8 16.8 114.5 15.8L117.2 17.2C115.8 19.5 113.2 20.8 110.2 20.8C105 20.8 102 17 102 12.2ZM114 10.8C113.8 9 112.5 7.8 110.5 7.8C108.5 7.8 107 9 106.8 10.8H114Z" />
       </g>
     </svg>
   );
 }
 
 export function PrometheanLogo({ height = 24 }: { height?: number }) {
-  // Official Promethean Flame Torch Mark & Distinctive Typography
+  // Official Promethean Multi-Layer Flame Torch + Wordmark
   return (
-    <svg height={height} viewBox="0 0 145 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      {/* Promethean Multi-Layer Flame */}
-      <g transform="translate(2, 3)">
-        <path d="M12 2C8 6 3 11 3 16.5C3 21.8 7.2 26 12.5 26C17.8 26 22 21.8 22 16.5C22 11 16 6 12 2Z" fill="#F26522" />
-        <path d="M12 8C9.5 11 6 14.5 6 18C6 21.5 8.8 24.2 12.2 24.2C15.8 24.2 18.5 21.5 18.5 18C18.5 14.5 14.5 11 12 8Z" fill="#FFC20E" />
-        <path d="M12 13C10.5 15 8.5 17 8.5 19.5C8.5 21.5 10.2 23 12.2 23C14.2 23 15.8 21.5 15.8 19.5C15.8 17 13.5 15 12 13Z" fill="#ED1C24" />
+    <svg height={height} viewBox="0 0 145 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      {/* Promethean Flame Emblem */}
+      <g transform="translate(2, 2)">
+        <path d="M12 2C7.5 6.5 3 11 3 16C3 21 7 25 12 25C17 25 21 21 21 16C21 11 16.5 6.5 12 2Z" fill="#F26522" />
+        <path d="M12 7C9.5 10 6 13 6 16.8C6 20.2 8.8 23 12.2 23C15.8 23 18.5 20.2 18.5 16.8C18.5 13 15 10 12 7Z" fill="#FFC20E" />
+        <path d="M12 12C10.5 14 8.5 16 8.5 18.5C8.5 20.5 10.2 22 12.2 22C14.2 22 15.8 20.5 15.8 18.5C15.8 16 13.5 14 12 12Z" fill="#ED1C24" />
       </g>
-      {/* 'Promethean' Modern Bold Wordmark */}
-      <g fill="#F5F5F7" transform="translate(28, 8)">
+      {/* 'Promethean' Wordmark */}
+      <g fill="#F5F5F7" transform="translate(28, 6)">
         {/* P */}
-        <path d="M2 15V0H7.5C10.5 0 12.5 1.5 12.5 4.5C12.5 7.5 10.5 9 7.5 9H4.8V15H2ZM4.8 6.5H7.2C8.8 6.5 9.8 5.8 9.8 4.5C9.8 3.2 8.8 2.5 7.2 2.5H4.8V6.5Z" />
+        <path d="M2 16V0H8C11.5 0 13.5 1.8 13.5 5C13.5 8.2 11.5 10 8 10H5V16H2ZM5 7.2H7.8C9.5 7.2 10.5 6.2 10.5 5C10.5 3.8 9.5 2.8 7.8 2.8H5V7.2Z" />
         {/* r */}
-        <path d="M14 15V4.5H16.5V7C17.2 5.2 18.8 4.5 20.5 4.5V7.2C18.5 7.2 16.8 8.5 16.8 10.8V15H14Z" />
+        <path d="M15 16V4.8H18V7.5C18.8 5.5 20.5 4.8 22.5 4.8V7.8C20.2 7.8 18.5 9.2 18.5 11.8V16H15Z" />
         {/* o */}
-        <path d="M21 9.8C21 5.8 23.8 3.8 27.2 3.8C30.8 3.8 33.5 5.8 33.5 9.8C33.5 13.8 30.8 15.8 27.2 15.8C23.8 15.8 21 13.8 21 9.8ZM30.8 9.8C30.8 7.2 29.2 5.8 27.2 5.8C25.2 5.8 23.8 7.2 23.8 9.8C23.8 12.2 25.2 13.8 27.2 13.8C29.2 13.8 30.8 12.2 30.8 9.8Z" />
+        <path d="M23 10.5C23 6 26 3.8 30 3.8C34 3.8 37 6 37 10.5C37 15 34 17.2 30 17.2C26 17.2 23 15 23 10.5ZM33.8 10.5C33.8 7.5 32 6.2 30 6.2C28 6.2 26.2 7.5 26.2 10.5C26.2 13.5 28 14.8 30 14.8C32 14.8 33.8 13.5 33.8 10.5Z" />
         {/* m */}
-        <path d="M35 15V4.5H37.5V6.8C38.2 5.2 39.8 4.2 41.5 4.2C43.2 4.2 44.8 5.2 45.2 6.8C46 5.2 47.8 4.2 49.5 4.2C52.2 4.2 53.8 5.8 53.8 9V15H51.2V9.5C51.2 7.5 50.2 6.5 48.8 6.5C47.2 6.5 46 7.8 46 9.8V15H43.5V9.5C43.5 7.5 42.5 6.5 41 6.5C39.5 6.5 38.2 7.8 38.2 9.8V15H35Z" />
+        <path d="M39 16V4.8H42V7C42.8 5.2 44.5 4.2 46.5 4.2C48.2 4.2 49.8 5.2 50.5 7C51.5 5.2 53.2 4.2 55.2 4.2C58.2 4.2 60 6 60 9.5V16H57V10C57 7.8 55.8 6.8 54.2 6.8C52.5 6.8 51 8.2 51 10.5V16H48V10C48 7.8 46.8 6.8 45.2 6.8C43.5 6.8 42 8.2 42 10.5V16H39Z" />
         {/* e */}
-        <path d="M55.5 9.8C55.5 6 58 4 61.5 4C65 4 67.2 6.2 67.2 10.2V11H58C58.2 12.8 59.5 14 61.5 14C62.8 14 63.8 13.5 64.2 12.8L66.5 14C65.5 15.5 63.8 16 61.5 16C57.8 16 55.5 13.5 55.5 9.8ZM64.5 9C64.2 7.5 63.2 6 61.5 6C59.8 6 58.5 7.5 58.2 9H64.5Z" />
+        <path d="M62 10.5C62 6.2 65 4 69 4C73 4 75.5 6.5 75.5 11V11.8H65.2C65.5 13.8 67 15 69.2 15C70.8 15 72 14.2 72.5 13.5L75 14.8C73.8 16.5 71.8 17.5 69.2 17.5C64.8 17.5 62 14.8 62 10.5ZM72.2 9.5C72 7.8 70.8 6.2 69 6.2C67 6.2 65.8 7.8 65.5 9.5H72.2Z" />
         {/* t */}
-        <path d="M70 1.5H72.5V4.5H75V6.8H72.5V12.2C72.5 13.2 73 13.8 74 13.8C74.5 13.8 75 13.5 75.2 13.2L75.8 15.2C75 15.8 74 16 73 16C71 16 70 14.8 70 12.5V6.8H68V4.5H70V1.5Z" />
+        <path d="M78 1.8H81V4.8H84V7.2H81V13C81 14 81.5 14.5 82.8 14.5C83.2 14.5 83.8 14.2 84.2 13.8L84.8 16C83.8 16.8 82.8 17 81.8 17C79.5 17 78 15.5 78 13V7.2H76V4.8H78V1.8Z" />
         {/* h */}
-        <path d="M77 0H79.5V6.8C80.2 5.2 81.8 4.2 83.8 4.2C86.5 4.2 88.2 5.8 88.2 9V15H85.8V9.5C85.8 7.5 84.8 6.5 83.2 6.5C81.8 6.5 80.2 7.8 80.2 9.8V15H77V0Z" />
+        <path d="M86 0H89V7C89.8 5.2 91.5 4.2 93.8 4.2C96.8 4.2 98.8 6 98.8 9.5V16H95.8V10C95.8 7.8 94.5 6.8 92.8 6.8C91 6.8 89.5 8.2 89.5 10.5V16H86V0Z" />
         {/* e */}
-        <path d="M90 9.8C90 6 92.5 4 96 4C99.5 4 101.8 6.2 101.8 10.2V11H92.5C92.8 12.8 94 14 96 14C97.2 14 98.2 13.5 98.8 12.8L101 14C100 15.5 98.2 16 96 16C92.2 16 90 13.5 90 9.8ZM99 9C98.8 7.5 97.8 6 96 6C94.2 6 93 7.5 92.8 9H99Z" />
+        <path d="M101 10.5C101 6.2 104 4 108 4C112 4 114.5 6.5 114.5 11V11.8H104.2C104.5 13.8 106 15 108.2 15C109.8 15 111 14.2 111.5 13.5L114 14.8C112.8 16.5 110.8 17.5 108.2 17.5C103.8 17.5 101 14.8 101 10.5ZM111.2 9.5C111 7.8 109.8 6.2 108 6.2C106 6.2 104.8 7.8 104.5 9.5H111.2Z" />
         {/* a */}
-        <path d="M103.5 10C103.5 6.5 106 4.2 109.5 4.2C111.2 4.2 112.5 5 113.2 6.2V4.5H115.5V15H113.2V13.5C112.5 14.8 111 15.8 109.5 15.8C106 15.8 103.5 13.5 103.5 10ZM113.2 10C113.2 7.8 111.8 6.5 109.8 6.5C107.8 6.5 106.2 7.8 106.2 10C106.2 12.2 107.8 13.5 109.8 13.5C111.8 13.5 113.2 12.2 113.2 10Z" />
+        <path d="M116 10.8C116 7 119 4.5 123 4.5C125 4.5 126.8 5.5 127.5 6.8V4.8H130.5V16H127.5V14.5C126.8 15.8 125 17 123 17C119 17 116 14.5 116 10.8ZM127.5 10.8C127.5 8.2 125.8 6.8 123.5 6.8C121.2 6.8 119.5 8.2 119.5 10.8C119.5 13.2 121.2 14.8 123.5 14.8C125.8 14.8 127.5 13.2 127.5 10.8Z" />
         {/* n */}
-        <path d="M117.5 4.5H120V6.8C120.8 5.2 122.2 4.2 124.2 4.2C127 4.2 128.5 5.8 128.5 9V15H126V9.5C126 7.5 125 6.5 123.5 6.5C122 6.5 120.5 7.8 120.5 9.8V15H117.5V4.5Z" />
+        <path d="M133 4.8H136V7C136.8 5.2 138.5 4.2 140.8 4.2C143.8 4.2 145.8 6 145.8 9.5V16H142.8V10C142.8 7.8 141.5 6.8 139.8 6.8C138 6.8 136.5 8.2 136.5 10.5V16H133V4.8Z" />
       </g>
     </svg>
   );
 }
 
 export function SmartBoardLogo({ height = 24 }: { height?: number }) {
-  // Official SMART Technologies Logo: Cyan badge + clean geometric SMART wordmark
+  // Official SMART Technologies Logo: Cyan square + SMART wordmark
   return (
-    <svg height={height} viewBox="0 0 115 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      <rect x="2" y="4" width="24" height="24" rx="6" fill="#00A3E0" />
-      <path d="M10 18C11 19 12.5 19.8 14.2 19.8C16.2 19.8 17.5 18.8 17.5 17.2C17.5 15.2 15 14.8 13.2 14.2C11 13.5 10.2 12.5 10.2 11C10.2 9 12 7.5 14.2 7.5C16 7.5 17.5 8.2 18.5 9.5L16.8 11C16.2 10.2 15.2 9.8 14.2 9.8C13.2 9.8 12.5 10.2 12.5 11C12.5 12 14.5 12.5 16.5 13C18.8 13.8 19.8 15 19.8 17C19.8 19.5 17.5 21.5 14.2 21.5C12 21.5 10 20.5 9 19.2L10 18Z" fill="#FFFFFF" />
-      <g fill="#F5F5F7" transform="translate(32, 7)">
+    <svg height={height} viewBox="0 0 115 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      <rect x="2" y="2" width="24" height="24" rx="6" fill="#00A3E0" />
+      <path d="M10 17C11 18 12.5 18.8 14.2 18.8C16.2 18.8 17.5 17.8 17.5 16.2C17.5 14.2 15 13.8 13.2 13.2C11 12.5 10.2 11.5 10.2 10C10.2 8 12 6.5 14.2 6.5C16 6.5 17.5 7.2 18.5 8.5L16.8 10C16.2 9.2 15.2 8.8 14.2 8.8C13.2 8.8 12.5 9.2 12.5 10C12.5 11 14.5 11.5 16.5 12C18.8 12.8 19.8 14 19.8 16C19.8 18.5 17.5 20.5 14.2 20.5C12 20.5 10 19.5 9 18.2L10 17Z" fill="#FFFFFF" />
+      <g fill="#F5F5F7" transform="translate(32, 5)">
         {/* S */}
         <path d="M1.5 14.2C2.8 15.5 4.8 16.5 7.2 16.5C10.2 16.5 12.2 14.8 12.2 12.5C12.2 9.8 8.8 9.2 6.5 8.5C4 7.8 3 6.8 3 5C3 3 5 1.5 7.5 1.5C9.8 1.5 11.5 2.5 12.8 3.8L10.8 5.8C9.8 4.8 8.8 4 7.5 4C6 4 5.2 4.8 5.2 5.8C5.2 7 7.5 7.5 10 8.2C12.8 9.2 14.5 10.5 14.5 13C14.5 16 11.8 18.8 7.2 18.8C4.5 18.8 2 17.5 0.5 15.8L1.5 14.2Z" />
         {/* M */}
@@ -176,11 +161,11 @@ export function SmartBoardLogo({ height = 24 }: { height?: number }) {
 export function ViewSonicLogo({ height = 24 }: { height?: number }) {
   // Official ViewSonic Logo: 3 Gouldian Finch Birds on Branch + Serif ViewSonic Wordmark
   return (
-    <svg height={height} viewBox="0 0 140 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <svg height={height} viewBox="0 0 140 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
       {/* Branch */}
-      <path d="M2 22C10 21.5 22 22.5 32 23.5" stroke="#8D6E63" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M2 20C10 19.5 22 20.5 32 21.5" stroke="#8D6E63" strokeWidth="2.5" strokeLinecap="round" />
       {/* Bird 1 (Left - Red Head Gouldian Finch) */}
-      <g transform="translate(4, 7)">
+      <g transform="translate(4, 5)">
         <path d="M4 8C4 5 6.5 2.5 9 3.5C11 4.5 11 8 9 10C7 11.5 4 11 4 8Z" fill="#ED1C24" />
         <path d="M7 8C7 12 3 14 1 15C4 16 8 15 9 12" fill="#00A651" />
         <path d="M6 10C8 11 9 13 8 15C5 15 4 13 6 10Z" fill="#6A1B9A" />
@@ -189,7 +174,7 @@ export function ViewSonicLogo({ height = 24 }: { height?: number }) {
         <polygon points="10,4.5 13,5.5 10,6.5" fill="#FFFFFF" />
       </g>
       {/* Bird 2 (Center - Blue/Black Gouldian Finch) */}
-      <g transform="translate(13, 5)">
+      <g transform="translate(13, 3)">
         <path d="M4 8C4 5 6.5 2.5 9 3.5C11 4.5 11 8 9 10C7 11.5 4 11 4 8Z" fill="#1A1A1A" />
         <path d="M7 8C7 12 3 14 1 15C4 16 8 15 9 12" fill="#00A651" />
         <path d="M6 10C8 11 9 13 8 15C5 15 4 13 6 10Z" fill="#0054A6" />
@@ -198,7 +183,7 @@ export function ViewSonicLogo({ height = 24 }: { height?: number }) {
         <polygon points="10,4.5 13,5.5 10,6.5" fill="#ED1C24" />
       </g>
       {/* Bird 3 (Right - Yellow/Orange Gouldian Finch) */}
-      <g transform="translate(22, 7)">
+      <g transform="translate(22, 5)">
         <path d="M4 8C4 5 6.5 2.5 9 3.5C11 4.5 11 8 9 10C7 11.5 4 11 4 8Z" fill="#F7941D" />
         <path d="M7 8C7 12 3 14 1 15C4 16 8 15 9 12" fill="#00A651" />
         <path d="M6 10C8 11 9 13 8 15C5 15 4 13 6 10Z" fill="#6A1B9A" />
@@ -207,7 +192,7 @@ export function ViewSonicLogo({ height = 24 }: { height?: number }) {
         <polygon points="10,4.5 13,5.5 10,6.5" fill="#FFFFFF" />
       </g>
       {/* ViewSonic Classic Wordmark */}
-      <g fill="#F5F5F7" transform="translate(38, 8)">
+      <g fill="#F5F5F7" transform="translate(38, 6)">
         {/* V */}
         <path d="M1 2H4L7.5 13.5L11 2H14L9 16H6L1 2Z" />
         {/* i */}
@@ -234,24 +219,22 @@ export function ViewSonicLogo({ height = 24 }: { height?: number }) {
 }
 
 export function HuaweiLogo({ height = 24 }: { height?: number }) {
-  // Official Huawei 8-Petal Radial Sunburst & Bold Logotype
+  // Official Classic Huawei 8-Petal Fan Blossom & Clean Bold HUAWEI Wordmark
   return (
-    <svg height={height} viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      {/* Huawei 8-Petal Fan Blossom in Official Red */}
-      <g transform="translate(14, 15) scale(0.68)">
-        {/* Central 2 petals */}
-        <path d="M0 -3C-1.5 -8 -1 -15 0 -18C1 -15 1.5 -8 0 -3Z" fill="#CF0A2C" />
-        <path d="M0 -3C-3.5 -7.5 -5.5 -13.5 -5 -16.5C-3.5 -15 -1.5 -9 0 -3Z" fill="#CF0A2C" />
-        <path d="M0 -3C3.5 -7.5 5.5 -13.5 5 -16.5C3.5 -15 1.5 -9 0 -3Z" fill="#CF0A2C" />
-        {/* Outer petals */}
-        <path d="M0 -3C-6 -6 -10.5 -10 -11.5 -13C-9.5 -12.5 -5 -8 0 -3Z" fill="#CF0A2C" />
-        <path d="M0 -3C6 -6 10.5 -10 11.5 -13C9.5 -12.5 5 -8 0 -3Z" fill="#CF0A2C" />
-        <path d="M0 -3C-8 -4 -14 -6 -16 -8C-14.5 -8.5 -8 -5.5 0 -3Z" fill="#CF0A2C" />
-        <path d="M0 -3C8 -4 14 -6 16 -8C14.5 -8.5 8 -5.5 0 -3Z" fill="#CF0A2C" />
-        <path d="M0 -3C-9 -1.5 -16 -2 -18 -3C-17 -4.5 -9 -3 0 -3Z" fill="#CF0A2C" />
+    <svg height={height} viewBox="0 0 115 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      {/* Huawei 8-Petal Fan Flower in Huawei Red (#CF0A2C) */}
+      <g transform="translate(12, 14) scale(0.65)">
+        <path d="M0 0C-1.5 -5 -1 -12 0 -15C1 -12 1.5 -5 0 0Z" fill="#CF0A2C" />
+        <path d="M0 0C-3.5 -4.5 -5.5 -10.5 -5 -13.5C-3.5 -12 -1.5 -7 0 0Z" fill="#CF0A2C" />
+        <path d="M0 0C3.5 -4.5 5.5 -10.5 5 -13.5C3.5 -12 1.5 -7 0 0Z" fill="#CF0A2C" />
+        <path d="M0 0C-5.5 -3.5 -9.5 -7.5 -10.5 -10.5C-8.5 -10 -4.5 -6 0 0Z" fill="#CF0A2C" />
+        <path d="M0 0C5.5 -3.5 9.5 -7.5 10.5 -10.5C8.5 -10 4.5 -6 0 0Z" fill="#CF0A2C" />
+        <path d="M0 0C-7 -2 -12 -3.5 -14 -5.5C-12.5 -6 -7 -4 0 0Z" fill="#CF0A2C" />
+        <path d="M0 0C7 -2 12 -3.5 14 -5.5C12.5 -6 7 -4 0 0Z" fill="#CF0A2C" />
+        <path d="M0 0C-8 -0.5 -14 -0.5 -16 -1.5C-15 -3 -8 -2 0 0Z" fill="#CF0A2C" />
       </g>
-      {/* HUAWEI Bold Wordmark */}
-      <g fill="#F5F5F7" transform="translate(32, 8)">
+      {/* HUAWEI Clean Bold Typography */}
+      <g fill="#F5F5F7" transform="translate(28, 6)">
         {/* H */}
         <path d="M2 15V0H5.5V6H11.5V0H15V15H11.5V9H5.5V15H2Z" />
         {/* U */}
@@ -272,11 +255,11 @@ export function HuaweiLogo({ height = 24 }: { height?: number }) {
 export function SamsungLogo({ height = 24 }: { height?: number }) {
   // Official Samsung Blue Ellipse & SΛMSUNG Wordmark
   return (
-    <svg height={height} viewBox="0 0 115 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <svg height={height} viewBox="0 0 115 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
       {/* Samsung Oval */}
-      <ellipse cx="57.5" cy="16" rx="55" ry="14" transform="rotate(-6, 57.5, 16)" fill="#1428A0" />
+      <ellipse cx="57.5" cy="14" rx="55" ry="13" transform="rotate(-6, 57.5, 14)" fill="#1428A0" />
       {/* SAMSUNG Typography (Signature 'A' without crossbar) */}
-      <g fill="#FFFFFF" transform="translate(12, 9.5)">
+      <g fill="#FFFFFF" transform="translate(12, 7.5)">
         {/* S */}
         <path d="M1.5 9.8C2.5 10.8 4 11.5 5.8 11.5C7.8 11.5 9 10.5 9 9C9 7.2 6.5 6.8 4.8 6.2C2.8 5.8 1.8 4.8 1.8 3.5C1.8 1.8 3.5 0.5 5.8 0.5C7.5 0.5 9 1.2 9.8 2.2L8.2 3.8C7.5 3 6.8 2.5 5.8 2.5C4.8 2.5 4 3 4 3.8C4 4.5 5.5 5 7.2 5.5C9.2 6.2 11 7.2 11 9.2C11 11.8 8.8 13.5 5.8 13.5C3.5 13.5 1.5 12.5 0.2 11L1.5 9.8Z" />
         {/* A (No horizontal crossbar) */}
@@ -296,9 +279,9 @@ export function SamsungLogo({ height = 24 }: { height?: number }) {
   );
 }
 
-// ==========================================
+// =========================================================================
 // 2. OS & Multi-Platform Vector Logos
-// ==========================================
+// =========================================================================
 
 export function AppleLogo({ height = 24, fill = '#F5F5F7' }: { height?: number; fill?: string }) {
   return (
