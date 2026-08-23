@@ -31,7 +31,7 @@ export default function MarketplacePage() {
             ← Back to Dashboard
           </div>
           <div style={{ padding: '12px 16px', background: 'rgba(56, 189, 248, 0.15)', borderLeft: '4px solid #38bdf8', borderRadius: '0 8px 8px 0', color: 'var(--text-main)', fontWeight: 600 }}>
-            🛒 Marketplace
+            Marketplace
           </div>
         </nav>
       </aside>

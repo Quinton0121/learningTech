@@ -36,7 +36,7 @@ export default function SetupPage() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
       <div className="glass-panel" style={{ padding: '40px', maxWidth: '400px', width: '90%', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '20px', color: '#fff' }}>🖥️ Device Setup</h2>
+        <h2 style={{ marginBottom: '20px', color: '#fff' }}>Device Setup</h2>
         
         <p style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '0.9rem' }}>
           Current Device ID: <strong style={{ color: '#10b981' }}>{currentId || 'Not Set'}</strong>

@@ -35,6 +35,9 @@
 ---
 
 ## 5. Next Steps & Recommendations
+- **Custom Domain Email (Resend)**: Set up and verify `interlectic.org` DNS records with Resend for transactional email and custom domain email workflows.
+- **Export to PPT**: Build functionality to export interactive slides to PowerPoint (.pptx) presentations.
+- **Landing Page Content Expansion**: Add compatibility sections to the index page highlighting supported whiteboard hardware (BenQ, MAXHUB, Seewo, Newline) and operating systems (Android, iPad, Windows, Mac, Linux).
 - **Airwallex Approval**: Integrate Airwallex payment API once approval is completed.
 - **Database Scaling**: Plan migration from SQLite (`dev.db`) to PostgreSQL / Prisma Postgres for high concurrent write performance.
 - **Backups & Security**: Configure daily automated DB/asset backups and Cloudflare WAF/security rules.

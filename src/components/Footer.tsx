@@ -67,11 +67,11 @@ export default function Footer() {
             <h4 style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.5px' }}>
               {t('footer.legal')}
             </h4>
-            <Link href="/refund-policy" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px', transition: 'color 0.2s' }}>
-              <span>💳</span> {t('footer.refundPolicy')}
+            <Link href="/refund-policy" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}>
+              {t('footer.refundPolicy')}
             </Link>
-            <Link href="/privacy-policy" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px', transition: 'color 0.2s' }}>
-              <span>🔒</span> {t('footer.privacyPolicy')}
+            <Link href="/privacy-policy" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }}>
+              {t('footer.privacyPolicy')}
             </Link>
           </div>
 

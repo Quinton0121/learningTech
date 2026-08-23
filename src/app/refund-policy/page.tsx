@@ -32,7 +32,6 @@ export default function RefundPolicyPage() {
     },
     summaryCards: [
       {
-        icon: '⏱️',
         title: {
           en: '7-Day Review Period',
           'zh-TW': '7 天審閱期保障',
@@ -45,7 +44,6 @@ export default function RefundPolicyPage() {
         }
       },
       {
-        icon: '🪙',
         title: {
           en: 'Token Policy',
           'zh-TW': '代幣與儲值保障',
@@ -58,7 +56,6 @@ export default function RefundPolicyPage() {
         }
       },
       {
-        icon: '🛡️',
         title: {
           en: 'Transparent Review',
           'zh-TW': '透明審核機制',
@@ -283,7 +280,7 @@ export default function RefundPolicyPage() {
         {/* Title Header */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }} className="animate-fade-in-up">
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '20px', background: 'rgba(56, 189, 248, 0.12)', border: '1px solid var(--primary)', color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '20px' }}>
-            <span>📜</span> {getLocalized(content.badge)}
+            {getLocalized(content.badge)}
           </div>
           <h1 style={{ fontSize: '3.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '16px', letterSpacing: '-1px' }}>
             {getLocalized(content.title)}
@@ -300,7 +297,6 @@ export default function RefundPolicyPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginBottom: '48px' }}>
           {content.summaryCards.map((card, idx) => (
             <div key={idx} className="glass-panel" style={{ padding: '24px', borderTop: '4px solid var(--primary)' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '12px' }}>{card.icon}</div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
                 {getLocalized(card.title)}
               </h3>
@@ -344,7 +340,7 @@ export default function RefundPolicyPage() {
             {language === 'zh-TW' ? '我們的專屬客服團隊將隨時為您提供協助與指引。' : language === 'zh-CN' ? '我们的专属客服团队将随时为您提供协助与指引。' : 'Our support team is ready to assist you with order inquiries and policy questions.'}
           </p>
           <a href="mailto:support@interlectic.com" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex' }}>
-            ✉️ Contact Support
+            Contact Support
           </a>
         </div>
 

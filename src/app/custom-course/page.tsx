@@ -81,7 +81,7 @@ export default function CustomCoursePage() {
             ← Back to Dashboard
           </div>
           <div style={{ padding: '12px 16px', background: 'rgba(56, 189, 248, 0.15)', borderLeft: '4px solid var(--primary)', borderRadius: '0 8px 8px 0', color: 'var(--text-main)', fontWeight: 600 }}>
-            🛠️ Custom Order
+            Custom Order
           </div>
         </nav>
       </aside>
@@ -90,7 +90,7 @@ export default function CustomCoursePage() {
       <main style={{ flex: 1, padding: '48px 48px 48px 0', overflowY: 'auto', zIndex: 10 }}>
         <header style={{ marginBottom: '48px', textAlign: 'center' }}>
           <div className="inline-block px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-sky-400 text-sm font-semibold mb-6 tracking-wide shadow-lg">
-            ✨ BUILD YOUR OWN PLAN
+            BUILD YOUR OWN PLAN
           </div>
           <h1 style={{ fontSize: '3.5rem', marginBottom: '16px', fontWeight: 800, background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Custom Course Configurator

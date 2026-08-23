@@ -155,10 +155,10 @@ export default function LearnerHub() {
 
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }} onClick={() => setShowInbox(true)}>
-            📥 Messages {inboxMessages.length > 0 && `(${inboxMessages.length})`}
+            Messages {inboxMessages.length > 0 && `(${inboxMessages.length})`}
           </button>
           <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }} onClick={() => router.push('/settings')}>
-            ⚙️ Settings
+            Settings
           </button>
           <button className="btn-secondary" style={{ width: '100%', fontSize: '0.9rem', borderColor: 'rgba(255,100,100,0.3)', color: '#ff8a8a' }} onClick={() => {
             localStorage.removeItem('token');
@@ -192,7 +192,6 @@ export default function LearnerHub() {
                 style={{ overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.3s' }}
               >
                 <div style={{ height: '180px', background: 'linear-gradient(45deg, #0f766e, #10b981)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                   <div style={{ fontSize: '4rem' }}>📊</div>
                 </div>
                 <div style={{ padding: '24px' }}>
                   <h3 style={{ fontSize: '1.3rem', marginBottom: '12px' }}>{e.course.title}</h3>

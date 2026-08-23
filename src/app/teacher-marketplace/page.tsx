@@ -30,7 +30,7 @@ export default function TeacherMarketplacePage() {
             ← Back to Dashboard
           </div>
           <div style={{ padding: '12px 16px', background: 'rgba(56, 189, 248, 0.15)', borderLeft: '4px solid #38bdf8', borderRadius: '0 8px 8px 0', color: 'var(--text-main)', fontWeight: 600 }}>
-            🛍️ Educator Shop
+            Educator Shop
           </div>
         </nav>
       </aside>
@@ -75,7 +75,7 @@ export default function TeacherMarketplacePage() {
                     <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>None</span>
                   </div>
                   <button className="btn-secondary" style={{ width: '100%', padding: '8px', fontSize: '0.85rem', borderColor: '#fbbf24', color: '#fbbf24' }}>
-                    ⭐ Feature for 7 days (200 Tokens)
+                    Feature for 7 days (200 Tokens)
                   </button>
                 </div>
                 
@@ -85,7 +85,7 @@ export default function TeacherMarketplacePage() {
                     <span style={{ color: '#a855f7', fontWeight: 'bold' }}>Not Shared</span>
                   </div>
                   <button className="btn-secondary" style={{ width: '100%', padding: '8px', fontSize: '0.85rem', borderColor: '#a855f7', color: '#a855f7' }}>
-                    🔗 Share Course (Buys 1 Quota for 10 Tokens)
+                    Share Course (Buys 1 Quota for 10 Tokens)
                   </button>
                 </div>
               </div>

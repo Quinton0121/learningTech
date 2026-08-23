@@ -39,15 +39,15 @@ export default function SettingsPage() {
       const data = await res.json();
       
       if (res.ok) {
-        setMessage('✅ ' + data.message);
+        setMessage(data.message);
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
       } else {
-        setMessage('❌ Error: ' + data.error);
+        setMessage('Error: ' + data.error);
       }
     } catch (err) {
-      setMessage('❌ Network error.');
+      setMessage('Network error.');
     }
   };
 
@@ -70,7 +70,7 @@ export default function SettingsPage() {
             ← Back to Dashboard
           </div>
           <div style={{ padding: '12px 16px', background: 'rgba(56, 189, 248, 0.15)', borderLeft: '4px solid var(--primary)', borderRadius: '0 8px 8px 0', color: 'var(--text-main)', fontWeight: 600 }}>
-            ⚙️ Settings
+            Settings
           </div>
         </nav>
       </aside>
@@ -111,7 +111,7 @@ export default function SettingsPage() {
             <button type="submit" className="btn-primary" style={{ padding: '12px', marginTop: '8px' }}>
               Update Password
             </button>
-            {message && <p style={{ color: message.includes('✅') ? '#10b981' : '#ef4444', marginTop: '12px', textAlign: 'center' }}>{message}</p>}
+            {message && <p style={{ color: !message.startsWith('Error') && !message.startsWith('Network') ? '#10b981' : '#ef4444', marginTop: '12px', textAlign: 'center' }}>{message}</p>}
           </form>
         </div>
       </main>

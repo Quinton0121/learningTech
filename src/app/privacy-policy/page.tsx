@@ -32,7 +32,6 @@ export default function PrivacyPolicyPage() {
     },
     summaryCards: [
       {
-        icon: '🔒',
         title: {
           en: 'End-to-End Encryption',
           'zh-TW': '傳輸與存儲加密',
@@ -45,7 +44,6 @@ export default function PrivacyPolicyPage() {
         }
       },
       {
-        icon: '🚫',
         title: {
           en: 'No Data Selling',
           'zh-TW': '絕不出售個資',
@@ -58,7 +56,6 @@ export default function PrivacyPolicyPage() {
         }
       },
       {
-        icon: '💻',
         title: {
           en: 'Classroom PC ID Security',
           'zh-TW': '教室終端綁定防護',
@@ -308,7 +305,7 @@ export default function PrivacyPolicyPage() {
         {/* Title Header */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }} className="animate-fade-in-up">
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid var(--secondary)', color: 'var(--secondary)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '20px' }}>
-            <span>🔒</span> {getLocalized(content.badge)}
+            {getLocalized(content.badge)}
           </div>
           <h1 style={{ fontSize: '3.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '16px', letterSpacing: '-1px' }}>
             {getLocalized(content.title)}
@@ -325,7 +322,6 @@ export default function PrivacyPolicyPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginBottom: '48px' }}>
           {content.summaryCards.map((card, idx) => (
             <div key={idx} className="glass-panel" style={{ padding: '24px', borderTop: '4px solid var(--secondary)' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '12px' }}>{card.icon}</div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
                 {getLocalized(card.title)}
               </h3>
@@ -369,7 +365,7 @@ export default function PrivacyPolicyPage() {
             {language === 'zh-TW' ? '歡迎聯絡我們的個資保護小組，我們將竭誠為您說明。' : language === 'zh-CN' ? '欢迎联系我们的个人信息保护小组，我们将竭诚为您解答。' : 'Feel free to contact our data protection team anytime.'}
           </p>
           <a href="mailto:privacy@interlectic.com" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex' }}>
-            ✉️ Contact Privacy Team
+            Contact Privacy Team
           </a>
         </div>
 

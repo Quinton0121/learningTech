@@ -359,7 +359,7 @@ export default function EducatorDashboard() {
             <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{t('sidebar.welcome')}</p>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '8px' }}>Educator {user.name}</h3>
             <div style={{ display: 'inline-block', padding: '4px 12px', background: 'rgba(168, 85, 247, 0.15)', borderRadius: '20px', color: '#c084fc', fontSize: '0.85rem', fontWeight: 700, border: '1px solid rgba(168, 85, 247, 0.3)' }}>
-              💰 {user.tokens || 0} Tokens
+              {user.tokens || 0} Tokens
             </div>
           </div>
         )}
@@ -391,10 +391,10 @@ export default function EducatorDashboard() {
             {t('sidebar.settings')}
           </div>
           <div onClick={() => { setSelectedContactId('ADMIN'); setShowInbox(true); }} style={{ padding: '12px 16px', color: '#f59e0b', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            ✉️ Contact Support
+            Contact Support
           </div>
           <div onClick={() => setShowInbox(true)} style={{ padding: '12px 16px', color: '#38bdf8', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>📥 Messages</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Messages</span>
             {inboxMessages.length > 0 && (
               <span style={{ background: '#ef4444', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{inboxMessages.length}</span>
             )}
@@ -456,7 +456,6 @@ export default function EducatorDashboard() {
                 onClick={() => setExpandedCourseId(expandedCourseId === course.id ? null : course.id)}
               >
                 <h3 style={{ margin: 0, fontSize: '1.2rem', color: course.isArchived ? 'var(--text-muted)' : 'white', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>📊</span>
                   {course.title}
                 </h3>
                 <span style={{ color: expandedCourseId === course.id ? '#38bdf8' : 'var(--text-muted)' }}>
@@ -473,7 +472,6 @@ export default function EducatorDashboard() {
                       if (!course.isArchived) window.location.href = `/api/course-play?id=${course.id}`;
                     }}
                   >
-                     <div style={{ fontSize: '3rem', marginBottom: '8px' }}>📊</div>
                      {!course.isArchived && (
                        <div style={{ background: 'rgba(255,255,255,0.2)', padding: '6px 16px', borderRadius: '24px', color: 'white', fontWeight: 600, fontSize: '0.9rem', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.3)' }}>
                          {t('dashboard.clickToOpen')}
@@ -568,7 +566,7 @@ export default function EducatorDashboard() {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)', padding: '16px 0', marginBottom: '16px' }}>
                       <div style={{ display: 'flex', gap: '16px' }}>
-                        <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>👥 {course.enrollments?.length || 0} {t('dashboard.enrolledCount')} | 🎟️ {course.studentQuota} {t('dashboard.seatsLeft')} {course.sharedQuotaCourseName ? `(${t('dashboard.sharedWith')} ${course.sharedQuotaCourseName})` : ''}</span>
+                        <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{course.enrollments?.length || 0} {t('dashboard.enrolledCount')} | {course.studentQuota} {t('dashboard.seatsLeft')} {course.sharedQuotaCourseName ? `(${t('dashboard.sharedWith')} ${course.sharedQuotaCourseName})` : ''}</span>
                       </div>
                     </div>
 

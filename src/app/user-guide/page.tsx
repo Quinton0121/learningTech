@@ -21,9 +21,9 @@ export default function UserGuide() {
       'zh-CN': '高效管理课程、学生与教室的完整教学指南。'
     },
     visibilityTitle: {
-      en: '🌍 Course Visibility: Public vs Private',
-      'zh-TW': '🌍 課程能見度：公開 vs 不公開',
-      'zh-CN': '🌍 课程可见度：公开 vs 不公开'
+      en: 'Course Visibility: Public vs Private',
+      'zh-TW': '課程能見度：公開 vs 不公開',
+      'zh-CN': '课程可见度：公开 vs 不公开'
     },
     visibilityDesc: {
       en: 'When you create a course on Interlectic, you can choose how it is shared with the world. You can easily toggle this setting from your Dashboard.',
@@ -31,9 +31,9 @@ export default function UserGuide() {
       'zh-CN': '在 Interlectic 创建课程时，您可以选择如何与世界分享该课程。您可以随时在控制台中切换此设置。'
     },
     privateTitle: {
-      en: '🔒 Private Courses',
-      'zh-TW': '🔒 不公開課程 (Private)',
-      'zh-CN': '🔒 不公开课程 (Private)'
+      en: 'Private Courses',
+      'zh-TW': '不公開課程 (Private)',
+      'zh-CN': '不公开课程 (Private)'
     },
     privateDesc: {
       en: 'By default, all new courses are Private. This means your course is hidden from the public marketplace.',
@@ -51,9 +51,9 @@ export default function UserGuide() {
       'zh-CN': '适用于实体教室或私人辅导班。'
     },
     publicTitle: {
-      en: '🌍 Public Courses',
-      'zh-TW': '🌍 公開課程 (Public)',
-      'zh-CN': '🌍 公开课程 (Public)'
+      en: 'Public Courses',
+      'zh-TW': '公開課程 (Public)',
+      'zh-CN': '公开课程 (Public)'
     },
     publicDesc: {
       en: 'Public courses are listed on the Interlectic Marketplace for anyone to discover.',
@@ -71,9 +71,9 @@ export default function UserGuide() {
       'zh-CN': '每当有外部学生报名，您即可赚取被动收入。'
     },
     loginTitle: {
-      en: '⚡ The Quick Login System',
-      'zh-TW': '⚡ 快速登入系統',
-      'zh-CN': '⚡ 快速登录系统'
+      en: 'The Quick Login System',
+      'zh-TW': '快速登入系統',
+      'zh-CN': '快速登录系统'
     },
     loginDesc: {
       en: 'Typing passwords wastes valuable class time. Our Quick Login system allows your students to instantly connect to your live presentation just by opening the browser on their assigned computer.',
@@ -91,14 +91,14 @@ export default function UserGuide() {
       'zh-CN': '在控制台中上传 CSV 文件，将学生资料与 PC_ID 进行绑定。'
     },
     loginLi3: {
-      en: 'Click the "▶️ Login Students" button on your dashboard. Any student sitting at a registered PC will be automatically logged in!',
-      'zh-TW': '在上課時，點擊控制台的「▶️ 登入學生裝置」，所有坐在註冊電腦前的學生將會自動登入！',
-      'zh-CN': '在上课时，点击控制台的“▶️ 登录学生设备”，所有坐在注册电脑前的学生将会自动登录！'
+      en: 'Click the "Login Students" button on your dashboard. Any student sitting at a registered PC will be automatically logged in!',
+      'zh-TW': '在上課時，點擊控制台的「登入學生裝置」，所有坐在註冊電腦前的學生將會自動登入！',
+      'zh-CN': '在上课时，点击控制台的“登录学生设备”，所有坐在注册电脑前的学生将会自动登录！'
     },
     expiryTitle: {
-      en: '⏳ Course Lifecycle & Expiration',
-      'zh-TW': '⏳ 課程生命週期與過期機制',
-      'zh-CN': '⏳ 课程生命周期与过期机制'
+      en: 'Course Lifecycle & Expiration',
+      'zh-TW': '課程生命週期與過期機制',
+      'zh-CN': '课程生命周期与过期机制'
     },
     expiryDesc1: {
       en: 'To ensure our servers remain fast and quotas are managed fairly, every course has a strict 13-month lifecycle.',
@@ -126,9 +126,9 @@ export default function UserGuide() {
       'zh-CN': '您将无法开启直播课堂，也无法邀请新学生。'
     },
     expiryLi3: {
-      en: 'Simply click the "📋 Copy Course" button to generate a fresh clone for a new batch of students!',
-      'zh-TW': '只需點擊「📋 複製課程」按鈕，系統將產生一份全新的複本，供下一批新生使用！',
-      'zh-CN': '只需点击“📋 复制课程”按钮，系统将生成一份全新的副本，供下一批新生使用！'
+      en: 'Simply click the "Copy Course" button to generate a fresh clone for a new batch of students!',
+      'zh-TW': '只需點擊「複製課程」按鈕，系統將產生一份全新的複本，供下一批新生使用！',
+      'zh-CN': '只需点击“复制课程”按钮，系统将生成一份全新的副本，供下一批新生使用！'
     },
     returnBtn: {
       en: '← Return to Dashboard',

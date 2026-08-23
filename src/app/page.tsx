@@ -5,6 +5,21 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 import Footer from '@/components/Footer';
+import { 
+  BenQLogo, 
+  MaxhubLogo, 
+  SeewoLogo, 
+  NewlineLogo, 
+  PrometheanLogo, 
+  SmartBoardLogo, 
+  ViewSonicLogo, 
+  HuaweiLogo, 
+  SamsungLogo,
+  AppleLogo,
+  AndroidLogo,
+  WindowsLogo,
+  ChromeOSLogo
+} from '@/components/BrandLogos';
 
 export default function Home() {
   const router = useRouter();
@@ -186,51 +201,263 @@ export default function Home() {
       <div className="bg-blob bg-blob-1" />
       <div className="bg-blob bg-blob-2" />
 
-      <nav className="glass-panel app-nav" style={{ margin: '24px auto', width: '90%', maxWidth: '1200px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px', zIndex: 100, position: 'relative' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onDoubleClick={() => { setTempPcId(localStorage.getItem('pc_id') || ''); setShowPcIdModal(true); }}>
-          <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '40px', objectFit: 'contain' }} title="Double click to configure PC ID" />
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px' }} title="Double click to configure PC ID">{t('header.brand')}</h2>
-        </div>
-        <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          
-          <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle menu">
-             {isMobileMenuOpen ? '✕' : '☰'}
-          </button>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, width: '100%', background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onDoubleClick={() => { setTempPcId(localStorage.getItem('pc_id') || ''); setShowPcIdModal(true); }}>
+            <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '32px', objectFit: 'contain' }} title="Double click to configure PC ID" />
+            <span style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', color: '#f5f5f7' }}>{t('header.brand')}</span>
+          </div>
 
-          <div className={`nav-actions ${isMobileMenuOpen ? 'open' : ''}`} style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <button type="button" className="btn-secondary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>{t('header.login')}</button>
-            <button type="button" className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.95rem' }} onClick={() => { resetForm(false); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>Register</button>
+          <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <LanguageToggle />
+            
+            <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle menu">
+               {isMobileMenuOpen ? '✕' : '☰'}
+            </button>
+
+            <div className={`nav-actions ${isMobileMenuOpen ? 'open' : ''}`} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <button type="button" className="btn-secondary" style={{ padding: '6px 16px', fontSize: '0.88rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>{t('header.login')}</button>
+              <button type="button" className="btn-primary" style={{ padding: '6px 18px', fontSize: '0.88rem' }} onClick={() => { resetForm(false); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>Register</button>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Floating Language Toggle Below Header */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', maxWidth: '1200px', margin: '8px auto 0', padding: '0 32px', position: 'relative', zIndex: 90 }}>
-        <LanguageToggle />
-      </div>
-
-      <section className="container" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px 80px', position: 'relative' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: '800px', opacity: 0 }} className="animate-fade-in-up">
-          <div className="glass-panel" style={{ padding: '8px 16px', borderRadius: '30px', display: 'inline-block', marginBottom: '24px', border: '1px solid var(--primary)', color: 'var(--primary)', fontWeight: 500, fontSize: '0.9rem' }}>
+      {/* Hero Section */}
+      <section style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px 60px', position: 'relative', textAlign: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '850px' }} className="animate-fade-in-up">
+          <div style={{ padding: '6px 16px', borderRadius: '980px', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '28px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#2997ff', fontWeight: 500, fontSize: '0.85rem', letterSpacing: '0.02em' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2997ff', display: 'inline-block' }} />
             {t('hero.badge')}
           </div>
           
-          <h1 style={{ fontSize: '4.5rem', fontWeight: 800, lineHeight: 1.1, marginBottom: '24px', letterSpacing: '-1px' }}>
-            {t('hero.title')}
+          <h1 style={{ fontSize: 'clamp(2.8rem, 6vw, 4.8rem)', fontWeight: 700, lineHeight: 1.05, marginBottom: '24px', letterSpacing: '-0.035em' }}>
+            <span className="apple-gradient-text">The interactive classroom.</span><br />
+            <span className="apple-color-gradient">Reimagined.</span>
           </h1>
           
-          <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', marginBottom: '40px', maxWidth: '600px', lineHeight: 1.6 }}>
+          <p style={{ fontSize: '1.25rem', color: '#86868b', marginBottom: '36px', maxWidth: '640px', lineHeight: 1.5, fontWeight: 400, letterSpacing: '-0.01em' }}>
             {t('hero.subtitle')}
           </p>
           
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <button className="btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', minWidth: '200px' }} onClick={() => { setRole('EDUCATOR'); resetForm(true); setShowAuthModal(true); }}>
-              👨‍🏫 {t('hero.loginAsEducator')}
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button className="btn-primary" style={{ padding: '14px 32px', fontSize: '1.05rem', minWidth: '190px' }} onClick={() => { setRole('EDUCATOR'); resetForm(true); setShowAuthModal(true); }}>
+              {t('hero.loginAsEducator')}
             </button>
-            <button className="btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', minWidth: '200px' }} onClick={() => { setRole('LEARNER'); resetForm(true); setShowAuthModal(true); }}>
-              🎓 {t('hero.loginAsStudent')}
+            <button className="btn-secondary" style={{ padding: '14px 32px', fontSize: '1.05rem', minWidth: '190px' }} onClick={() => { setRole('LEARNER'); resetForm(true); setShowAuthModal(true); }}>
+              {t('hero.loginAsStudent')}
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Interactive Whiteboard Brands Marquee Section */}
+      <section style={{ width: '100%', padding: '40px 0 20px', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', textAlign: 'center', marginBottom: '28px' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
+            HARDWARE ECOSYSTEM
+          </div>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', marginBottom: '10px' }}>
+            {t('brands.title')}
+          </h2>
+          <p style={{ color: '#86868b', fontSize: '1.05rem', maxWidth: '640px', margin: '0 auto', lineHeight: 1.5 }}>
+            {t('brands.subtitle')}
+          </p>
+        </div>
+
+        {/* Marquee Carousel with Real Vector Brand Logos */}
+        <div className="marquee-wrapper">
+          <div className="marquee-track">
+            {/* First Set of Brands */}
+            {[
+              { id: 'benq', desc: 'RP / RM Interactive Displays', logo: <BenQLogo height={22} /> },
+              { id: 'maxhub', desc: 'V5 / V6 Interactive Panels', logo: <MaxhubLogo height={20} /> },
+              { id: 'seewo', desc: 'Interactive Touch Boards', logo: <SeewoLogo height={20} /> },
+              { id: 'newline', desc: 'Touch Collaboration Displays', logo: <NewlineLogo height={20} /> },
+              { id: 'promethean', desc: 'ActivPanel Series', logo: <PrometheanLogo height={20} /> },
+              { id: 'smart', desc: 'Interactive Learning Ecosystem', logo: <SmartBoardLogo height={20} /> },
+              { id: 'viewsonic', desc: 'ViewBoard 4K Panels', logo: <ViewSonicLogo height={20} /> },
+              { id: 'huawei', desc: 'IdeaHub Board Education', logo: <HuaweiLogo height={20} /> },
+              { id: 'samsung', desc: 'Interactive Digital Whiteboard', logo: <SamsungLogo height={18} /> },
+            ].map((brand, idx) => (
+              <div key={`brand-1-${idx}`} className="brand-pill" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '12px 26px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>{brand.logo}</div>
+                <div style={{ fontSize: '0.75rem', color: '#86868b', fontWeight: 400, borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '12px', whiteSpace: 'nowrap' }}>
+                  {brand.desc}
+                </div>
+              </div>
+            ))}
+
+            {/* Duplicate Set for Seamless Continuous Infinite Scrolling */}
+            {[
+              { id: 'benq', desc: 'RP / RM Interactive Displays', logo: <BenQLogo height={22} /> },
+              { id: 'maxhub', desc: 'V5 / V6 Interactive Panels', logo: <MaxhubLogo height={20} /> },
+              { id: 'seewo', desc: 'Interactive Touch Boards', logo: <SeewoLogo height={20} /> },
+              { id: 'newline', desc: 'Touch Collaboration Displays', logo: <NewlineLogo height={20} /> },
+              { id: 'promethean', desc: 'ActivPanel Series', logo: <PrometheanLogo height={20} /> },
+              { id: 'smart', desc: 'Interactive Learning Ecosystem', logo: <SmartBoardLogo height={20} /> },
+              { id: 'viewsonic', desc: 'ViewBoard 4K Panels', logo: <ViewSonicLogo height={20} /> },
+              { id: 'huawei', desc: 'IdeaHub Board Education', logo: <HuaweiLogo height={20} /> },
+              { id: 'samsung', desc: 'Interactive Digital Whiteboard', logo: <SamsungLogo height={18} /> },
+            ].map((brand, idx) => (
+              <div key={`brand-2-${idx}`} className="brand-pill" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '12px 26px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>{brand.logo}</div>
+                <div style={{ fontSize: '0.75rem', color: '#86868b', fontWeight: 400, borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '12px', whiteSpace: 'nowrap' }}>
+                  {brand.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Compatible Devices & Operating Systems Grid */}
+      <section style={{ maxWidth: '1200px', margin: '60px auto 20px', padding: '0 24px', width: '100%', position: 'relative', zIndex: 10 }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
+            CROSS-PLATFORM INTEGRATION
+          </div>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', marginBottom: '12px' }}>
+            {t('devices.title')}
+          </h2>
+          <p style={{ color: '#86868b', fontSize: '1.1rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.5 }}>
+            {t('devices.subtitle')}
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '64px' }}>
+          {[
+            {
+              logo: <AppleLogo height={26} fill="#F5F5F7" />,
+              os: 'Apple iPadOS',
+              badge: 'Safari & Chrome',
+              desc: 'iPad Pro / Air, Apple Pencil low-latency ink & 120Hz ProMotion'
+            },
+            {
+              logo: <AndroidLogo height={26} />,
+              os: 'Android OS',
+              badge: 'v9.0 ~ v14.0',
+              desc: 'Built-in whiteboard browsers, Xiaomi, Samsung & Huawei Tablets'
+            },
+            {
+              logo: <WindowsLogo height={24} />,
+              os: 'Microsoft Windows',
+              badge: 'Win 10 / 11',
+              desc: 'Interactive touch TVs, Surface Hub, AIO touch monitors & PCs'
+            },
+            {
+              logo: <AppleLogo height={26} fill="#F5F5F7" />,
+              os: 'Apple macOS',
+              badge: 'macOS Monterey+',
+              desc: 'MacBook, iMac, dual-display teacher control & staging'
+            },
+            {
+              logo: <ChromeOSLogo height={25} />,
+              os: 'ChromeOS & Linux',
+              badge: 'Web-Native',
+              desc: 'Classroom Chromebook fleets & open-source lab workstations'
+            }
+          ].map((device, idx) => (
+            <div key={idx} className="device-badge">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>{device.logo}</div>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.08)', color: '#2997ff', fontWeight: 500, border: '1px solid rgba(41, 151, 255, 0.25)' }}>
+                  {device.badge}
+                </span>
+              </div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#f5f5f7', margin: '8px 0 0', letterSpacing: '-0.02em' }}>{device.os}</h3>
+              <p style={{ fontSize: '0.85rem', color: '#86868b', lineHeight: 1.45, margin: 0 }}>{device.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Feature Highlights & Technology Introductions (Big 1 Card Per Row Bento) */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
+            ENGINEERED CAPABILITIES
+          </div>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', marginBottom: '12px' }}>
+            {t('features.title')}
+          </h2>
+          <p style={{ color: '#86868b', fontSize: '1.1rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.5 }}>
+            {t('features.subtitle')}
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '80px' }}>
+          {[
+            {
+              icon: (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2997ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                </svg>
+              ),
+              titleKey: 'features.sync.title',
+              descKey: 'features.sync.desc',
+              tag: '< 50ms Latency',
+              color: '#2997ff',
+              metric: '0.05s Sync Speed'
+            },
+            {
+              icon: (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#30d158" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+              ),
+              titleKey: 'features.touch.title',
+              descKey: 'features.touch.desc',
+              tag: 'Multi-Touch & Stylus',
+              color: '#30d158',
+              metric: '4096 Levels Pressure'
+            },
+            {
+              icon: (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              ),
+              titleKey: 'features.hardware.title',
+              descKey: 'features.hardware.desc',
+              tag: '100% Web-Based',
+              color: '#ff9f0a',
+              metric: 'Zero Driver Setup'
+            },
+            {
+              icon: (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#bf5af2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              ),
+              titleKey: 'features.presence.title',
+              descKey: 'features.presence.desc',
+              tag: 'Live Telemetry',
+              color: '#bf5af2',
+              metric: 'Real-Time Roster'
+            }
+          ].map((feat, idx) => (
+            <div key={idx} className="feature-row-card">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: '0 0 auto', minWidth: '320px' }}>
+                <span style={{ background: `${feat.color}15`, border: `1px solid ${feat.color}35`, padding: '16px', borderRadius: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {feat.icon}
+                </span>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: feat.color, border: `1px solid ${feat.color}40`, padding: '3px 12px', borderRadius: '980px', background: `${feat.color}15`, letterSpacing: '0.03em' }}>
+                      {feat.tag}
+                    </span>
+                  </div>
+                  <h3 style={{ fontSize: 'clamp(1.25rem, 2vw, 1.55rem)', fontWeight: 700, color: '#f5f5f7', margin: 0, letterSpacing: '-0.025em' }}>
+                    {t(feat.titleKey)}
+                  </h3>
+                </div>
+              </div>
+              <div style={{ flex: 1, borderLeft: '1px solid rgba(255, 255, 255, 0.08)', paddingLeft: '32px' }}>
+                <p style={{ fontSize: '1.02rem', color: '#86868b', lineHeight: 1.6, margin: 0 }}>
+                  {t(feat.descKey)}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

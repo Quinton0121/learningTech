@@ -78,36 +78,36 @@ export default function EducatorStudentsPage() {
             <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Welcome back,</p>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '8px' }}>Educator {user.name}</h3>
             <div style={{ display: 'inline-block', padding: '4px 12px', background: 'rgba(168, 85, 247, 0.15)', borderRadius: '20px', color: '#c084fc', fontSize: '0.85rem', fontWeight: 700, border: '1px solid rgba(168, 85, 247, 0.3)' }}>
-              💰 {user.tokens || 0} Tokens
+              {user.tokens || 0} Tokens
             </div>
           </div>
         )}
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
           <div onClick={() => router.push('/dashboard')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }} className="hover:text-white">
-            📚 My Courses
+            My Courses
           </div>
           <div style={{ padding: '12px 16px', background: 'rgba(56, 189, 248, 0.15)', borderLeft: '4px solid var(--primary)', borderRadius: '0 8px 8px 0', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer' }}>
-            👥 Students
+            Students
           </div>
           <div onClick={() => router.push('/analytics')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }} className="hover:text-white">
-            📊 Analytics
+            Analytics
           </div>
           <div onClick={() => router.push('/marketplace')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }} className="hover:text-white">
-            🛒 Marketplace
+            Marketplace
           </div>
           <div onClick={() => router.push('/tokens')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }} className="hover:text-white">
-            💰 Buy Tokens
+            Buy Tokens
           </div>
           <div onClick={() => router.push('/teacher-marketplace')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }} className="hover:text-white">
-            🛍️ Educator Shop
+            Educator Shop
           </div>
           <div onClick={() => router.push('/custom-course')} style={{ padding: '12px 16px', color: '#38bdf8', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#38bdf8', borderRadius: '50%', boxShadow: '0 0 10px #38bdf8' }}></span>
-            🛠️ Custom Order
+            Custom Order
           </div>
           <div onClick={() => router.push('/settings')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }} className="hover:text-white">
-            ⚙️ Settings
+            Settings
           </div>
         </nav>
 

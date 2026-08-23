@@ -45,7 +45,7 @@ export default function AnalyticsPage() {
             ← Back to Dashboard
           </div>
           <div style={{ padding: '12px 16px', background: 'rgba(167, 139, 250, 0.15)', borderLeft: '4px solid #a78bfa', borderRadius: '0 8px 8px 0', color: 'var(--text-main)', fontWeight: 600 }}>
-            📊 Analytics & Exports
+            Analytics & Exports
           </div>
         </nav>
       </aside>

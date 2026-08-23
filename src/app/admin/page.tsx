@@ -267,7 +267,7 @@ export default function AdminDashboard() {
                     <h3 style={{ fontSize: '1.3rem', margin: '0 0 8px 0', color: 'var(--text-main)' }}>{course.title}</h3>
                     <p style={{ color: 'var(--text-muted)', margin: '0 0 12px 0', fontSize: '0.95rem' }}>{course.description}</p>
                     <div style={{ display: 'inline-flex', padding: '4px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '20px', fontSize: '0.85rem', color: '#cbd5e1', border: '1px solid var(--glass-border)' }}>
-                      👤 Educator: {course.educator?.name} ({course.educator?.email})
+                      Educator: {course.educator?.name} ({course.educator?.email})
                     </div>
                   </div>
                 </div>
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
                     className="btn-secondary"
                     style={{ padding: '12px 24px', border: '1px solid #38bdf8', color: '#38bdf8', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                   >
-                    📥 Download TXT for AI Scanning
+                    Download TXT for AI Scanning
                   </a>
                   
                   <div style={{ flex: 1 }} />
@@ -347,7 +347,7 @@ export default function AdminDashboard() {
                 <h3 style={{ fontSize: '1.2rem', margin: '0 0 8px 0', color: 'var(--text-main)' }}>{course.title}</h3>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   <span style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '20px', fontSize: '0.85rem', color: '#cbd5e1', border: '1px solid var(--glass-border)' }}>
-                    👤 {course.educator?.name || course.educator?.email}
+                    Educator: {course.educator?.name || course.educator?.email}
                   </span>
                   <span style={{ padding: '4px 12px', background: course.isActive ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)', borderRadius: '20px', fontSize: '0.85rem', color: course.isActive ? '#10b981' : '#cbd5e1', border: course.isActive ? '1px solid #10b981' : '1px solid var(--glass-border)' }}>
                     {course.isActive ? 'Class Session Running' : 'Class Session Paused'}
