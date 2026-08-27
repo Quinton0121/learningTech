@@ -383,18 +383,17 @@ export default function EducatorDashboard() {
           <div onClick={() => router.push('/teacher-marketplace')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
             {t('sidebar.educatorShop')}
           </div>
-          <div onClick={() => router.push('/custom-course')} style={{ padding: '12px 16px', color: '#38bdf8', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#38bdf8', borderRadius: '50%', boxShadow: '0 0 10px #38bdf8' }}></span>
+          <div onClick={() => router.push('/custom-course')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
             {t('sidebar.customOrder')}
           </div>
           <div onClick={() => router.push('/settings')} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
             {t('sidebar.settings')}
           </div>
-          <div onClick={() => { setSelectedContactId('ADMIN'); setShowInbox(true); }} style={{ padding: '12px 16px', color: '#f59e0b', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div onClick={() => { setSelectedContactId('ADMIN'); setShowInbox(true); }} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px' }}>
             Contact Support
           </div>
-          <div onClick={() => setShowInbox(true)} style={{ padding: '12px 16px', color: '#38bdf8', cursor: 'pointer', borderRadius: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Messages</span>
+          <div onClick={() => setShowInbox(true)} style={{ padding: '12px 16px', color: 'var(--text-muted)', cursor: 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>Messages</span>
             {inboxMessages.length > 0 && (
               <span style={{ background: '#ef4444', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{inboxMessages.length}</span>
             )}
