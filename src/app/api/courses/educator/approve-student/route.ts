@@ -1,0 +1,49 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-development-key-change-in-production';
+
+export async function POST(request: Request) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const token = authHeader.split(' ')[1];
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    
+    const { courseId, studentId, action } = await request.json(); // action = 'APPROVE' or 'REJECT'
+    
+    const course = await prisma.course.findFirst({ where: { id: courseId, educatorId: decoded.userId }});
+    if (!course) return NextResponse.json({ error: 'Unauthorized' }, { status: 404 });
+
+    if (action === 'REJECT') {
+      await prisma.enrollment.delete({ where: { userId_courseId: { userId: studentId, courseId: course.id } }});
+      return NextResponse.json({ success: true, message: 'Request rejected' }, { status: 200 });
+    } else {
+      const quotaSourceCourseId = course.sharedQuotaGroupId || course.id;
+      const quotaCourse = quotaSourceCourseId === course.id ? course : await prisma.course.findUnique({ where: { id: quotaSourceCourseId }});
+      
+      if (!quotaCourse) {
+         return NextResponse.json({ error: 'Shared quota pool not found' }, { status: 404 });
+      }
+
+      if (quotaCourse.studentQuota < 1) {
+        return NextResponse.json({ error: '0 seats left. Please purchase more quotas.' }, { status: 400 });
+      }
+
+      await prisma.$transaction([
+        prisma.course.update({
+          where: { id: quotaSourceCourseId },
+          data: { studentQuota: quotaCourse.studentQuota - 1 }
+        }),
+        prisma.enrollment.update({
+          where: { userId_courseId: { userId: studentId, courseId: course.id } },
+          data: { status: 'APPROVED' }
+        })
+      ]);
+      return NextResponse.json({ success: true, message: 'Request approved' }, { status: 200 });
+    }
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  }
+}

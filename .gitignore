@@ -67,7 +67,7 @@ create_user.js
 combine_html.py
 translate.py
 *.tmp
-courses/
+/courses/
 public/courses/
 public/pending_courses/
 *.html
