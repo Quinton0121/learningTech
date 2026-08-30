@@ -569,19 +569,40 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         }
       }, true);
 
+      document.getElementById('prev-btn')?.addEventListener('click', (e) => {
+        if (!isTeacher && isSynced) {
+          e.preventDefault();
+          e.stopPropagation();
+          const lang = localStorage.getItem('courseLang') || 'en';
+          window.showSyncToast(lang === 'en' ? 'Class is synced with teacher' : '課堂目前與教師同步中', true);
+          return false;
+        }
+      }, true);
+
       // Keyboard navigation interceptor for learners
       window.addEventListener('keydown', (e) => {
-        if (!isTeacher && (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ')) {
-          if (isSynced) {
-            e.preventDefault();
-            const lang = localStorage.getItem('courseLang') || 'en';
-            window.showSyncToast(lang === 'en' ? 'Class is synced with teacher' : '課堂目前與教師同步中', true);
-          } else {
-            const activeIdx = window.getActiveSlideIndex();
-            if (activeIdx >= publishedSlide) {
+        if (!isTeacher) {
+          if (['ArrowRight', 'PageDown', ' '].includes(e.key)) {
+            if (isSynced) {
               e.preventDefault();
+              e.stopPropagation();
               const lang = localStorage.getItem('courseLang') || 'en';
-              window.showSyncToast(lang === 'en' ? 'Slide not published yet' : '教師尚未發佈此頁面', true);
+              window.showSyncToast(lang === 'en' ? 'Class is synced with teacher' : '課堂目前與教師同步中', true);
+            } else {
+              const activeIdx = window.getActiveSlideIndex();
+              if (activeIdx >= publishedSlide) {
+                e.preventDefault();
+                e.stopPropagation();
+                const lang = localStorage.getItem('courseLang') || 'en';
+                window.showSyncToast(lang === 'en' ? 'Slide not published yet' : '教師尚未發佈此頁面', true);
+              }
+            }
+          } else if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+            if (isSynced) {
+              e.preventDefault();
+              e.stopPropagation();
+              const lang = localStorage.getItem('courseLang') || 'en';
+              window.showSyncToast(lang === 'en' ? 'Class is synced with teacher' : '課堂目前與教師同步中', true);
             }
           }
         }
@@ -611,6 +632,10 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
 
           if (isTeacher) {
             document.getElementById('teacher-controls')?.classList.remove('hidden');
+            document.getElementById('back-dashboard-btn')?.classList.remove('hidden');
+            const backBtn = document.getElementById('back-dashboard-btn');
+            if (backBtn) backBtn.style.display = 'flex';
+
             const studentCountEl = document.getElementById('active-students-count');
             if (studentCountEl) studentCountEl.textContent = data.activeStudents || 0;
             const tooltipCountEl = document.getElementById('active-students-tooltip-count');
@@ -659,7 +684,27 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
             }
 
           } else {
-            // Learner UI
+            // Learner UI: Hide teacher controls & hide back dashboard button to lock student in slide
+            document.getElementById('teacher-controls')?.classList.add('hidden');
+            const backBtn = document.getElementById('back-dashboard-btn');
+            if (backBtn) {
+              backBtn.classList.add('hidden');
+              backBtn.style.setProperty('display', 'none', 'important');
+            }
+
+            // Lock browser navigation for learners
+            if (!window.__history_trapped__) {
+              window.__history_trapped__ = true;
+              try {
+                history.pushState(null, document.title, location.href);
+                window.addEventListener('popstate', function () {
+                  history.pushState(null, document.title, location.href);
+                  const l = localStorage.getItem('courseLang') || 'en';
+                  window.showSyncToast(l === 'en' ? 'Class in session - Navigation locked' : '課堂進行中 - 導航已鎖定', true);
+                });
+              } catch(e) {}
+            }
+
             const studentIndicator = document.getElementById('student-indicator');
             if (studentIndicator) {
               studentIndicator.classList.remove('hidden');
@@ -682,9 +727,12 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
                 syncText.className = 'text-emerald-400 text-xs font-semibold';
               }
 
-              // Automatically follow teacher's slide
+              // In Synced Mode: Student must be on teacher's exact current slide
               if (typeof data.currentSlide === 'number' && activeIdx !== data.currentSlide) {
                 window.goToSlideDOM(data.currentSlide);
+              } else {
+                // Ensure buttons remain locked in sync mode
+                window.goToSlideDOM(activeIdx, false);
               }
             } else {
               if (syncDot) syncDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
@@ -693,7 +741,7 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
                 syncText.className = 'text-slate-300 text-xs font-semibold';
               }
 
-              // Enforce boundary in independent mode
+              // In Independent Mode: Student can change pages freely up to publishedSlide
               if (activeIdx > publishedSlide) {
                 window.goToSlideDOM(publishedSlide);
               } else {

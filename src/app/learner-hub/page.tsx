@@ -25,28 +25,39 @@ export default function LearnerHub() {
     }
     setToken(t);
     
-    // Auto-Logout Polling: Check if class is still active
-    const interval = setInterval(() => {
-      fetch('/api/auth/status', {
-        headers: { 'Authorization': `Bearer ${t}` }
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (!data.active) {
+    // Auto-Logout & Active Class Polling
+    const checkStatusAndActiveCourse = async () => {
+      try {
+        const authRes = await fetch('/api/auth/status', {
+          headers: { 'Authorization': `Bearer ${t}` }
+        });
+        const authData = await authRes.json();
+        if (!authData.active) {
           localStorage.removeItem('token');
-          window.location.href = '/'; // Force refresh
+          window.location.href = '/';
+          return;
         }
-      })
-      .catch(e => console.error(e));
-    }, 5000);
-    
-    // Fetch enrollments
-    fetch('/api/courses/my-courses', {
-      headers: { 'Authorization': `Bearer ${t}` }
-    }).then(r => r.json()).then(data => {
-      if (data.enrollments) setEnrollments(data.enrollments);
-      if (data.user) setUser(data.user);
-    });
+
+        const coursesRes = await fetch('/api/courses/my-courses', {
+          headers: { 'Authorization': `Bearer ${t}` }
+        });
+        const coursesData = await coursesRes.json();
+        if (coursesData.enrollments) {
+          setEnrollments(coursesData.enrollments);
+          const activeEnrollment = coursesData.enrollments.find((e: any) => e.course && e.course.isActive);
+          if (activeEnrollment && activeEnrollment.course && activeEnrollment.course.id) {
+            window.location.href = `/api/course-play?id=${activeEnrollment.course.id}`;
+            return;
+          }
+        }
+        if (coursesData.user) setUser(coursesData.user);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    checkStatusAndActiveCourse();
+    const interval = setInterval(checkStatusAndActiveCourse, 2500);
 
     // Fetch messages
     fetch('/api/messages/inbox', {

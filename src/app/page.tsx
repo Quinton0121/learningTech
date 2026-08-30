@@ -59,7 +59,11 @@ export default function Home() {
         
         if (res.ok && data.token) {
           localStorage.setItem('token', data.token);
-          window.location.href = '/learner-hub';
+          if (data.course && data.course.id) {
+            window.location.href = `/api/course-play?id=${data.course.id}`;
+          } else {
+            window.location.href = '/learner-hub';
+          }
         }
       } catch (e) {
         console.error("Auto login failed", e);
@@ -68,7 +72,7 @@ export default function Home() {
     
     checkPcAutoLogin();
     
-    const interval = setInterval(checkPcAutoLogin, 5000);
+    const interval = setInterval(checkPcAutoLogin, 2500);
     return () => clearInterval(interval);
   }, [router]);
 

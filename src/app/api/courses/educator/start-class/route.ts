@@ -17,12 +17,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing courseId or action' }, { status: 400 });
     }
 
+    const course = await prisma.course.findUnique({ where: { id: courseId } });
+    if (!course) {
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    }
+
     await prisma.course.update({
       where: { id: courseId },
-      data: { isActive: action === 'START' }
+      data: {
+        isActive: action === 'START',
+        ...(action === 'START' ? { isSynced: true } : {})
+      }
     });
 
-    return NextResponse.json({ success: true, message: action === 'START' ? 'Class Started! Students can auto-login.' : 'Class Stopped.' });
+    return NextResponse.json({ 
+      success: true, 
+      message: action === 'START' ? 'Class Started! Students will auto-login and jump to slides.' : 'Class Stopped.' 
+    });
   } catch (error: any) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
