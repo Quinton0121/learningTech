@@ -1306,6 +1306,74 @@
             const totalSlides = slides.length;
             let currentSlideIndex = 0;
 
+            function getSafeSize(container) {
+                if (!container) return { width: 600, height: 450 };
+                let width = container.clientWidth || container.offsetWidth;
+                let height = container.clientHeight || container.offsetHeight;
+                if (!width || width < 50) {
+                    width = container.parentElement ? (container.parentElement.clientWidth || container.parentElement.offsetWidth) : 0;
+                    if (!width || width < 50) width = Math.floor(window.innerWidth * 0.55);
+                }
+                if (!height || height < 50) {
+                    height = container.parentElement ? (container.parentElement.clientHeight || container.parentElement.offsetHeight) : 0;
+                    if (!height || height < 50) height = Math.floor(window.innerHeight * 0.55);
+                }
+                return { width: Math.max(width, 300), height: Math.max(height, 250) };
+            }
+
+            function triggerSlideViewport(idx) {
+                const doResize = () => {
+                    if (idx === 5) { if (!isThreeInitialized) initThreeJS(); onSlide6Resize(); }
+                    else if (idx === 6) { if (!initSlide7Done) initSlide7(); onSlide7Resize(); }
+                    else if (idx === 7) { if (!initSlide8Done) initSlide8(); onSlide8Resize(); }
+                    else if (idx === 8) { initMazeCanvas(); }
+                    else if (idx === 9) { if (!initSlide10Done) initSlide10(); onSlide10Resize(); }
+                    else if (idx === 10) { if (!initSlide11Done) initSlide11(); onSlide11Resize(); }
+                    else if (idx === 11) { if (!initSlide12Done) initSlide12(); onSlide12Resize(); }
+                    else if (idx === 12) { if (!initSlide13Done) initSlide13(); onSlide13Resize(); }
+                };
+
+                doResize();
+                setTimeout(doResize, 60);
+                setTimeout(doResize, 180);
+                setTimeout(doResize, 350);
+                setTimeout(doResize, 650);
+            }
+
+            window.onSlideEntered = function(index) {
+                if (typeof index === 'number' && index >= 0 && index < totalSlides) {
+                    currentSlideIndex = index;
+                } else {
+                    const activeEl = document.querySelector('.slide-container.active');
+                    if (activeEl) {
+                        const idx = Array.from(slides).indexOf(activeEl);
+                        if (idx !== -1) currentSlideIndex = idx;
+                    }
+                }
+                
+                slides.forEach((slide, idx) => {
+                    if (idx === currentSlideIndex) {
+                        slide.classList.add('active');
+                        slide.classList.remove('previous');
+                    } else if (idx < currentSlideIndex) {
+                        slide.classList.remove('active');
+                        slide.classList.add('previous');
+                    } else {
+                        slide.classList.remove('active', 'previous');
+                    }
+                });
+
+                if (prevBtn) prevBtn.disabled = (currentSlideIndex === 0);
+                if (nextBtn) nextBtn.disabled = (currentSlideIndex === totalSlides - 1);
+                if (currentNumSpan) currentNumSpan.textContent = currentSlideIndex + 1;
+                if (progressBar) progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
+
+                triggerSlideViewport(currentSlideIndex);
+            };
+
+            window.showSlide = window.onSlideEntered;
+            window.goToSlide = window.onSlideEntered;
+
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
             const currentNumSpan = document.getElementById('current-slide-num');
@@ -1315,66 +1383,7 @@
             totalNumSpan.textContent = totalSlides;
 
             window.updateUI = function() {
-                slides.forEach((slide, index) => {
-                    slide.classList.remove('active', 'previous');
-                    if (index === currentSlideIndex) {
-                        slide.classList.add('active');
-                    } else if (index < currentSlideIndex) {
-                        slide.classList.add('previous');
-                    }
-                });
-
-                prevBtn.disabled = currentSlideIndex === 0;
-                nextBtn.disabled = currentSlideIndex === totalSlides - 1;
-                currentNumSpan.textContent = currentSlideIndex + 1;
-                progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
-
-                // Slide specific viewport updates (Slide 6 is index 5)
-                if (currentSlideIndex === 5 && !isThreeInitialized) {
-                    setTimeout(initThreeJS, 100);
-                } else if (currentSlideIndex === 5 && isThreeInitialized) {
-                    onSlide6Resize();
-                }
-
-                if (currentSlideIndex === 6 && !initSlide7Done) {
-                    setTimeout(initSlide7, 100);
-                } else if (currentSlideIndex === 6 && initSlide7Done) {
-                    onSlide7Resize();
-                }
-
-                if (currentSlideIndex === 7 && !initSlide8Done) {
-                    setTimeout(initSlide8, 100);
-                } else if (currentSlideIndex === 7 && initSlide8Done) {
-                    onSlide8Resize();
-                }
-
-                if (currentSlideIndex === 8) {
-                    setTimeout(initMazeCanvas, 100);
-                }
-
-                if (currentSlideIndex === 9 && !initSlide10Done) {
-                    setTimeout(initSlide10, 100);
-                } else if (currentSlideIndex === 9 && initSlide10Done) {
-                    onSlide10Resize();
-                }
-
-                if (currentSlideIndex === 10 && !initSlide11Done) {
-                    setTimeout(initSlide11, 100);
-                } else if (currentSlideIndex === 10 && initSlide11Done) {
-                    onSlide11Resize();
-                }
-
-                if (currentSlideIndex === 11 && !initSlide12Done) {
-                    setTimeout(initSlide12, 100);
-                } else if (currentSlideIndex === 11 && initSlide12Done) {
-                    onSlide12Resize();
-                }
-
-                if (currentSlideIndex === 12 && !initSlide13Done) {
-                    setTimeout(initSlide13, 100);
-                } else if (currentSlideIndex === 12 && initSlide13Done) {
-                    onSlide13Resize();
-                }
+                window.onSlideEntered(currentSlideIndex);
             };
 
             window.nextSlide = function() {
@@ -1485,12 +1494,15 @@
             let isThreeInitialized = false;
 
             function initThreeJS() {
-                if (isThreeInitialized) return;
-                
+                if (isThreeInitialized) {
+                    onSlide6Resize();
+                    return;
+                }
                 const container = document.getElementById('three-container');
                 if (!container) return;
-                const width = container.clientWidth;
-                const height = container.clientHeight;
+                const size = getSafeSize(container);
+                const width = size.width;
+                const height = size.height;
 
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x2b2b2b);
@@ -1563,26 +1575,33 @@
             function onSlide6Resize() {
                 const container = document.getElementById('three-container');
                 if (!container || !renderer || !camera) return;
-                camera.aspect = container.clientWidth / container.clientHeight;
+                const size = getSafeSize(container);
+                camera.aspect = size.width / size.height;
                 camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setSize(size.width, size.height);
+                if (renderer && scene && camera) renderer.render(scene, camera);
             }
 
             let initSlide7Done = false;
             let scene7, camera7, renderer7, controls7, transformControl7, cube7;
 
             function initSlide7() {
+                if (initSlide7Done) {
+                    onSlide7Resize();
+                    return;
+                }
                 const container = document.getElementById('slide7-canvas-container');
                 if (!container) return;
+                const size = getSafeSize(container);
 
                 scene7 = new THREE.Scene();
                 scene7.background = new THREE.Color(0x1e1e1e);
 
-                camera7 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera7 = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 100);
                 camera7.position.set(5, 4, 6);
 
                 renderer7 = new THREE.WebGLRenderer({ antialias: true });
-                renderer7.setSize(container.clientWidth, container.clientHeight);
+                renderer7.setSize(size.width, size.height);
                 renderer7.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(renderer7.domElement);
 
@@ -1658,9 +1677,11 @@
             function onSlide7Resize() {
                 const container = document.getElementById('slide7-canvas-container');
                 if (!container || !renderer7 || !camera7) return;
-                camera7.aspect = container.clientWidth / container.clientHeight;
+                const size = getSafeSize(container);
+                camera7.aspect = size.width / size.height;
                 camera7.updateProjectionMatrix();
-                renderer7.setSize(container.clientWidth, container.clientHeight);
+                renderer7.setSize(size.width, size.height);
+                if (renderer7 && scene7 && camera7) renderer7.render(scene7, camera7);
             }
 
             let initSlide8Done = false;
@@ -1675,17 +1696,22 @@
             let s8LastConfirmedPos = new THREE.Vector3(0, 0.6, 0);
 
             function initSlide8() {
+                if (initSlide8Done) {
+                    onSlide8Resize();
+                    return;
+                }
                 const container = document.getElementById('slide8-canvas-container');
-                if (!container || initSlide8Done) return;
+                if (!container) return;
+                const size = getSafeSize(container);
 
                 scene8 = new THREE.Scene();
                 scene8.background = new THREE.Color(0x1a1a1e);
 
-                camera8 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera8 = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 100);
                 camera8.position.set(6.5, 5, 7.5);
 
                 renderer8 = new THREE.WebGLRenderer({ antialias: true });
-                renderer8.setSize(container.clientWidth, container.clientHeight);
+                renderer8.setSize(size.width, size.height);
                 renderer8.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(renderer8.domElement);
 
@@ -1930,9 +1956,11 @@
             function onSlide8Resize() {
                 const container = document.getElementById('slide8-canvas-container');
                 if (!container || !renderer8 || !camera8) return;
-                camera8.aspect = container.clientWidth / container.clientHeight;
+                const size = getSafeSize(container);
+                camera8.aspect = size.width / size.height;
                 camera8.updateProjectionMatrix();
-                renderer8.setSize(container.clientWidth, container.clientHeight);
+                renderer8.setSize(size.width, size.height);
+                if (renderer8 && scene8 && camera8) renderer8.render(scene8, camera8);
             }
 
             const MAZE_SIZE = 11;
@@ -1960,10 +1988,18 @@
             let mazeCtx = null;
 
             function initMazeCanvas() {
-                if (!mazeCanvas) return;
+                const canvas = document.getElementById('maze-canvas');
+                if (!canvas) return;
+                mazeCanvas = canvas;
                 mazeCtx = mazeCanvas.getContext('2d');
-                mazeCanvas.width = 440;
-                mazeCanvas.height = 440;
+                const container = canvas.parentElement;
+                let size = 440;
+                if (container && container.clientWidth) {
+                    size = Math.min(440, container.clientWidth - 32, container.clientHeight - 32);
+                }
+                if (size < 200) size = 440;
+                mazeCanvas.width = size;
+                mazeCanvas.height = size;
                 renderMaze();
             }
 
@@ -2179,17 +2215,22 @@
             let scene10, camera10, renderer10, controls10, transformControl10, cube10;
 
             function initSlide10() {
+                if (initSlide10Done) {
+                    onSlide10Resize();
+                    return;
+                }
                 const container = document.getElementById('slide10-canvas-container');
-                if (!container || initSlide10Done) return;
+                if (!container) return;
+                const size = getSafeSize(container);
 
                 scene10 = new THREE.Scene();
                 scene10.background = new THREE.Color(0x1e1e1e);
 
-                camera10 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera10 = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 100);
                 camera10.position.set(5, 4, 6);
 
                 renderer10 = new THREE.WebGLRenderer({ antialias: true });
-                renderer10.setSize(container.clientWidth, container.clientHeight);
+                renderer10.setSize(size.width, size.height);
                 renderer10.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(renderer10.domElement);
 
@@ -2272,9 +2313,11 @@
             function onSlide10Resize() {
                 const container = document.getElementById('slide10-canvas-container');
                 if (!container || !renderer10 || !camera10) return;
-                camera10.aspect = container.clientWidth / container.clientHeight;
+                const size = getSafeSize(container);
+                camera10.aspect = size.width / size.height;
                 camera10.updateProjectionMatrix();
-                renderer10.setSize(container.clientWidth, container.clientHeight);
+                renderer10.setSize(size.width, size.height);
+                if (renderer10 && scene10 && camera10) renderer10.render(scene10, camera10);
             }
 
             let initSlide11Done = false;
@@ -2340,18 +2383,23 @@
             }
 
             function initSlide11() {
+                if (initSlide11Done) {
+                    onSlide11Resize();
+                    return;
+                }
                 const container = document.getElementById('slide11-canvas-container');
-                if (!container || initSlide11Done) return;
+                if (!container) return;
+                const size = getSafeSize(container);
 
                 scene11 = new THREE.Scene();
                 scene11.background = new THREE.Color(0x141416);
 
-                camera11 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera11 = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 100);
                 camera11.position.set(0, 1.8, 8.5);
                 camera11.lookAt(0, 0, -1);
 
                 renderer11 = new THREE.WebGLRenderer({ antialias: true });
-                renderer11.setSize(container.clientWidth, container.clientHeight);
+                renderer11.setSize(size.width, size.height);
                 renderer11.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(renderer11.domElement);
 
@@ -2527,26 +2575,33 @@
             function onSlide11Resize() {
                 const container = document.getElementById('slide11-canvas-container');
                 if (!container || !renderer11 || !camera11) return;
-                camera11.aspect = container.clientWidth / container.clientHeight;
+                const size = getSafeSize(container);
+                camera11.aspect = size.width / size.height;
                 camera11.updateProjectionMatrix();
-                renderer11.setSize(container.clientWidth, container.clientHeight);
+                renderer11.setSize(size.width, size.height);
+                if (renderer11 && scene11 && camera11) renderer11.render(scene11, camera11);
             }
 
             let initSlide12Done = false;
             let scene12, camera12, renderer12, controls12, transformControl12, cube12;
 
             function initSlide12() {
+                if (initSlide12Done) {
+                    onSlide12Resize();
+                    return;
+                }
                 const container = document.getElementById('slide12-canvas-container');
-                if (!container || initSlide12Done) return;
+                if (!container) return;
+                const size = getSafeSize(container);
 
                 scene12 = new THREE.Scene();
                 scene12.background = new THREE.Color(0x1e1e1e);
 
-                camera12 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera12 = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 100);
                 camera12.position.set(5, 4, 6);
 
                 renderer12 = new THREE.WebGLRenderer({ antialias: true });
-                renderer12.setSize(container.clientWidth, container.clientHeight);
+                renderer12.setSize(size.width, size.height);
                 renderer12.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(renderer12.domElement);
 
@@ -2679,9 +2734,11 @@
             function onSlide12Resize() {
                 const container = document.getElementById('slide12-canvas-container');
                 if (!container || !renderer12 || !camera12) return;
-                camera12.aspect = container.clientWidth / container.clientHeight;
+                const size = getSafeSize(container);
+                camera12.aspect = size.width / size.height;
                 camera12.updateProjectionMatrix();
-                renderer12.setSize(container.clientWidth, container.clientHeight);
+                renderer12.setSize(size.width, size.height);
+                if (renderer12 && scene12 && camera12) renderer12.render(scene12, camera12);
             }
 
             let initSlide13Done = false;
@@ -2696,17 +2753,22 @@
             let dragPlaneIntersect13 = new THREE.Vector3();
 
             function initSlide13() {
+                if (initSlide13Done) {
+                    onSlide13Resize();
+                    return;
+                }
                 const container = document.getElementById('slide13-canvas-container');
-                if (!container || initSlide13Done) return;
+                if (!container) return;
+                const size = getSafeSize(container);
 
                 scene13 = new THREE.Scene();
                 scene13.background = new THREE.Color(0x1a1a1e);
 
-                camera13 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera13 = new THREE.PerspectiveCamera(45, size.width / size.height, 0.1, 100);
                 camera13.position.set(5.5, 4.5, 6.5);
 
                 renderer13 = new THREE.WebGLRenderer({ antialias: true });
-                renderer13.setSize(container.clientWidth, container.clientHeight);
+                renderer13.setSize(size.width, size.height);
                 renderer13.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(renderer13.domElement);
 
@@ -2931,9 +2993,11 @@
             function onSlide13Resize() {
                 const container = document.getElementById('slide13-canvas-container');
                 if (!container || !renderer13 || !camera13) return;
-                camera13.aspect = container.clientWidth / container.clientHeight;
+                const size = getSafeSize(container);
+                camera13.aspect = size.width / size.height;
                 camera13.updateProjectionMatrix();
-                renderer13.setSize(container.clientWidth, container.clientHeight);
+                renderer13.setSize(size.width, size.height);
+                if (renderer13 && scene13 && camera13) renderer13.render(scene13, camera13);
             }
 
             document.addEventListener('keydown', (e) => {

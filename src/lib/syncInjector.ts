@@ -510,13 +510,11 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         }
 
         // Call Course-Specific Enter Hook
-        if (triggerHook) {
-          if (typeof window.onSlideEntered === 'function') {
-            try { window.onSlideEntered(targetIndex); } catch(e) {}
-          }
-          if (typeof window.speakCurrentSlide === 'function') {
-            try { window.speakCurrentSlide(); } catch(e) {}
-          }
+        if (typeof window.onSlideEntered === 'function') {
+          try { window.onSlideEntered(targetIndex); } catch(e) {}
+        }
+        if (triggerHook && typeof window.speakCurrentSlide === 'function') {
+          try { window.speakCurrentSlide(); } catch(e) {}
         }
       };
 
