@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       where: { id: courseId }
     });
     
-    if (!course || course.educatorId !== decoded.userId) {
+    if (!course || (course.educatorId !== decoded.userId && decoded.role !== 'ADMIN')) {
       return NextResponse.json({ error: 'Course not found or unauthorized' }, { status: 404 });
     }
 
@@ -48,12 +48,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'CSV is empty or missing data rows' }, { status: 400 });
     }
 
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/[\s_-]/g, ''));
     
     const required = ['name', 'studentid', 'email', 'password', 'pcid'];
     for (const reqCol of required) {
       if (!headers.includes(reqCol)) {
-        return NextResponse.json({ error: `Missing required column: ${reqCol}` }, { status: 400 });
+        return NextResponse.json({ error: `Missing required column: ${reqCol}. Required columns: name, studentId, email, password, pcId` }, { status: 400 });
       }
     }
 

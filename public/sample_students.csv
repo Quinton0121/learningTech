@@ -1,0 +1,6 @@
+﻿name,studentId,email,password,pcId
+Alex Wong,S1001,alex.wong@example.com,Pass1234,PC-01
+Betty Chan,S1002,betty.chan@example.com,Pass1234,PC-02
+Chris Lee,S1003,chris.lee@example.com,Pass1234,PC-03
+David Ho,S1004,david.ho@example.com,Pass1234,PC-04
+Emily Cheung,S1005,emily.cheung@example.com,Pass1234,PC-05

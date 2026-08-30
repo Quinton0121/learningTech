@@ -114,6 +114,19 @@ export default function EducatorDashboard() {
     }
   };
 
+  const downloadSampleCsv = () => {
+    const csvContent = "name,studentId,email,password,pcId\nAlex Wong,S1001,alex.wong@example.com,Pass1234,PC-01\nBetty Chan,S1002,betty.chan@example.com,Pass1234,PC-02\nChris Lee,S1003,chris.lee@example.com,Pass1234,PC-03\nDavid Ho,S1004,david.ho@example.com,Pass1234,PC-04\nEmily Cheung,S1005,emily.cheung@example.com,Pass1234,PC-05\n";
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'sample_students.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
 
   const handleTogglePublic = async (courseId: string, currentPublic: boolean) => {
     const res = await fetch('/api/courses/educator/toggle-public', {
@@ -590,7 +603,30 @@ export default function EducatorDashboard() {
                         </button>
                       </div>
                       
-                      <p style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>{t('dashboard.bulkImport')}</p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', margin: 0, fontWeight: 500 }}>{t('dashboard.bulkImport')}</p>
+                        <button 
+                          onClick={downloadSampleCsv}
+                          type="button"
+                          style={{
+                            background: 'rgba(56, 189, 248, 0.12)',
+                            border: '1px solid rgba(56, 189, 248, 0.35)',
+                            color: '#38bdf8',
+                            fontSize: '0.75rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            fontWeight: 600,
+                            transition: 'all 0.2s ease'
+                          }}
+                          title="Download sample CSV template"
+                        >
+                          <i className="fa-solid fa-file-arrow-down"></i> {t('dashboard.downloadSampleCsv')}
+                        </button>
+                      </div>
                       <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>{t('dashboard.csvFormat')}</p>
                       <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                         <input 
