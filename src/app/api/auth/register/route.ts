@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { sendTelegramAdminNotification } from '@/lib/telegramNotify';
 
 export async function POST(request: Request) {
   try {
@@ -52,6 +53,11 @@ export async function POST(request: Request) {
         trialExpiresAt,
       },
     });
+
+    // Send Telegram alert to admin about new registered user
+    sendTelegramAdminNotification(
+      `🎉 <b>[Interlectic New User Signup!]</b>\n<b>Name:</b> ${name}\n<b>Email:</b> <code>${email}</code>\n<b>Role:</b> ${assignedRole}\n<b>Time:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Macau' })}`
+    ).catch(() => {});
 
     // Don't send password hash back
     const { passwordHash: _, ...userWithoutPassword } = user;

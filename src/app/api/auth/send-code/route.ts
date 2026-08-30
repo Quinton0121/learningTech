@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { Resend } from 'resend';
+import { sendTelegramAdminNotification } from '@/lib/telegramNotify';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-development-key-change-in-production';
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -24,6 +25,11 @@ export async function POST(request: Request) {
       JWT_SECRET,
       { expiresIn: '10m' }
     );
+
+    // Send Telegram alert to admin about signup intent
+    sendTelegramAdminNotification(
+      `🔔 <b>[Interlectic Signup Attempt]</b>\nSomeone requested an account verification code for: <code>${email}</code>\nTime: ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Macau' })}`
+    ).catch(() => {});
 
     if (process.env.RESEND_API_KEY) {
       try {
