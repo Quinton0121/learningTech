@@ -44,7 +44,7 @@ async function main() {
         console.log("Updated Quinton user on M9:", quinton.id, quinton.email);
     }
 
-    // 2. Setup Excel courses
+    // 2. Upsert / Sync Interactive Courses
     // A) Excel A
     let excelAHtml = '';
     if (fs.existsSync('excel_a_course.html')) {
@@ -55,7 +55,8 @@ async function main() {
         update: {
             title: 'Excel A 班',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             ...(excelAHtml ? { htmlContent: excelAHtml } : {})
@@ -65,7 +66,8 @@ async function main() {
             title: 'Excel A 班',
             description: 'Excel A 班 - 基礎試算表操作與進階實戰。',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             htmlContent: excelAHtml,
@@ -84,7 +86,8 @@ async function main() {
         update: {
             title: 'Excel B',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             ...(excelBHtml ? { htmlContent: excelBHtml } : {})
@@ -94,7 +97,8 @@ async function main() {
             title: 'Excel B',
             description: 'Excel B - 試算表實務與數據分析課程。',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             htmlContent: excelBHtml,
@@ -113,7 +117,8 @@ async function main() {
         update: {
             title: 'What is Excel? | Interactive Learning',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             ...(excelSandboxHtml ? { htmlContent: excelSandboxHtml } : {})
@@ -123,7 +128,8 @@ async function main() {
             title: 'What is Excel? | Interactive Learning',
             description: 'Interactive Excel sandbox and foundational spreadsheet lessons.',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             htmlContent: excelSandboxHtml,
@@ -146,7 +152,8 @@ async function main() {
             title: 'Intro to 3D Navigation in Blender | BLENDER 4.5 BASICS',
             description: 'Comprehensive interactive 13-slide masterclass on 3D Viewport Navigation in Blender 4.5 based on CG Cookie tutorial.',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             ...(blenderNavHtml ? { htmlContent: blenderNavHtml } : {})
@@ -156,7 +163,8 @@ async function main() {
             title: 'Intro to 3D Navigation in Blender | BLENDER 4.5 BASICS',
             description: 'Comprehensive interactive 13-slide masterclass on 3D Viewport Navigation in Blender 4.5 based on CG Cookie tutorial.',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             htmlContent: blenderNavHtml,
@@ -176,7 +184,8 @@ async function main() {
             title: 'Blender Basics | 3D Navigation',
             description: 'Interactive 3D Navigation tutorial for Blender: Orbit, Pan, Zoom, and viewport controls.',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             ...(blenderTutorialHtml ? { htmlContent: blenderTutorialHtml } : {})
@@ -186,7 +195,8 @@ async function main() {
             title: 'Blender Basics | 3D Navigation',
             description: 'Interactive 3D Navigation tutorial for Blender: Orbit, Pan, Zoom, and viewport controls.',
             educatorId: quinton.id,
-            isActive: true,
+            isActive: false,
+            isSynced: false,
             isPublic: true,
             isArchived: false,
             htmlContent: blenderTutorialHtml,

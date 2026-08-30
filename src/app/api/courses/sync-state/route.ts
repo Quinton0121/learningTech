@@ -79,7 +79,8 @@ export async function GET(request: Request) {
     }
     
     return NextResponse.json({ 
-      isSynced: course.isSynced, 
+      isSynced: course.isActive ? course.isSynced : false, 
+      isActive: course.isActive,
       currentSlide: course.currentSlide,
       publishedSlide: course.publishedSlide,
       activeStudents: activeStudents,

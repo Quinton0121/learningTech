@@ -22,18 +22,47 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    await prisma.course.update({
-      where: { id: courseId },
-      data: {
-        isActive: action === 'START',
-        ...(action === 'START' ? { isSynced: true } : {})
-      }
-    });
+    if (action === 'START') {
+      // 1. Only one class can be active at a time: Stop & desync all other active courses
+      await prisma.course.updateMany({
+        where: {
+          id: { not: courseId },
+          isActive: true
+        },
+        data: {
+          isActive: false,
+          isSynced: false
+        }
+      });
 
-    return NextResponse.json({ 
-      success: true, 
-      message: action === 'START' ? 'Class Started! Students will auto-login and jump to slides.' : 'Class Stopped.' 
-    });
+      // 2. Start this course: default to desync (Independent mode)
+      await prisma.course.update({
+        where: { id: courseId },
+        data: {
+          isActive: true,
+          isSynced: false
+        }
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Class Started (Independent Mode)! Students can auto-login and navigate pages.' 
+      });
+    } else {
+      // STOP action: Automatically desync all students and mark course inactive
+      await prisma.course.update({
+        where: { id: courseId },
+        data: {
+          isActive: false,
+          isSynced: false
+        }
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Class Stopped. All students have been desynced.' 
+      });
+    }
   } catch (error: any) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
