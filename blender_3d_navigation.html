@@ -1,0 +1,3075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blender 3D Navigation & Transform Masterclass</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js and Official Controls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1e1e1e; /* Blender dark gray */
+            color: #f0f0f0;
+            overflow: hidden; 
+            user-select: none;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Branding Colors */
+        .text-blender-orange { color: #ea7600; }
+        .bg-blender-orange { background-color: #ea7600; }
+        .border-blender-orange { border-color: #ea7600; }
+        
+        .text-blender-blue { color: #2d8ebf; }
+        .bg-blender-blue { background-color: #2d8ebf; }
+        .border-blender-blue { border-color: #2d8ebf; }
+
+        /* Slide Transitions and Layout */
+        .slide-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease-in-out, transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translateY(20px);
+            padding: 1.5rem 2rem 5rem 2rem;
+            box-sizing: border-box;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .slide-container.previous {
+            transform: translateY(-20px);
+        }
+
+        /* 3D Cube Graphics (Slide 3) */
+        .cube-container {
+            width: 160px;
+            height: 160px;
+            perspective: 800px;
+        }
+        
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-25deg) rotateY(-45deg);
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: rgba(30, 30, 30, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .face-front  { transform: translateZ(80px); }
+        .face-back   { transform: rotateY(180deg) translateZ(80px); }
+        .face-right  { transform: rotateY(90deg) translateZ(80px); }
+        .face-left   { transform: rotateY(-90deg) translateZ(80px); }
+        .face-top    { transform: rotateX(90deg) translateZ(80px); }
+        .face-bottom { transform: rotateX(-90deg) translateZ(80px); }
+
+        .cube[class*="highlight-"] .cube-face {
+            background: rgba(30, 30, 30, 0.4);
+            border-color: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* X-Axis (Red): Left/Right Horizontal Edges */
+        .highlight-x .face-front, .highlight-x .face-back {
+            border-top-color: #ff3333;
+            border-bottom-color: #ff3333;
+            box-shadow: inset 0 15px 15px -15px rgba(255,51,51,0.8), inset 0 -15px 15px -15px rgba(255,51,51,0.8), 0 15px 15px -15px rgba(255,51,51,0.8), 0 -15px 15px -15px rgba(255,51,51,0.8);
+        }
+        .highlight-x .face-right, .highlight-x .face-left {
+            color: #ff3333;
+            text-shadow: 0 0 15px rgba(255,51,51,0.8);
+        }
+        
+        /* Y-Axis (Green): Front/Back Depth Edges */
+        .highlight-y .face-left, .highlight-y .face-right {
+            border-top-color: #88ff33;
+            border-bottom-color: #88ff33;
+            box-shadow: inset 0 15px 15px -15px rgba(136,255,51,0.8), inset 0 -15px 15px -15px rgba(136,255,51,0.8), 0 15px 15px -15px rgba(136,255,51,0.8), 0 -15px 15px -15px rgba(136,255,51,0.8);
+        }
+        .highlight-y .face-front, .highlight-y .face-back {
+            color: #88ff33;
+            text-shadow: 0 0 15px rgba(136,255,51,0.8);
+        }
+        
+        /* Z-Axis (Blue): Up/Down Vertical Edges */
+        .highlight-z .face-front, .highlight-z .face-back {
+            border-left-color: #3388ff;
+            border-right-color: #3388ff;
+            box-shadow: inset 15px 0 15px -15px rgba(51,136,255,0.8), inset -15px 0 15px -15px rgba(51,136,255,0.8), 15px 0 15px -15px rgba(51,136,255,0.8), -15px 0 15px -15px rgba(51,136,255,0.8);
+        }
+        .highlight-z .face-top, .highlight-z .face-bottom {
+            color: #3388ff;
+            text-shadow: 0 0 15px rgba(51,136,255,0.8);
+        }
+
+        /* Movement Keyframe Animations for Axes */
+        @keyframes slide-axis-x {
+            0% { transform: rotateX(-25deg) rotateY(-45deg) translateX(-60px); }
+            100% { transform: rotateX(-25deg) rotateY(-45deg) translateX(60px); }
+        }
+        @keyframes slide-axis-y {
+            0% { transform: rotateX(-25deg) rotateY(-45deg) translateZ(-60px); }
+            100% { transform: rotateX(-25deg) rotateY(-45deg) translateZ(60px); }
+        }
+        @keyframes slide-axis-z {
+            0% { transform: rotateX(-25deg) rotateY(-45deg) translateY(-60px); }
+            100% { transform: rotateX(-25deg) rotateY(-45deg) translateY(60px); }
+        }
+
+        .cube.highlight-x { animation: slide-axis-x 1.2s ease-in-out infinite alternate; }
+        .cube.highlight-y { animation: slide-axis-y 1.2s ease-in-out infinite alternate; }
+        .cube.highlight-z { animation: slide-axis-z 1.2s ease-in-out infinite alternate; }
+
+        .input-device {
+            width: 140px;
+            height: 180px;
+            border: 2px solid #555;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .trackpad-finger {
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            opacity: 0;
+        }
+
+        @keyframes demo-orbit {
+            from { transform: rotate(0deg) translateX(-85px) rotate(0deg); }
+            to   { transform: rotate(360deg) translateX(-85px) rotate(-360deg); }
+        }
+        @keyframes demo-pan {
+            0% { transform: translate(-85px, -40px); }
+            100% { transform: translate(-85px, 40px); }
+        }
+        @keyframes demo-zoom {
+            0% { transform: translateX(-120px) scale(0.7); }
+            100% { transform: translateX(-40px) scale(1.3); }
+        }
+
+        .mode-orbit { animation: demo-orbit 4s linear infinite; }
+        .mode-pan { animation: demo-pan 1.5s ease-in-out infinite alternate; }
+        .mode-zoom { animation: demo-zoom 1.5s ease-in-out infinite alternate; }
+
+        @keyframes orbit-gesture {
+            0% { transform: translate(-20px, 0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { transform: translate(20px, 0); opacity: 1; }
+            100% { transform: translate(20px, 0); opacity: 0; }
+        }
+        
+        @keyframes pan-gesture {
+            0% { transform: translate(0, -20px); opacity: 0; }
+            20% { opacity: 1; }
+            80% { transform: translate(0, 20px); opacity: 1; }
+            100% { transform: translate(0, 20px); opacity: 0; }
+        }
+
+        @keyframes pinch-gesture-1 {
+            0% { transform: translate(-30px, -30px); opacity: 0; }
+            20% { opacity: 1; }
+            80% { transform: translate(-10px, -10px); opacity: 1; }
+            100% { transform: translate(-10px, -10px); opacity: 0; }
+        }
+        
+        @keyframes pinch-gesture-2 {
+            0% { transform: translate(30px, 30px); opacity: 0; }
+            20% { opacity: 1; }
+            80% { transform: translate(10px, 10px); opacity: 1; }
+            100% { transform: translate(10px, 10px); opacity: 0; }
+        }
+
+        .anim-orbit .finger-1 { animation: orbit-gesture 2s infinite; top: 45%; left: 35%; }
+        .anim-orbit .finger-2 { animation: orbit-gesture 2s infinite; top: 45%; left: 55%; }
+
+        .anim-pan .finger-1 { animation: pan-gesture 2s infinite; top: 35%; left: 45%; }
+        .anim-pan .finger-2 { animation: pan-gesture 2s infinite; top: 55%; left: 45%; }
+
+        .anim-zoom .finger-1 { animation: pinch-gesture-1 2s infinite; top: 40%; left: 40%; }
+        .anim-zoom .finger-2 { animation: pinch-gesture-2 2s infinite; top: 60%; left: 60%; }
+
+        kbd, .keyboard-key {
+            background-color: #27272a;
+            border: 1px solid #3f3f46;
+            border-bottom: 2px solid #52525b;
+            color: #f4f4f5;
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.375rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .viewport-frame {
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid #3f3f46;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
+            position: relative;
+            background-color: #27272a;
+        }
+
+        .blender-toolbar {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background-color: #1f1f23;
+            border: 1px solid #3f3f46;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 4px;
+            z-index: 20;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .blender-tool-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #a1a1aa;
+            font-size: 13px;
+            transition: all 0.15s ease;
+        }
+
+        .blender-tool-btn:hover {
+            background-color: #3f3f46;
+            color: #ffffff;
+        }
+
+        .blender-tool-btn.active {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        /* Mockup Highlights for Slide 2 (Windows Structure) */
+        .blender-window-pane {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .blender-window-pane.highlight-active {
+            border-color: #ea7600 !important;
+            box-shadow: 0 0 20px rgba(234, 118, 0, 0.35) !important;
+            background-color: rgba(234, 118, 0, 0.08) !important;
+        }
+    </style>
+</head>
+<body class="bg-[#1e1e1e] text-zinc-100 antialiased">
+
+    <!-- Top Progress Indicator -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-gray-800 z-50">
+        <div id="progress-bar" class="h-full bg-blender-orange transition-all duration-500 w-0"></div>
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50 bg-gray-900/85 backdrop-blur-md px-6 py-2.5 rounded-full border border-gray-700 shadow-2xl">
+        <button id="prev-btn" class="text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-1" title="Previous Slide (Left Arrow)">
+            <i class="fa-solid fa-chevron-left text-lg"></i>
+        </button>
+        <div class="text-gray-300 font-mono text-sm tracking-widest font-semibold flex items-center gap-1.5">
+            <span id="current-slide-num" class="text-blender-orange text-base font-bold">1</span>
+            <span class="text-gray-500">/</span>
+            <span id="total-slide-num">13</span>
+        </div>
+        <button id="next-btn" class="text-blender-orange hover:text-orange-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-1" title="Next Slide (Right Arrow)">
+            <i class="fa-solid fa-chevron-right text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Slide 1: Introduction -->
+    <div class="slide-container active" id="slide-1">
+        <div class="text-center max-w-3xl">
+            <div class="w-24 h-24 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl mx-auto mb-8 flex items-center justify-center shadow-lg border border-gray-600 transform hover:scale-110 transition-transform duration-500">
+                <i class="fa-solid fa-cube text-5xl text-blender-orange"></i>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
+                Into the 3D View
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 mb-12 leading-relaxed">
+                Navigating in 3D space is the first—and most important—skill you'll need to master in Blender.
+            </p>
+            <p class="text-gray-500 text-sm uppercase tracking-widest animate-pulse flex items-center justify-center gap-2">
+                <kbd><i class="fa-solid fa-arrow-right"></i></kbd> Press Right Arrow or Click Next to begin
+            </p>
+        </div>
+    </div>
+
+    <!-- Slide 2: Blender Window Structure (3D Viewport, Outliner, Properties Editor) -->
+    <div class="slide-container" id="slide-2">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <!-- Left Info Panel -->
+            <div class="w-full md:w-96 flex flex-col justify-between text-left h-full py-1 overflow-y-auto pr-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-2">
+                        STEP 1: THE INTERFACE
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The 3 Core Windows</h2>
+                    <p class="text-gray-300 text-xs leading-relaxed mb-3">
+                        Blender's default layout is divided into specialized modular panes. Hover or click each card below to see its exact place and role:
+                    </p>
+
+                    <!-- Interactive Window Cards -->
+                    <div class="space-y-2 text-xs">
+                        <!-- 1. 3D Viewport -->
+                        <div id="card-win-viewport" onmouseenter="highlightBlenderWin('viewport')" onclick="highlightBlenderWin('viewport')" class="p-3 rounded-xl bg-zinc-800/90 border border-zinc-700 hover:border-blender-orange cursor-pointer transition-all">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fa-solid fa-cube text-blender-orange text-sm"></i>
+                                <strong class="text-white text-sm">1. 3D Viewport (Center / Main)</strong>
+                            </div>
+                            <p class="text-zinc-400 text-[11px] leading-relaxed">
+                                Your physical workspace. This is where you create, model, navigate, transform, and view your 3D geometry in real space.
+                            </p>
+                        </div>
+
+                        <!-- 2. Outliner -->
+                        <div id="card-win-outliner" onmouseenter="highlightBlenderWin('outliner')" onclick="highlightBlenderWin('outliner')" class="p-3 rounded-xl bg-zinc-800/90 border border-zinc-700 hover:border-blender-blue cursor-pointer transition-all">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fa-solid fa-list-tree text-blender-blue text-sm"></i>
+                                <strong class="text-white text-sm">2. Outliner (Top-Right)</strong>
+                            </div>
+                            <p class="text-zinc-400 text-[11px] leading-relaxed">
+                                The hierarchical scene list (like File Explorer). Shows all objects, collections, cameras, and lights with visibility and render toggles.
+                            </p>
+                        </div>
+
+                        <!-- 3. Properties Editor -->
+                        <div id="card-win-properties" onmouseenter="highlightBlenderWin('properties')" onclick="highlightBlenderWin('properties')" class="p-3 rounded-xl bg-zinc-800/90 border border-zinc-700 hover:border-emerald-400 cursor-pointer transition-all">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fa-solid fa-sliders text-emerald-400 text-sm"></i>
+                                <strong class="text-white text-sm">3. Properties Editor (Bottom-Right)</strong>
+                            </div>
+                            <p class="text-zinc-400 text-[11px] leading-relaxed">
+                                The parameters dashboard. Adjust numeric transforms, materials, modifiers, camera focal length, and render engines here.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 mt-2 text-[11px] text-zinc-400 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400 text-base"></i>
+                    <span><strong>Pro Tip:</strong> Any window corner can be split or joined by dragging the edge!</span>
+                </div>
+            </div>
+
+            <!-- Right Interactive Blender UI Mockup -->
+            <div class="flex-1 w-full h-full min-h-[380px]">
+                <div class="viewport-frame w-full h-full p-2 bg-[#121214] flex flex-col gap-1.5 border border-zinc-700">
+                    <!-- Top Menu Header Mockup -->
+                    <div class="h-6 bg-[#252528] rounded flex items-center justify-between px-3 text-[11px] text-zinc-400 font-mono border border-zinc-800">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-cube text-blender-orange"></i>
+                            <span class="hover:text-white cursor-pointer">File</span>
+                            <span class="hover:text-white cursor-pointer">Edit</span>
+                            <span class="hover:text-white cursor-pointer">Render</span>
+                            <span class="hover:text-white cursor-pointer">Window</span>
+                            <span class="hover:text-white cursor-pointer">Help</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-zinc-500">
+                            <span class="bg-[#35353a] text-zinc-300 px-2 py-0.5 rounded text-[10px]">Layout</span>
+                            <span>Modeling</span>
+                            <span>Sculpting</span>
+                            <span>Shading</span>
+                        </div>
+                    </div>
+
+                    <!-- Split Work Area Grid -->
+                    <div class="flex-1 flex gap-1.5 overflow-hidden">
+                        <!-- Left: 3D Viewport Window Pane -->
+                        <div id="pane-viewport" onmouseenter="highlightBlenderWin('viewport')" class="blender-window-pane highlight-active flex-1 bg-[#28282c] rounded-lg border-2 border-blender-orange/80 relative flex flex-col overflow-hidden p-2">
+                            <!-- Viewport Header -->
+                            <div class="h-5 flex items-center justify-between text-[10px] text-zinc-400 font-mono border-b border-zinc-700/60 pb-1 mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-[#1f1f23] px-1.5 py-0.5 rounded text-white font-bold"><i class="fa-solid fa-cube text-blender-orange mr-1"></i>3D Viewport</span>
+                                    <span>Object Mode</span>
+                                    <span>View</span>
+                                    <span>Select</span>
+                                    <span>Add</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-zinc-400">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <i class="fa-solid fa-circle-notch"></i>
+                                </div>
+                            </div>
+
+                            <!-- 3D Viewport Graphic representation -->
+                            <div class="flex-1 relative flex items-center justify-center bg-[#1e1e22] rounded overflow-hidden">
+                                <!-- Grid lines -->
+                                <div class="absolute inset-0 opacity-15" style="background-image: linear-gradient(#555 1px, transparent 1px), linear-gradient(90deg, #555 1px, transparent 1px); background-size: 24px 24px;"></div>
+                                <div class="absolute w-full h-[1px] bg-red-500/40"></div>
+                                <div class="absolute h-full w-[1px] bg-green-500/40"></div>
+                                
+                                <!-- Default Cube Mockup -->
+                                <div class="w-20 h-20 bg-zinc-700/90 border-2 border-blender-orange rounded shadow-2xl flex flex-col items-center justify-center z-10 transform -rotate-12 hover:scale-105 transition-transform">
+                                    <i class="fa-solid fa-cube text-2xl text-amber-400"></i>
+                                    <span class="text-[9px] font-mono text-white mt-1 font-bold">Default Cube</span>
+                                </div>
+
+                                <!-- Left Mini Toolbar -->
+                                <div class="absolute left-2 top-2 bg-[#1f1f23] border border-zinc-700 rounded p-1 flex flex-col gap-1 text-zinc-400 text-xs">
+                                    <i class="fa-regular fa-square p-1 hover:text-white"></i>
+                                    <i class="fa-solid fa-crosshairs p-1 hover:text-white"></i>
+                                    <i class="fa-solid fa-arrows-up-down-left-right p-1 text-blender-orange"></i>
+                                    <i class="fa-solid fa-arrows-rotate p-1 hover:text-white"></i>
+                                    <i class="fa-solid fa-expand p-1 hover:text-white"></i>
+                                </div>
+
+                                <!-- Overlay Tag -->
+                                <div class="absolute top-2 right-2 bg-zinc-900/90 px-2 py-1 rounded text-[10px] font-mono text-zinc-300 border border-zinc-700">
+                                    <span class="text-blender-orange font-bold">User Perspective</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Outliner (Top) + Properties (Bottom) -->
+                        <div class="w-64 flex flex-col gap-1.5">
+                            <!-- 2. Outliner Pane -->
+                            <div id="pane-outliner" onmouseenter="highlightBlenderWin('outliner')" class="blender-window-pane h-1/2 bg-[#28282c] rounded-lg border-2 border-zinc-700 relative flex flex-col overflow-hidden p-2">
+                                <div class="h-5 flex items-center justify-between text-[10px] text-zinc-400 font-mono border-b border-zinc-700/60 pb-1 mb-1">
+                                    <span class="bg-[#1f1f23] px-1.5 py-0.5 rounded text-white font-bold"><i class="fa-solid fa-list-tree text-blender-blue mr-1"></i>Outliner</span>
+                                    <i class="fa-solid fa-filter text-zinc-500"></i>
+                                </div>
+                                <div class="flex-1 bg-[#1e1e22] rounded p-2 text-[10px] font-mono space-y-1.5 overflow-hidden text-zinc-300">
+                                    <div class="flex items-center justify-between text-zinc-400">
+                                        <span><i class="fa-solid fa-box-archive mr-1 text-zinc-500"></i> Scene Collection</span>
+                                    </div>
+                                    <div class="pl-3 space-y-1">
+                                        <div class="flex items-center justify-between hover:bg-zinc-800 p-0.5 rounded">
+                                            <span><i class="fa-solid fa-folder mr-1 text-amber-500"></i> Collection</span>
+                                        </div>
+                                        <div class="pl-3 space-y-1">
+                                            <div class="flex items-center justify-between hover:bg-zinc-800 p-0.5 rounded text-white font-bold bg-blender-blue/20">
+                                                <span><i class="fa-solid fa-cube mr-1 text-blender-orange"></i> Cube</span>
+                                                <span class="text-zinc-500 text-[9px]"><i class="fa-solid fa-eye text-zinc-300 mr-1"></i><i class="fa-solid fa-camera"></i></span>
+                                            </div>
+                                            <div class="flex items-center justify-between hover:bg-zinc-800 p-0.5 rounded text-zinc-400">
+                                                <span><i class="fa-solid fa-video mr-1 text-blue-400"></i> Camera</span>
+                                                <span class="text-zinc-500 text-[9px]"><i class="fa-solid fa-eye mr-1"></i><i class="fa-solid fa-camera"></i></span>
+                                            </div>
+                                            <div class="flex items-center justify-between hover:bg-zinc-800 p-0.5 rounded text-zinc-400">
+                                                <span><i class="fa-solid fa-lightbulb mr-1 text-yellow-400"></i> Light</span>
+                                                <span class="text-zinc-500 text-[9px]"><i class="fa-solid fa-eye mr-1"></i><i class="fa-solid fa-camera"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Properties Editor Pane -->
+                            <div id="pane-properties" onmouseenter="highlightBlenderWin('properties')" class="blender-window-pane h-1/2 bg-[#28282c] rounded-lg border-2 border-zinc-700 relative flex flex-col overflow-hidden p-2">
+                                <div class="h-5 flex items-center justify-between text-[10px] text-zinc-400 font-mono border-b border-zinc-700/60 pb-1 mb-1">
+                                    <span class="bg-[#1f1f23] px-1.5 py-0.5 rounded text-white font-bold"><i class="fa-solid fa-sliders text-emerald-400 mr-1"></i>Properties</span>
+                                    <span class="text-[9px] text-zinc-500">Object Tab</span>
+                                </div>
+                                <div class="flex-1 bg-[#1e1e22] rounded p-2 text-[10px] font-mono flex gap-1.5 overflow-hidden">
+                                    <!-- Left Tab strip icons -->
+                                    <div class="w-5 flex flex-col items-center gap-1.5 border-r border-zinc-800 pr-1 text-zinc-500 text-[10px]">
+                                        <i class="fa-solid fa-camera text-zinc-400"></i>
+                                        <i class="fa-solid fa-gear"></i>
+                                        <i class="fa-solid fa-cube text-blender-orange"></i>
+                                        <i class="fa-solid fa-wrench text-blue-400"></i>
+                                        <i class="fa-solid fa-circle-dot text-red-400"></i>
+                                    </div>
+                                    <!-- Properties content mockup -->
+                                    <div class="flex-1 space-y-1 text-[9px] text-zinc-300">
+                                        <div class="text-zinc-400 font-bold uppercase text-[8px] tracking-wider mb-1">Transform</div>
+                                        <div class="flex justify-between bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
+                                            <span class="text-red-400 font-bold">X:</span> <span>0.00 m</span>
+                                        </div>
+                                        <div class="flex justify-between bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
+                                            <span class="text-green-400 font-bold">Y:</span> <span>0.00 m</span>
+                                        </div>
+                                        <div class="flex justify-between bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
+                                            <span class="text-blue-400 font-bold">Z:</span> <span>0.00 m</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Axes -->
+    <div class="slide-container" id="slide-3">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 2: THE COMPASS
+                </div>
+                <h2 class="text-4xl font-bold mb-6 text-white">X, Y, and Z.</h2>
+                <p class="text-xl text-gray-400 mb-8 leading-relaxed">
+                    In a spreadsheet, you have Columns and Rows (2D). In Blender, you have three dimensions, represented by colored axes.
+                </p>
+                <div class="space-y-4">
+                    <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700 hover:border-red-500/50 transition-colors cursor-pointer" onmouseenter="highlightAxis('x')" onmouseleave="resetAxis()">
+                        <span class="inline-block w-4 h-4 rounded-full bg-red-500 mr-2"></span>
+                        <strong class="text-white">X-Axis (Red):</strong> Left and Right (Width)
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700 hover:border-green-500/50 transition-colors cursor-pointer" onmouseenter="highlightAxis('y')" onmouseleave="resetAxis()">
+                        <span class="inline-block w-4 h-4 rounded-full bg-green-500 mr-2"></span>
+                        <strong class="text-white">Y-Axis (Green):</strong> Front and Back (Depth)
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700 hover:border-blue-500/50 transition-colors cursor-pointer" onmouseenter="highlightAxis('z')" onmouseleave="resetAxis()">
+                        <span class="inline-block w-4 h-4 rounded-full bg-blue-500 mr-2"></span>
+                        <strong class="text-white">Z-Axis (Blue):</strong> Up and Down (Height)
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex justify-center items-center">
+                <div class="bg-gray-800 p-12 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-gray-700">
+                    <div class="cube-container">
+                        <div class="cube" id="demo-cube">
+                            <div class="cube-face face-front">Y</div>
+                            <div class="cube-face face-back">Y</div>
+                            <div class="cube-face face-right">X</div>
+                            <div class="cube-face face-left">X</div>
+                            <div class="cube-face face-top">Z</div>
+                            <div class="cube-face face-bottom">Z</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Orbit, Pan, Zoom -->
+    <div class="slide-container" id="slide-4">
+        <div class="flex flex-col md:flex-row-reverse items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-sm font-semibold mb-4 tracking-wide">
+                    STEP 3: THE HOLY TRINITY
+                </div>
+                <h2 class="text-4xl font-bold mb-6 text-white">Moving the Camera</h2>
+                <p class="text-xl text-gray-300 mb-6 leading-relaxed">
+                    Click a movement type below to see how it affects your perspective.
+                </p>
+                
+                <div class="space-y-4">
+                    <div id="card-orbit" onclick="setSlide4Mode('orbit')" class="bg-gray-700 p-4 rounded-xl border-2 border-blender-orange shadow-lg cursor-pointer transition-all transform hover:scale-105">
+                        <h3 class="text-xl font-bold text-blender-orange mb-1"><i class="fa-solid fa-arrows-rotate mr-2"></i> Orbit</h3>
+                        <p class="text-gray-300 text-sm">Rotates the camera around the center of your view. Imagine walking in a circle around an object.</p>
+                    </div>
+                    <div id="card-pan" onclick="setSlide4Mode('pan')" class="bg-gray-800 p-4 rounded-xl border-2 border-gray-700 cursor-pointer transition-all transform hover:scale-105 hover:border-gray-500">
+                        <h3 class="text-xl font-bold text-blender-blue mb-1"><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i> Pan</h3>
+                        <p class="text-gray-400 text-sm">Slides the camera horizontally or vertically, parallel to the screen.</p>
+                    </div>
+                    <div id="card-zoom" onclick="setSlide4Mode('zoom')" class="bg-gray-800 p-4 rounded-xl border-2 border-gray-700 cursor-pointer transition-all transform hover:scale-105 hover:border-gray-500">
+                        <h3 class="text-xl font-bold text-white mb-1"><i class="fa-solid fa-magnifying-glass-plus mr-2"></i> Zoom</h3>
+                        <p class="text-gray-400 text-sm">Moves the camera closer to or further from the center of focus.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex justify-center items-center">
+                <div class="relative w-64 h-64 border-2 border-dashed border-gray-600 rounded-full flex justify-center items-center bg-gray-900/50 shadow-inner">
+                    <!-- The Target Object (Cube) -->
+                    <div class="w-16 h-16 bg-gray-500 rounded border border-gray-400 absolute flex justify-center items-center shadow-lg">
+                        <i class="fa-solid fa-cube text-gray-700 text-2xl"></i>
+                    </div>
+                    
+                    <!-- The Camera -->
+                    <div id="demo-camera" class="absolute w-10 h-10 bg-blender-orange rounded-lg flex justify-center items-center text-sm text-gray-900 shadow-[0_0_15px_rgba(234,118,0,0.5)] mode-orbit z-10">
+                        <i class="fa-solid fa-video"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Touch Gestures -->
+    <div class="slide-container" id="slide-5">
+        <div class="flex flex-col items-center max-w-5xl w-full text-center">
+            <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-blue text-sm font-semibold mb-4 tracking-wide">
+                STEP 4: LAPTOP WORKFLOW
+            </div>
+            <h2 class="text-4xl font-bold mb-4 text-white">Trackpad Touch Gestures</h2>
+            <p class="text-xl text-gray-400 mb-10 max-w-2xl">
+                If you are on a MacBook or Windows laptop with a precision touchpad, a middle-mouse button isn't required. You can use two-finger gestures.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                <!-- Orbit Gesture -->
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col items-center">
+                    <div class="input-device mb-4 anim-orbit">
+                        <div class="trackpad-finger finger-1"></div>
+                        <div class="trackpad-finger finger-2"></div>
+                    </div>
+                    <h3 class="text-xl font-bold text-blender-orange mb-2">Orbit</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">Drag with <strong class="text-white">two fingers</strong> in any direction.</p>
+                </div>
+
+                <!-- Pan Gesture -->
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col items-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-blender-blue text-xs font-bold px-2 py-1 rounded-bl-lg">Modifier Key</div>
+                    <div class="input-device mb-4 anim-pan">
+                        <div class="trackpad-finger finger-1"></div>
+                        <div class="trackpad-finger finger-2"></div>
+                    </div>
+                    <h3 class="text-xl font-bold text-blender-blue mb-2">Pan</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">Hold <kbd>Shift</kbd> + drag with <strong class="text-white">two fingers</strong>.</p>
+                </div>
+
+                <!-- Zoom Gesture -->
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col items-center">
+                    <div class="input-device mb-4 anim-zoom">
+                        <div class="trackpad-finger finger-1"></div>
+                        <div class="trackpad-finger finger-2"></div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Zoom</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed"><strong class="text-white">Pinch</strong> in and out with two fingers.</p>
+                    <p class="text-gray-500 text-[11px] mt-1">(Or hold <kbd>Ctrl</kbd> + drag two fingers)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Interactive 3D Sandbox -->
+    <div class="slide-container" id="slide-6">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[78vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-2">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-green-400 text-xs font-bold tracking-wider mb-3">
+                        STEP 5: TRY IT YOURSELF
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3 text-white">Interactive 3D Sandbox</h2>
+                    <p class="text-xs md:text-sm text-gray-300 mb-5 leading-relaxed">
+                        Use authentic mouse or trackpad controls inside the 3D canvas to inspect the classic Blender scene.
+                    </p>
+
+                    <div class="bg-gray-800/90 p-4 rounded-xl border border-zinc-700 shadow-xl space-y-2.5 text-xs">
+                        <div class="flex justify-between items-center pb-2 border-b border-zinc-700">
+                            <span class="text-zinc-400">Orbit (Rotate View):</span>
+                            <kbd>Middle Drag</kbd>
+                        </div>
+                        <div class="flex justify-between items-center pb-2 border-b border-zinc-700">
+                            <span class="text-zinc-400">Pan (Slide Camera):</span>
+                            <div class="flex gap-1"><kbd>Shift</kbd>+<kbd>MMB</kbd></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-zinc-400">Zoom In / Out:</span>
+                            <kbd>Scroll Wheel</kbd>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 mt-2">
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mb-1 font-mono">Camera Position</div>
+                    <div id="slide6-cam-readout" class="font-mono text-xs text-amber-400 font-bold">X: 5.0 | Y: 4.0 | Z: 5.0</div>
+                </div>
+            </div>
+            
+            <div class="flex-1 w-full h-full min-h-[350px]">
+                <div class="viewport-frame w-full h-full relative" id="slide6-viewport">
+                    <div id="three-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md text-xs px-3 py-1.5 rounded-lg border border-zinc-700 text-zinc-300 pointer-events-none flex items-center gap-2">
+                        <i class="fa-solid fa-cube text-blender-orange"></i>
+                        <span>Default Cube</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: The Move Tool & 3D Gizmo -->
+    <div class="slide-container" id="slide-7">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[80vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-2">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-3">
+                        STEP 6: TRANSFORMS
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3 text-white">The Move Tool</h2>
+                    <p class="text-gray-300 text-xs md:text-sm mb-4 leading-relaxed">
+                        In Blender's left toolbar, selecting the <strong>Move Tool</strong> displays the 3D Translation Gizmo with colored arrow handles.
+                    </p>
+
+                    <div class="space-y-2 mb-4 text-xs font-mono">
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-red-900/50 flex justify-between items-center">
+                            <span class="text-red-400 font-bold">Red Arrow:</span>
+                            <span class="text-zinc-300">Moves strictly along X</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-green-900/50 flex justify-between items-center">
+                            <span class="text-green-400 font-bold">Green Arrow:</span>
+                            <span class="text-zinc-300">Moves strictly along Y</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-blue-900/50 flex justify-between items-center">
+                            <span class="text-blue-400 font-bold">Blue Arrow:</span>
+                            <span class="text-zinc-300">Moves strictly along Z</span>
+                        </div>
+                    </div>
+
+                    <!-- Step Move Buttons -->
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <button onclick="stepTranslateAxis('x', 1)" class="bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">+1 X</button>
+                        <button onclick="stepTranslateAxis('y', 1)" class="bg-green-950/80 hover:bg-green-900 text-green-300 border border-green-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">+1 Y</button>
+                        <button onclick="stepTranslateAxis('z', 1)" class="bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">+1 Z</button>
+                    </div>
+
+                    <button onclick="resetTranslate3D()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-600 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Location (<kbd>Alt + G</kbd>)
+                    </button>
+                </div>
+
+                <div class="bg-zinc-900 p-3.5 rounded-xl border border-zinc-800 mt-2">
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mb-1 font-mono">Location Coordinates</div>
+                    <div id="slide7-loc-readout" class="font-mono text-xs text-amber-400 font-bold">X: 0.00 | Y: 0.00 | Z: 0.00</div>
+                </div>
+            </div>
+
+            <!-- Slide 7 Three.js Viewport -->
+            <div class="flex-1 w-full h-full min-h-[350px]">
+                <div class="viewport-frame w-full h-full relative" id="slide7-viewport">
+                    <div class="blender-toolbar">
+                        <div class="blender-tool-btn" title="Select Box"><i class="fa-regular fa-square"></i></div>
+                        <div class="blender-tool-btn" title="3D Cursor"><i class="fa-solid fa-crosshairs"></i></div>
+                        <div class="blender-tool-btn active" title="Move Tool"><i class="fa-solid fa-arrows-up-down-left-right"></i></div>
+                        <div class="blender-tool-btn" title="Rotate Tool"><i class="fa-solid fa-arrows-rotate"></i></div>
+                        <div class="blender-tool-btn" title="Scale Tool"><i class="fa-solid fa-expand"></i></div>
+                        <div class="blender-tool-btn" title="Scale Cage Tool"><i class="fa-solid fa-vector-square"></i></div>
+                    </div>
+
+                    <div id="slide7-canvas-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-zinc-700 text-xs font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-up-down-left-right text-blender-orange"></i>
+                        <span>Drag Gizmo Handles to Move</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: The G Grab Key & Axis Locking -->
+    <div class="slide-container" id="slide-8">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[80vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-2">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-2">
+                        STEP 7: PRO WORKFLOW
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The <span class="text-blender-orange font-mono">G</span> (Grab) Hotkey</h2>
+                    <p class="text-gray-300 text-xs leading-relaxed mb-3">
+                        Instead of aiming at small gizmo arrows, Blender pros use modal hotkeys on physical 3D rails:
+                    </p>
+
+                    <div class="space-y-2 text-xs">
+                        <div id="s8-step-0" class="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 transition-all duration-300 cursor-pointer" onclick="triggerS8Select()">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-zinc-200">1. Click Cube (Select):</span>
+                                <span id="s8-badge-0" class="text-[10px] px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-400 font-mono">Unselected</span>
+                            </div>
+                            <div class="text-zinc-400 mt-0.5">Turns <span class="text-blender-orange font-semibold">Active Orange</span>.</div>
+                        </div>
+
+                        <div id="s8-step-1" class="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 transition-all duration-300 cursor-pointer" onclick="triggerS8Grab()">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-zinc-200">2. Press <kbd>G</kbd> (Grab):</span>
+                                <span id="s8-badge-1" class="text-[10px] px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-400 font-mono">Idle</span>
+                            </div>
+                            <div class="text-zinc-400 mt-0.5">Picks up the active 3D object.</div>
+                        </div>
+
+                        <div id="s8-step-2" class="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 transition-all duration-300">
+                            <span class="font-bold text-zinc-200">3. Tap 3D Axis:</span>
+                            <div class="grid grid-cols-3 gap-1.5 mt-1.5 font-mono">
+                                <button onclick="triggerS8Axis('X')" class="bg-red-950/70 hover:bg-red-900 border border-red-800 py-1 rounded text-red-300 font-bold transition-colors">X (Width)</button>
+                                <button onclick="triggerS8Axis('Y')" class="bg-green-950/70 hover:bg-green-900 border border-green-800 py-1 rounded text-green-300 font-bold transition-colors">Y (Depth)</button>
+                                <button onclick="triggerS8Axis('Z')" class="bg-blue-950/70 hover:bg-blue-900 border border-blue-800 py-1 rounded text-blue-300 font-bold transition-colors">Z (Height)</button>
+                            </div>
+                        </div>
+
+                        <div id="s8-step-3" class="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 transition-all duration-300">
+                            <span class="font-bold text-zinc-200">4. Confirm or Cancel:</span>
+                            <div class="flex gap-2 mt-1.5">
+                                <button onclick="confirmS8Transform(true)" class="flex-1 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-800 py-1 rounded text-emerald-300 font-mono font-bold transition-colors">Confirm (L-Click)</button>
+                                <button onclick="confirmS8Transform(false)" class="flex-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 py-1 rounded text-zinc-300 font-mono font-bold transition-colors">Cancel (R-Click)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 mt-2">
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mb-1 font-mono">3D Coordinates</div>
+                    <div id="s8-loc-readout" class="font-mono text-xs text-amber-400 font-bold">X: 0.00 | Y: 0.00 | Z: 0.00</div>
+                </div>
+            </div>
+
+            <!-- Slide 8 Three.js Viewport -->
+            <div class="flex-1 w-full h-full min-h-[350px]">
+                <div class="viewport-frame w-full h-full relative" id="slide8-viewport">
+                    <div id="slide8-canvas-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 left-3 bg-zinc-900/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-zinc-700 text-xs font-mono flex items-center gap-2 z-10">
+                        <span id="s8-hud-tag" class="w-2 h-2 rounded-full bg-zinc-500"></span>
+                        <span id="s8-hud-msg">Click 3D Cube to Select</span>
+                    </div>
+                    <button onclick="resetS8CubeLocation()" class="absolute top-3 right-3 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors z-10">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Alt + G
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: The Maze Challenge Game -->
+    <div class="slide-container" id="slide-9">
+        <div class="flex flex-col md:flex-row items-center gap-6 max-w-6xl w-full h-[82vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-2">
+                        GAME: HOTKEY MAZE
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">Navigate the Maze</h2>
+                    <p class="text-gray-300 text-xs leading-relaxed mb-3">
+                        Use Blender translation hotkeys to guide the cube to the glowing green portal.
+                    </p>
+
+                    <!-- Hotkey Instructions & Controls -->
+                    <div class="space-y-1.5 text-xs mb-3 font-mono">
+                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                            <span class="text-blender-orange font-bold">1. Select Cube:</span>
+                            <span class="text-zinc-300">Click the box</span>
+                        </div>
+                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                            <span class="text-blender-orange font-bold">2. Press <kbd>G</kbd>:</span>
+                            <span class="text-zinc-300">Enters Grab Mode</span>
+                        </div>
+                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                            <span class="text-blender-orange font-bold">3. Lock Axis:</span>
+                            <div class="flex gap-1">
+                                <button onclick="gameTriggerHotKey('X')" class="bg-red-900/60 hover:bg-red-800 text-red-300 px-1.5 py-0.5 rounded border border-red-700">X</button>
+                                <button onclick="gameTriggerHotKey('Y')" class="bg-green-900/60 hover:bg-green-800 text-green-300 px-1.5 py-0.5 rounded border border-green-700">Y</button>
+                                <button onclick="gameTriggerHotKey('Z')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 px-1.5 py-0.5 rounded border border-blue-700">Z (Fly)</button>
+                            </div>
+                        </div>
+                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                            <span class="text-blender-orange font-bold">4. Confirm / Cancel:</span>
+                            <span><kbd>L-Click</kbd> / <kbd>R-Click</kbd></span>
+                        </div>
+                    </div>
+
+                    <div class="p-2.5 rounded-lg bg-red-950/40 border border-red-800 text-[11px] text-red-300 mb-2">
+                        <i class="fa-solid fa-shield-halved mr-1 text-red-400"></i> Red Laser Gates block ground moves. Use <kbd>G</kbd> + <kbd>Z</kbd> to fly over them!
+                    </div>
+
+                    <button onclick="resetMazeGame()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-600 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-rotate-left"></i> Restart Maze
+                    </button>
+                </div>
+
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-zinc-500">Position:</span>
+                        <span id="maze-pos-display" class="text-amber-400 font-bold">(0, 0) | Z: 0.0m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2D Top-Orthographic Maze Canvas -->
+            <div class="flex-1 w-full h-full min-h-[360px] relative">
+                <div class="viewport-frame w-full h-full relative flex items-center justify-center bg-zinc-950 p-2">
+                    <canvas id="maze-canvas" class="max-w-full max-h-full aspect-square rounded-lg"></canvas>
+                    
+                    <!-- Victory Overlay -->
+                    <div id="maze-victory-card" class="absolute inset-0 bg-zinc-950/85 backdrop-blur-md rounded-xl flex flex-col items-center justify-center hidden z-30 animate-fade-in p-6 text-center">
+                        <div class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-3xl text-emerald-400 mb-3 shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-1">Extraction Complete!</h3>
+                        <p class="text-sm text-zinc-400 max-w-sm mb-5">You navigated the corridors and cleared the laser barriers using authentic Blender modal hotkeys.</p>
+                        <button onclick="resetMazeGame()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i> Play Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: The Rotate Tool & The R Hotkey -->
+    <div class="slide-container" id="slide-10">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[80vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-2">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-2">
+                        STEP 8: ROTATION
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The Rotate Tool & <kbd class="text-blender-orange font-mono">R</kbd></h2>
+                    <p class="text-gray-300 text-xs md:text-sm mb-4 leading-relaxed">
+                        Spinning objects in 3D turns them around an axis line. In Blender, use the <strong>Rotate Tool</strong> rings or tap <kbd>R</kbd>.
+                    </p>
+
+                    <div class="space-y-2 mb-4 text-xs font-mono">
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-red-900/50 flex justify-between items-center">
+                            <span class="text-red-400 font-bold">Red Ring (X):</span>
+                            <span class="text-zinc-300">Pitch / Forward Tilt</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-green-900/50 flex justify-between items-center">
+                            <span class="text-green-400 font-bold">Green Ring (Y):</span>
+                            <span class="text-zinc-300">Roll / Side Tilt</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-blue-900/50 flex justify-between items-center">
+                            <span class="text-blue-400 font-bold">Blue Ring (Z):</span>
+                            <span class="text-zinc-300">Yaw / Turntable Spin</span>
+                        </div>
+                    </div>
+
+                    <!-- Step Rotate Buttons -->
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <button onclick="stepRotateAxis('x', 45)" class="bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">+45° X</button>
+                        <button onclick="stepRotateAxis('y', 45)" class="bg-green-950/80 hover:bg-green-900 text-green-300 border border-green-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">+45° Y</button>
+                        <button onclick="stepRotateAxis('z', 45)" class="bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">+45° Z</button>
+                    </div>
+
+                    <button onclick="resetRotate3D()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-600 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-rotate-left"></i> Clear Rotation (<kbd>Alt + R</kbd>)
+                    </button>
+                </div>
+
+                <div class="bg-zinc-900 p-3.5 rounded-xl border border-zinc-800 mt-2">
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mb-1 font-mono">Rotation Angles</div>
+                    <div id="slide10-rot-readout" class="font-mono text-xs text-amber-400 font-bold">X: 0° | Y: 0° | Z: 0°</div>
+                </div>
+            </div>
+
+            <!-- Slide 10 Three.js Viewport -->
+            <div class="flex-1 w-full h-full min-h-[350px]">
+                <div class="viewport-frame w-full h-full relative" id="slide10-viewport">
+                    <div class="blender-toolbar">
+                        <div class="blender-tool-btn" title="Select Box"><i class="fa-regular fa-square"></i></div>
+                        <div class="blender-tool-btn" title="3D Cursor"><i class="fa-solid fa-crosshairs"></i></div>
+                        <div class="blender-tool-btn" title="Move Tool"><i class="fa-solid fa-arrows-up-down-left-right"></i></div>
+                        <div class="blender-tool-btn active" title="Rotate Tool"><i class="fa-solid fa-arrows-rotate"></i></div>
+                        <div class="blender-tool-btn" title="Scale Tool"><i class="fa-solid fa-expand"></i></div>
+                        <div class="blender-tool-btn" title="Scale Cage Tool"><i class="fa-solid fa-vector-square"></i></div>
+                    </div>
+
+                    <div id="slide10-canvas-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-zinc-700 text-xs font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate text-blender-orange"></i>
+                        <span>Drag Colored Rings to Rotate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Hole in the Wall Rotation Game -->
+    <div class="slide-container" id="slide-11">
+        <div class="flex flex-col md:flex-row items-center gap-6 max-w-6xl w-full h-[82vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-2">
+                        GAME: HOLE IN THE WALL
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">Rotate to Fit</h2>
+                    <p class="text-gray-300 text-xs leading-relaxed mb-3">
+                        Spin the 3D block along <span class="text-red-400 font-bold">X</span>, <span class="text-green-400 font-bold">Y</span>, or <span class="text-blue-400 font-bold">Z</span> so its orientation matches the cutout in the barrier wall.
+                    </p>
+
+                    <!-- Rotation Controls Panel -->
+                    <div class="space-y-2 text-xs mb-3 font-mono">
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700">
+                            <span class="text-zinc-400 text-[11px] uppercase tracking-wider block mb-1.5">Rotate +90° along Axis:</span>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <button onclick="game11RotateAxis('X')" class="bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 py-1.5 rounded font-bold transition-all transform active:scale-95">
+                                    <kbd class="text-[10px] mr-1">X</kbd> Pitch
+                                </button>
+                                <button onclick="game11RotateAxis('Y')" class="bg-green-950/80 hover:bg-green-900 text-green-300 border border-green-800 py-1.5 rounded font-bold transition-all transform active:scale-95">
+                                    <kbd class="text-[10px] mr-1">Y</kbd> Roll
+                                </button>
+                                <button onclick="game11RotateAxis('Z')" class="bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-800 py-1.5 rounded font-bold transition-all transform active:scale-95">
+                                    <kbd class="text-[10px] mr-1">Z</kbd> Yaw
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="game11ResetRotation()" class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-600 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors" title="Alt + R">
+                                <i class="fa-solid fa-rotate-left"></i> <kbd>Alt + R</kbd>
+                            </button>
+                            <button id="s11-launch-btn" onclick="game11LaunchShape()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-1.5 transition-all transform active:scale-95">
+                                <i class="fa-solid fa-paper-plane"></i> Launch (<kbd>Space</kbd>)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alignment Status Tag -->
+                    <div id="s11-match-badge" class="p-2.5 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-between text-xs font-mono">
+                        <span class="text-zinc-400">Alignment:</span>
+                        <span id="s11-match-text" class="text-amber-400 font-bold flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Checking...
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 mt-2 flex justify-between items-center text-xs font-mono">
+                    <div>
+                        <span class="text-zinc-500 text-[10px] uppercase block">Current Angles</span>
+                        <span id="s11-angles-readout" class="text-amber-400 font-bold">X: 0° | Y: 0° | Z: 0°</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-zinc-500 text-[10px] uppercase block">Level</span>
+                        <span id="s11-level-readout" class="text-emerald-400 font-bold text-sm">1 / 3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11 Three.js Viewport -->
+            <div class="flex-1 w-full h-full min-h-[360px] relative">
+                <div class="viewport-frame w-full h-full relative" id="slide11-viewport">
+                    <div id="slide11-canvas-container" class="w-full h-full"></div>
+
+                    <!-- Level Clear / Victory Card -->
+                    <div id="s11-victory-card" class="absolute inset-0 bg-zinc-950/85 backdrop-blur-md rounded-xl flex flex-col items-center justify-center hidden z-30 p-6 text-center">
+                        <div class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-3xl text-emerald-400 mb-3 shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-1">Wall Cleared!</h3>
+                        <p class="text-sm text-zinc-400 max-w-sm mb-5">You rotated the 3D block to the exact Euler orientation required to slip through the laser aperture.</p>
+                        <div class="flex gap-3">
+                            <button onclick="game11NextLevel()" id="s11-next-lvl-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
+                                Next Puzzle <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <button onclick="game11RestartGame()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-600 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+                                Play Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: The Scale Tool & The S Hotkey -->
+    <div class="slide-container" id="slide-12">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[80vh]">
+            <div class="w-full md:w-96 flex flex-col justify-between text-left h-full py-1 overflow-y-auto pr-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-2">
+                        STEP 9: SCALING & PLANES
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The Scale Tool & <kbd class="text-blender-orange font-mono">S</kbd></h2>
+                    <p class="text-gray-300 text-xs leading-relaxed mb-3">
+                        The gizmo gives you 3 ways to resize: <strong>1-Axis</strong> (Cubes), <strong>2-Axis Plane</strong> (Flat Squares), or <strong>All 3 Axes</strong> (Outer Ring / <kbd>S</kbd>).
+                    </p>
+
+                    <!-- Gizmo Breakdown Card -->
+                    <div class="space-y-2 mb-3 text-xs font-mono">
+                        <div class="p-2 rounded-lg bg-zinc-800/80 border border-zinc-700">
+                            <span class="text-zinc-400 text-[11px] font-bold block mb-1">1-AXIS (CUBE HANDLES):</span>
+                            <div class="grid grid-cols-3 gap-1 text-center text-[10px]">
+                                <span class="bg-red-950/70 text-red-300 py-0.5 rounded border border-red-800">Red: X Only</span>
+                                <span class="bg-green-950/70 text-green-300 py-0.5 rounded border border-green-800">Green: Y Only</span>
+                                <span class="bg-blue-950/70 text-blue-300 py-0.5 rounded border border-blue-800">Blue: Z Only</span>
+                            </div>
+                        </div>
+
+                        <!-- Flat Squares (Planar Handles) Explanation -->
+                        <div class="p-2.5 rounded-lg bg-amber-950/30 border border-amber-600/60 text-amber-200">
+                            <div class="flex items-center gap-1.5 font-bold text-amber-300 mb-1">
+                                <i class="fa-solid fa-vector-square text-amber-400"></i>
+                                <span>FLAT SQUARES = 2D PLANE LOCK:</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-300 font-sans leading-relaxed mb-1.5">
+                                Scales across <strong>two axes at once</strong> uniformly while <em>strictly locking</em> the perpendicular 3rd axis.
+                            </p>
+                            <div class="space-y-1 text-[10px]">
+                                <div class="flex justify-between items-center bg-zinc-900/80 p-1 rounded border border-blue-900/60">
+                                    <span class="text-blue-300 font-bold"><i class="fa-solid fa-square mr-1"></i> Blue Square (XY Plane):</span>
+                                    <span class="text-zinc-300">Scales X & Y | Locks Z (<kbd class="text-[9px]">Shift+Z</kbd>)</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-zinc-900/80 p-1 rounded border border-green-900/60">
+                                    <span class="text-green-300 font-bold"><i class="fa-solid fa-square mr-1"></i> Green Square (XZ Plane):</span>
+                                    <span class="text-zinc-300">Scales X & Z | Locks Y (<kbd class="text-[9px]">Shift+Y</kbd>)</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-zinc-900/80 p-1 rounded border border-red-900/60">
+                                    <span class="text-red-300 font-bold"><i class="fa-solid fa-square mr-1"></i> Red Square (YZ Plane):</span>
+                                    <span class="text-zinc-300">Scales Y & Z | Locks X (<kbd class="text-[9px]">Shift+X</kbd>)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Plane Scale Action Buttons -->
+                    <div class="mb-2">
+                        <span class="text-zinc-400 text-[10px] uppercase font-mono tracking-wider block mb-1">Try 2D Plane Scaling:</span>
+                        <div class="grid grid-cols-3 gap-1.5 font-mono text-xs">
+                            <button onclick="stepScalePlane('xy', 1.25)" class="bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-800 py-1 rounded text-center font-bold transition-colors" title="Scale XY (Floor), Keep Z Height">
+                                XY <kbd class="text-[9px]">⇧Z</kbd>
+                            </button>
+                            <button onclick="stepScalePlane('xz', 1.25)" class="bg-green-950/80 hover:bg-green-900 text-green-300 border border-green-800 py-1 rounded text-center font-bold transition-colors" title="Scale XZ (Wall), Keep Y Depth">
+                                XZ <kbd class="text-[9px]">⇧Y</kbd>
+                            </button>
+                            <button onclick="stepScalePlane('yz', 1.25)" class="bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 py-1 rounded text-center font-bold transition-colors" title="Scale YZ (Wall), Keep X Width">
+                                YZ <kbd class="text-[9px]">⇧X</kbd>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step Scale Buttons -->
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <button onclick="stepScaleUniform(1.3)" class="bg-amber-950/80 hover:bg-amber-900 text-amber-300 border border-amber-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">
+                            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Uniform +30%
+                        </button>
+                        <button onclick="stepScaleUniform(0.7)" class="bg-amber-950/80 hover:bg-amber-900 text-amber-300 border border-amber-800 py-1.5 rounded text-xs font-mono font-bold transition-colors">
+                            <i class="fa-solid fa-magnifying-glass-minus mr-1"></i> Uniform -30%
+                        </button>
+                    </div>
+
+                    <button onclick="resetScale3D()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-600 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-rotate-left"></i> Clear Scale (<kbd>Alt + S</kbd>)
+                    </button>
+                </div>
+
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 mt-2">
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mb-1 font-mono">Scale Factors</div>
+                    <div id="slide12-scale-readout" class="font-mono text-xs text-amber-400 font-bold">X: 1.00x | Y: 1.00x | Z: 1.00x</div>
+                </div>
+            </div>
+
+            <!-- Slide 12 Three.js Viewport -->
+            <div class="flex-1 w-full h-full min-h-[350px]">
+                <div class="viewport-frame w-full h-full relative" id="slide12-viewport">
+                    <div class="blender-toolbar">
+                        <div class="blender-tool-btn" title="Select Box"><i class="fa-regular fa-square"></i></div>
+                        <div class="blender-tool-btn" title="3D Cursor"><i class="fa-solid fa-crosshairs"></i></div>
+                        <div class="blender-tool-btn" title="Move Tool"><i class="fa-solid fa-arrows-up-down-left-right"></i></div>
+                        <div class="blender-tool-btn" title="Rotate Tool"><i class="fa-solid fa-arrows-rotate"></i></div>
+                        <div class="blender-tool-btn active" title="Scale Tool"><i class="fa-solid fa-expand"></i></div>
+                        <div class="blender-tool-btn" title="Scale Cage Tool"><i class="fa-solid fa-vector-square"></i></div>
+                    </div>
+
+                    <div id="slide12-canvas-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-zinc-700 text-xs font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-expand text-blender-orange"></i>
+                        <span>Drag Flat Squares for 2D Plane Scaling</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: The Scale Cage Tool -->
+    <div class="slide-container" id="slide-13">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[80vh]">
+            <div class="w-full md:w-96 flex flex-col justify-between text-left h-full py-1 overflow-y-auto pr-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-blender-orange text-xs font-bold tracking-wider mb-2">
+                        STEP 10: BOUNDING BOX SCALING
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The Scale Cage Tool</h2>
+                    <p class="text-gray-300 text-xs leading-relaxed mb-3">
+                        In standard scaling, objects expand from their <strong>center pivot</strong>. The <strong>Scale Cage</strong> gives you a bounding box where dragging a handle scales from the <strong>opposite side</strong>.
+                    </p>
+
+                    <!-- Core Differences Card -->
+                    <div class="space-y-2 mb-3 text-xs font-mono">
+                        <div class="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700">
+                            <span class="text-zinc-400 text-[11px] font-bold block mb-1 uppercase tracking-wider">How to Access in Blender:</span>
+                            <p class="text-[11px] text-zinc-300 font-sans leading-relaxed">
+                                Long-press the <strong>Scale Icon</strong> in the left toolbar &rarr; choose <strong class="text-blender-orange">Scale Cage</strong> (or press <kbd class="text-[10px]">Shift + Space</kbd> &rarr; <kbd class="text-[10px]">Scale Cage</kbd>).
+                            </p>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-amber-950/30 border border-amber-600/60 text-amber-200">
+                            <div class="flex items-center gap-1.5 font-bold text-amber-300 mb-1">
+                                <i class="fa-solid fa-cube text-amber-400"></i>
+                                <span>OPPOSITE ANCHOR BEHAVIOR:</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-300 font-sans leading-relaxed">
+                                Pull the <strong>Top handle</strong> upward &rarr; The <strong>bottom stays firmly on the floor</strong> while the top stretches up!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Cage Direction Buttons -->
+                    <div class="mb-2">
+                        <span class="text-zinc-400 text-[10px] uppercase font-mono tracking-wider block mb-1">Pull Cage Handles (Anchored Base):</span>
+                        <div class="grid grid-cols-3 gap-1.5 font-mono text-xs mb-2">
+                            <button onclick="stepScaleCage('top', 0.4)" class="bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-800 py-1.5 rounded text-center font-bold transition-colors">
+                                <i class="fa-solid fa-arrow-up mr-1"></i> +Top (Z)
+                            </button>
+                            <button onclick="stepScaleCage('right', 0.4)" class="bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 py-1.5 rounded text-center font-bold transition-colors">
+                                <i class="fa-solid fa-arrow-right mr-1"></i> +Right (X)
+                            </button>
+                            <button onclick="stepScaleCage('front', 0.4)" class="bg-green-950/80 hover:bg-green-900 text-green-300 border border-green-800 py-1.5 rounded text-center font-bold transition-colors">
+                                <i class="fa-solid fa-arrow-down mr-1"></i> +Depth (Y)
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 font-mono text-xs">
+                            <button onclick="stepScaleCage('corner', 0.3)" class="bg-amber-950/80 hover:bg-amber-900 text-amber-300 border border-amber-800 py-1.5 rounded text-center font-bold transition-colors">
+                                <i class="fa-solid fa-up-right-and-down-left-from-center mr-1"></i> Pull Corner
+                            </button>
+                            <button onclick="toggleCageMode()" id="cage-mode-toggle-btn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-600 py-1.5 rounded text-center font-bold transition-colors">
+                                Mode: <span class="text-blender-orange">Cage</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="resetScaleCage3D()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-600 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors mt-2">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Dimensions (<kbd>Alt + S</kbd>)
+                    </button>
+                </div>
+
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 mt-2">
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mb-1 font-mono">Bounding Box Dimensions</div>
+                    <div id="slide13-cage-readout" class="font-mono text-xs text-amber-400 font-bold">W: 2.00m | D: 2.00m | H: 2.00m</div>
+                </div>
+            </div>
+
+            <!-- Slide 13 Three.js Viewport -->
+            <div class="flex-1 w-full h-full min-h-[350px]">
+                <div class="viewport-frame w-full h-full relative" id="slide13-viewport">
+                    <div class="blender-toolbar">
+                        <div class="blender-tool-btn" title="Select Box"><i class="fa-regular fa-square"></i></div>
+                        <div class="blender-tool-btn" title="3D Cursor"><i class="fa-solid fa-crosshairs"></i></div>
+                        <div class="blender-tool-btn" title="Move Tool"><i class="fa-solid fa-arrows-up-down-left-right"></i></div>
+                        <div class="blender-tool-btn" title="Rotate Tool"><i class="fa-solid fa-arrows-rotate"></i></div>
+                        <div class="blender-tool-btn" title="Scale Tool"><i class="fa-solid fa-expand"></i></div>
+                        <div class="blender-tool-btn active" title="Scale Cage Tool"><i class="fa-solid fa-vector-square"></i></div>
+                    </div>
+
+                    <div id="slide13-canvas-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-zinc-700 text-xs font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-vector-square text-blender-orange"></i>
+                        <span>Click & Drag Glowing Handles to Stretch from Opposite Base</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide-container');
+            const totalSlides = slides.length;
+            let currentSlideIndex = 0;
+
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const currentNumSpan = document.getElementById('current-slide-num');
+            const totalNumSpan = document.getElementById('total-slide-num');
+            const progressBar = document.getElementById('progress-bar');
+
+            totalNumSpan.textContent = totalSlides;
+
+            window.updateUI = function() {
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'previous');
+                    if (index === currentSlideIndex) {
+                        slide.classList.add('active');
+                    } else if (index < currentSlideIndex) {
+                        slide.classList.add('previous');
+                    }
+                });
+
+                prevBtn.disabled = currentSlideIndex === 0;
+                nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+                currentNumSpan.textContent = currentSlideIndex + 1;
+                progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
+
+                // Slide specific viewport updates (Slide 6 is index 5)
+                if (currentSlideIndex === 5 && !isThreeInitialized) {
+                    setTimeout(initThreeJS, 100);
+                } else if (currentSlideIndex === 5 && isThreeInitialized) {
+                    onSlide6Resize();
+                }
+
+                if (currentSlideIndex === 6 && !initSlide7Done) {
+                    setTimeout(initSlide7, 100);
+                } else if (currentSlideIndex === 6 && initSlide7Done) {
+                    onSlide7Resize();
+                }
+
+                if (currentSlideIndex === 7 && !initSlide8Done) {
+                    setTimeout(initSlide8, 100);
+                } else if (currentSlideIndex === 7 && initSlide8Done) {
+                    onSlide8Resize();
+                }
+
+                if (currentSlideIndex === 8) {
+                    setTimeout(initMazeCanvas, 100);
+                }
+
+                if (currentSlideIndex === 9 && !initSlide10Done) {
+                    setTimeout(initSlide10, 100);
+                } else if (currentSlideIndex === 9 && initSlide10Done) {
+                    onSlide10Resize();
+                }
+
+                if (currentSlideIndex === 10 && !initSlide11Done) {
+                    setTimeout(initSlide11, 100);
+                } else if (currentSlideIndex === 10 && initSlide11Done) {
+                    onSlide11Resize();
+                }
+
+                if (currentSlideIndex === 11 && !initSlide12Done) {
+                    setTimeout(initSlide12, 100);
+                } else if (currentSlideIndex === 11 && initSlide12Done) {
+                    onSlide12Resize();
+                }
+
+                if (currentSlideIndex === 12 && !initSlide13Done) {
+                    setTimeout(initSlide13, 100);
+                } else if (currentSlideIndex === 12 && initSlide13Done) {
+                    onSlide13Resize();
+                }
+            };
+
+            window.nextSlide = function() {
+                if (currentSlideIndex < totalSlides - 1) {
+                    currentSlideIndex++;
+                    updateUI();
+                }
+            };
+
+            window.prevSlide = function() {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    updateUI();
+                }
+            };
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            // --- Slide 2: Blender Windows Structure Highlight Logic ---
+            window.highlightBlenderWin = function(winType) {
+                const panes = {
+                    viewport: document.getElementById('pane-viewport'),
+                    outliner: document.getElementById('pane-outliner'),
+                    properties: document.getElementById('pane-properties')
+                };
+                const cards = {
+                    viewport: document.getElementById('card-win-viewport'),
+                    outliner: document.getElementById('card-win-outliner'),
+                    properties: document.getElementById('card-win-properties')
+                };
+
+                Object.keys(panes).forEach(k => {
+                    if (panes[k]) {
+                        if (k === winType) {
+                            panes[k].classList.add('highlight-active');
+                            if (k === 'viewport') panes[k].style.borderColor = '#ea7600';
+                            if (k === 'outliner') panes[k].style.borderColor = '#2d8ebf';
+                            if (k === 'properties') panes[k].style.borderColor = '#10b981';
+                        } else {
+                            panes[k].classList.remove('highlight-active');
+                            panes[k].style.borderColor = '#3f3f46';
+                        }
+                    }
+                    if (cards[k]) {
+                        if (k === winType) {
+                            cards[k].classList.add('bg-zinc-700', 'border-blender-orange');
+                            cards[k].classList.remove('bg-zinc-800/90', 'border-zinc-700');
+                        } else {
+                            cards[k].classList.remove('bg-zinc-700', 'border-blender-orange');
+                            cards[k].classList.add('bg-zinc-800/90', 'border-zinc-700');
+                        }
+                    }
+                });
+            };
+
+            // --- Slide 3: Cube Hover Logic ---
+            window.highlightAxis = function(axis) {
+                const cube = document.getElementById('demo-cube');
+                if (!cube) return;
+                cube.className = 'cube';
+                cube.classList.add(`highlight-${axis}`);
+                cube.style.transform = ''; 
+            };
+
+            window.resetAxis = function() {
+                const cube = document.getElementById('demo-cube');
+                if (!cube) return;
+                cube.className = 'cube';
+                cube.style.transform = ''; 
+            };
+
+            // --- Slide 4: Camera Mode Selector ---
+            window.setSlide4Mode = function(mode) {
+                const cam = document.getElementById('demo-camera');
+                if (!cam) return;
+                const modes = ['orbit', 'pan', 'zoom'];
+                
+                cam.classList.remove('mode-orbit', 'mode-pan', 'mode-zoom');
+                
+                setTimeout(() => {
+                    cam.classList.add(`mode-${mode}`);
+                }, 10);
+
+                modes.forEach(m => {
+                    const card = document.getElementById(`card-${m}`);
+                    if (!card) return;
+                    const textP = card.querySelector('p');
+                    if (m === mode) {
+                        card.classList.add('bg-gray-700', 'border-blender-orange');
+                        card.classList.remove('bg-gray-800', 'border-gray-700');
+                        if (textP) {
+                            textP.classList.add('text-gray-300');
+                            textP.classList.remove('text-gray-400');
+                        }
+                    } else {
+                        card.classList.remove('bg-gray-700', 'border-blender-orange');
+                        card.classList.add('bg-gray-800', 'border-gray-700');
+                        if (textP) {
+                            textP.classList.remove('text-gray-300');
+                            textP.classList.add('text-gray-400');
+                        }
+                    }
+                });
+            };
+
+            let scene, camera, renderer, controls;
+            let isThreeInitialized = false;
+
+            function initThreeJS() {
+                if (isThreeInitialized) return;
+                
+                const container = document.getElementById('three-container');
+                if (!container) return;
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x2b2b2b);
+
+                camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+                camera.position.set(5, 4, 5);
+
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(width, height);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer.domElement);
+
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+                controls.mouseButtons = {
+                    LEFT: -1,
+                    MIDDLE: THREE.MOUSE.ROTATE,
+                    RIGHT: -1
+                };
+
+                renderer.domElement.addEventListener('pointerdown', (e) => {
+                    if (e.button === 1) e.preventDefault();
+                });
+
+                const ambientLight = new THREE.AmbientLight(0x404040, 2);
+                scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(5, 10, 7.5);
+                scene.add(directionalLight);
+
+                const geometry = new THREE.BoxGeometry(2, 2, 2);
+                const edges = new THREE.EdgesGeometry(geometry);
+                const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xea7600 }));
+                
+                const material = new THREE.MeshStandardMaterial({ 
+                    color: 0x808080, 
+                    roughness: 0.5,
+                    polygonOffset: true,
+                    polygonOffsetFactor: 1,
+                    polygonOffsetUnits: 1
+                });
+                
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                cube.add(line);
+
+                const gridHelper = new THREE.GridHelper(10, 10, 0x555555, 0x444444);
+                scene.add(gridHelper);
+
+                const axesHelper = new THREE.AxesHelper(3);
+                scene.add(axesHelper);
+
+                const readout = document.getElementById('slide6-cam-readout');
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update();
+                    if (readout) {
+                        readout.textContent = `X: ${camera.position.x.toFixed(1)} | Y: ${camera.position.y.toFixed(1)} | Z: ${camera.position.z.toFixed(1)}`;
+                    }
+                    renderer.render(scene, camera);
+                }
+                
+                animate();
+                isThreeInitialized = true;
+            }
+
+            function onSlide6Resize() {
+                const container = document.getElementById('three-container');
+                if (!container || !renderer || !camera) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            let initSlide7Done = false;
+            let scene7, camera7, renderer7, controls7, transformControl7, cube7;
+
+            function initSlide7() {
+                const container = document.getElementById('slide7-canvas-container');
+                if (!container) return;
+
+                scene7 = new THREE.Scene();
+                scene7.background = new THREE.Color(0x1e1e1e);
+
+                camera7 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera7.position.set(5, 4, 6);
+
+                renderer7 = new THREE.WebGLRenderer({ antialias: true });
+                renderer7.setSize(container.clientWidth, container.clientHeight);
+                renderer7.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer7.domElement);
+
+                controls7 = new THREE.OrbitControls(camera7, renderer7.domElement);
+                controls7.enableDamping = true;
+                controls7.dampingFactor = 0.05;
+                controls7.mouseButtons = {
+                    LEFT: -1,
+                    MIDDLE: THREE.MOUSE.ROTATE,
+                    RIGHT: -1
+                };
+
+                const grid7 = new THREE.GridHelper(10, 10, 0xef4444, 0x3f3f46);
+                scene7.add(grid7);
+
+                const cubeGeo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+                const cubeMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.3 });
+                cube7 = new THREE.Mesh(cubeGeo, cubeMat);
+                cube7.position.set(0, 0.6, 0);
+                scene7.add(cube7);
+
+                const wireGeo = new THREE.EdgesGeometry(cubeGeo);
+                const wireMat = new THREE.LineBasicMaterial({ color: 0xea7600 });
+                cube7.add(new THREE.LineSegments(wireGeo, wireMat));
+
+                transformControl7 = new THREE.TransformControls(camera7, renderer7.domElement);
+                transformControl7.size = 0.85;
+                transformControl7.attach(cube7);
+                scene7.add(transformControl7);
+
+                transformControl7.addEventListener('dragging-changed', (event) => {
+                    controls7.enabled = !event.value;
+                });
+
+                transformControl7.addEventListener('change', updateSlide7Readout);
+
+                const ambLight = new THREE.AmbientLight(0xffffff, 0.7);
+                scene7.add(ambLight);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                dirLight.position.set(5, 8, 5);
+                scene7.add(dirLight);
+
+                function animate7() {
+                    requestAnimationFrame(animate7);
+                    controls7.update();
+                    renderer7.render(scene7, camera7);
+                }
+                animate7();
+                initSlide7Done = true;
+            }
+
+            function updateSlide7Readout() {
+                const readout = document.getElementById('slide7-loc-readout');
+                if (readout && cube7) {
+                    readout.textContent = `X: ${cube7.position.x.toFixed(2)} | Y: ${(cube7.position.y - 0.6).toFixed(2)} | Z: ${cube7.position.z.toFixed(2)}`;
+                }
+            }
+
+            window.stepTranslateAxis = function(axis, amount) {
+                if (!cube7) return;
+                if (axis === 'x') cube7.position.x += amount;
+                if (axis === 'y') cube7.position.z += amount;
+                if (axis === 'z') cube7.position.y += amount;
+                updateSlide7Readout();
+            };
+
+            window.resetTranslate3D = function() {
+                if (!cube7) return;
+                cube7.position.set(0, 0.6, 0);
+                updateSlide7Readout();
+            };
+
+            function onSlide7Resize() {
+                const container = document.getElementById('slide7-canvas-container');
+                if (!container || !renderer7 || !camera7) return;
+                camera7.aspect = container.clientWidth / container.clientHeight;
+                camera7.updateProjectionMatrix();
+                renderer7.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            let initSlide8Done = false;
+            let scene8, camera8, renderer8, controls8, cube8, lineOutline8;
+            let laserLineX, laserLineY, laserLineZ;
+            let s8Raycaster = new THREE.Raycaster();
+            let s8Mouse = new THREE.Vector2();
+
+            let s8IsSelected = false;
+            let s8IsGrabbed = false;
+            let s8AxisLock = null; 
+            let s8LastConfirmedPos = new THREE.Vector3(0, 0.6, 0);
+
+            function initSlide8() {
+                const container = document.getElementById('slide8-canvas-container');
+                if (!container || initSlide8Done) return;
+
+                scene8 = new THREE.Scene();
+                scene8.background = new THREE.Color(0x1a1a1e);
+
+                camera8 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera8.position.set(6.5, 5, 7.5);
+
+                renderer8 = new THREE.WebGLRenderer({ antialias: true });
+                renderer8.setSize(container.clientWidth, container.clientHeight);
+                renderer8.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer8.domElement);
+
+                controls8 = new THREE.OrbitControls(camera8, renderer8.domElement);
+                controls8.enableDamping = true;
+                controls8.dampingFactor = 0.05;
+                controls8.mouseButtons = {
+                    LEFT: -1,
+                    MIDDLE: THREE.MOUSE.ROTATE,
+                    RIGHT: -1
+                };
+
+                const grid8 = new THREE.GridHelper(14, 14, 0xef4444, 0x3f3f46);
+                scene8.add(grid8);
+
+                const cubeGeo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+                const cubeMat = new THREE.MeshStandardMaterial({ 
+                    color: 0x475569, 
+                    roughness: 0.35 
+                });
+                cube8 = new THREE.Mesh(cubeGeo, cubeMat);
+                cube8.position.set(0, 0.6, 0);
+                scene8.add(cube8);
+
+                const wireGeo = new THREE.EdgesGeometry(cubeGeo);
+                const wireMat = new THREE.LineBasicMaterial({ color: 0x64748b, linewidth: 2 });
+                lineOutline8 = new THREE.LineSegments(wireGeo, wireMat);
+                cube8.add(lineOutline8);
+
+                const laserMatX = new THREE.LineBasicMaterial({ color: 0xef4444, linewidth: 3 });
+                const laserGeoX = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-40, 0, 0), new THREE.Vector3(40, 0, 0)]);
+                laserLineX = new THREE.Line(laserGeoX, laserMatX);
+                laserLineX.visible = false;
+                scene8.add(laserLineX);
+
+                const laserMatY = new THREE.LineBasicMaterial({ color: 0x22c55e, linewidth: 3 });
+                const laserGeoY = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -40), new THREE.Vector3(0, 0, 40)]);
+                laserLineY = new THREE.Line(laserGeoY, laserMatY);
+                laserLineY.visible = false;
+                scene8.add(laserLineY);
+
+                const laserMatZ = new THREE.LineBasicMaterial({ color: 0x3b82f6, linewidth: 3 });
+                const laserGeoZ = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -40, 0), new THREE.Vector3(0, 40, 0)]);
+                laserLineZ = new THREE.Line(laserGeoZ, laserMatZ);
+                laserLineZ.visible = false;
+                scene8.add(laserLineZ);
+
+                const ambLight = new THREE.AmbientLight(0xffffff, 0.75);
+                scene8.add(ambLight);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                dirLight.position.set(6, 10, 6);
+                scene8.add(dirLight);
+
+                renderer8.domElement.addEventListener('pointerdown', (e) => {
+                    const rect = renderer8.domElement.getBoundingClientRect();
+                    s8Mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                    s8Mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+                    if (e.button === 0) { 
+                        if (s8IsGrabbed) {
+                            confirmS8Transform(true);
+                        } else {
+                            s8Raycaster.setFromCamera(s8Mouse, camera8);
+                            const intersects = s8Raycaster.intersectObject(cube8);
+                            if (intersects.length > 0) {
+                                s8IsSelected = true;
+                            } else {
+                                s8IsSelected = false;
+                            }
+                            updateS8UI();
+                        }
+                    } else if (e.button === 2) { 
+                        e.preventDefault();
+                        if (s8IsGrabbed) {
+                            confirmS8Transform(false);
+                        }
+                    }
+                });
+
+                renderer8.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+
+                let prevMouseX = null;
+                let prevMouseY = null;
+
+                renderer8.domElement.addEventListener('pointermove', (e) => {
+                    if (!s8IsGrabbed || !cube8) {
+                        prevMouseX = e.clientX;
+                        prevMouseY = e.clientY;
+                        return;
+                    }
+
+                    if (prevMouseX !== null && prevMouseY !== null) {
+                        const dx = e.clientX - prevMouseX;
+                        const dy = e.clientY - prevMouseY;
+                        const speed = 0.025;
+
+                        if (s8AxisLock === 'X') {
+                            cube8.position.x += dx * speed;
+                        } else if (s8AxisLock === 'Y') {
+                            cube8.position.z += dy * speed;
+                        } else if (s8AxisLock === 'Z') {
+                            cube8.position.y -= dy * speed;
+                        }
+
+                        updateS8LaserPositions();
+                        updateS8Readout();
+                    }
+
+                    prevMouseX = e.clientX;
+                    prevMouseY = e.clientY;
+                });
+
+                function animate8() {
+                    requestAnimationFrame(animate8);
+                    controls8.update();
+                    renderer8.render(scene8, camera8);
+                }
+                animate8();
+                initSlide8Done = true;
+                updateS8UI();
+            }
+
+            function updateS8LaserPositions() {
+                if (!cube8) return;
+                if (laserLineX) laserLineX.position.set(0, cube8.position.y, cube8.position.z);
+                if (laserLineY) laserLineY.position.set(cube8.position.x, cube8.position.y, 0);
+                if (laserLineZ) laserLineZ.position.set(cube8.position.x, 0, cube8.position.z);
+            }
+
+            function updateS8UI() {
+                const hudTag = document.getElementById('s8-hud-tag');
+                const hudMsg = document.getElementById('s8-hud-msg');
+                const step0 = document.getElementById('s8-step-0');
+                const step1 = document.getElementById('s8-step-1');
+                const badge0 = document.getElementById('s8-badge-0');
+                const badge1 = document.getElementById('s8-badge-1');
+
+                if (!lineOutline8 || !cube8) return;
+
+                if (!s8IsSelected) {
+                    cube8.material.color.setHex(0x3f3f46);
+                    lineOutline8.material.color.setHex(0x64748b);
+                    if (hudTag) hudTag.className = 'w-2 h-2 rounded-full bg-zinc-500';
+                    if (hudMsg) hudMsg.textContent = 'Click 3D Cube to Select';
+                    if (step0) step0.className = 'p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 transition-all duration-300 cursor-pointer hover:border-amber-500/50';
+                    if (step1) step1.className = 'p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 opacity-50 transition-all duration-300';
+                    if (badge0) { badge0.textContent = 'Unselected'; badge0.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-400 font-mono'; }
+                    if (badge1) { badge1.textContent = 'Idle'; badge1.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-400 font-mono'; }
+                    hideS8Lasers();
+                } else if (!s8IsGrabbed) {
+                    cube8.material.color.setHex(0x475569);
+                    lineOutline8.material.color.setHex(0xea7600); 
+                    if (hudTag) hudTag.className = 'w-2 h-2 rounded-full bg-blender-orange animate-ping';
+                    if (hudMsg) hudMsg.textContent = 'Selected! Press G to Grab (or click an axis)';
+                    if (step0) step0.className = 'p-2.5 rounded-lg bg-amber-950/40 border border-amber-600 transition-all duration-300 cursor-pointer';
+                    if (step1) step1.className = 'p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 transition-all duration-300 cursor-pointer hover:border-amber-500/50';
+                    if (badge0) { badge0.textContent = 'Selected'; badge0.className = 'text-[10px] px-1.5 py-0.5 rounded bg-amber-600 text-black font-bold font-mono'; }
+                    if (badge1) { badge1.textContent = 'Ready'; badge1.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-300 font-mono'; }
+                    hideS8Lasers();
+                } else {
+                    cube8.material.color.setHex(0x64748b);
+                    lineOutline8.material.color.setHex(0xfbbf24);
+                    if (step1) step1.className = 'p-2.5 rounded-lg bg-amber-950/40 border border-amber-600 transition-all duration-300 cursor-pointer';
+                    if (badge1) { badge1.textContent = 'Grabbed'; badge1.className = 'text-[10px] px-1.5 py-0.5 rounded bg-amber-500 text-black font-bold font-mono'; }
+                    
+                    if (s8AxisLock) {
+                        const axisName = s8AxisLock === 'X' ? 'X (Width)' : s8AxisLock === 'Y' ? 'Y (Depth)' : 'Z (Height)';
+                        if (hudMsg) hudMsg.textContent = `Locked to ${axisName} | Move mouse, Left-Click to drop`;
+                    } else {
+                        if (hudMsg) hudMsg.textContent = 'Grabbed! Press X, Y, or Z to lock rail';
+                    }
+                }
+
+                updateS8Readout();
+            }
+
+            function updateS8Readout() {
+                const readout = document.getElementById('s8-loc-readout');
+                if (readout && cube8) {
+                    readout.textContent = `X: ${cube8.position.x.toFixed(2)} | Y (Depth): ${cube8.position.z.toFixed(2)} | Z (Height): ${(cube8.position.y - 0.6).toFixed(2)}`;
+                }
+            }
+
+            function hideS8Lasers() {
+                if (laserLineX) laserLineX.visible = false;
+                if (laserLineY) laserLineY.visible = false;
+                if (laserLineZ) laserLineZ.visible = false;
+            }
+
+            window.triggerS8Select = function() {
+                s8IsSelected = true;
+                updateS8UI();
+            };
+
+            window.triggerS8Grab = function() {
+                if (!cube8) return;
+                s8IsSelected = true;
+                s8IsGrabbed = true;
+                s8AxisLock = null;
+                s8LastConfirmedPos.copy(cube8.position);
+                updateS8UI();
+            };
+
+            window.triggerS8Axis = function(axis) {
+                if (!cube8) return;
+                s8IsSelected = true;
+                s8IsGrabbed = true;
+                s8AxisLock = axis;
+                hideS8Lasers();
+
+                if (axis === 'X' && laserLineX) laserLineX.visible = true;
+                if (axis === 'Y' && laserLineY) laserLineY.visible = true;
+                if (axis === 'Z' && laserLineZ) laserLineZ.visible = true;
+
+                updateS8LaserPositions();
+                updateS8UI();
+            };
+
+            window.confirmS8Transform = function(confirm) {
+                if (!s8IsGrabbed || !cube8) return;
+                if (!confirm) {
+                    cube8.position.copy(s8LastConfirmedPos);
+                } else {
+                    s8LastConfirmedPos.copy(cube8.position);
+                }
+                s8IsGrabbed = false;
+                s8AxisLock = null;
+                hideS8Lasers();
+                updateS8UI();
+            };
+
+            window.resetS8CubeLocation = function() {
+                if (!cube8) return;
+                cube8.position.set(0, 0.6, 0);
+                s8LastConfirmedPos.set(0, 0.6, 0);
+                s8IsGrabbed = false;
+                s8AxisLock = null;
+                hideS8Lasers();
+                updateS8UI();
+            };
+
+            function onSlide8Resize() {
+                const container = document.getElementById('slide8-canvas-container');
+                if (!container || !renderer8 || !camera8) return;
+                camera8.aspect = container.clientWidth / container.clientHeight;
+                camera8.updateProjectionMatrix();
+                renderer8.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            const MAZE_SIZE = 11;
+            const mazeGrid = [
+                [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+                [0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0],
+                [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                [0, 1, 1, 2, 1, 0, 1, 1, 1, 1, 0],
+                [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0],
+                [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]
+            ];
+
+            let playerPos = { x: 0, y: 0, z: 0 };
+            let startDragPos = { x: 0, y: 0, z: 0 };
+            let isGameSelected = false;
+            let isGameGrabbed = false;
+            let gameAxisLock = null;
+
+            const mazeCanvas = document.getElementById('maze-canvas');
+            let mazeCtx = null;
+
+            function initMazeCanvas() {
+                if (!mazeCanvas) return;
+                mazeCtx = mazeCanvas.getContext('2d');
+                mazeCanvas.width = 440;
+                mazeCanvas.height = 440;
+                renderMaze();
+            }
+
+            function renderMaze() {
+                if (!mazeCtx || !mazeCanvas) return;
+                const cellSize = mazeCanvas.width / MAZE_SIZE;
+
+                mazeCtx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+
+                mazeCtx.fillStyle = '#18181b';
+                mazeCtx.fillRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+
+                for (let r = 0; r < MAZE_SIZE; r++) {
+                    for (let c = 0; c < MAZE_SIZE; c++) {
+                        const x = c * cellSize;
+                        const y = r * cellSize;
+
+                        if (mazeGrid[r][c] === 1) {
+                            mazeCtx.fillStyle = '#27272a';
+                            mazeCtx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+                            mazeCtx.strokeStyle = '#3f3f46';
+                            mazeCtx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+                        } else if (mazeGrid[r][c] === 2) {
+                            mazeCtx.fillStyle = '#450a0a';
+                            mazeCtx.fillRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+                            mazeCtx.strokeStyle = '#ef4444';
+                            mazeCtx.lineWidth = 2;
+                            mazeCtx.strokeRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+                            
+                            mazeCtx.beginPath();
+                            mazeCtx.moveTo(x + 4, y + cellSize / 2);
+                            mazeCtx.lineTo(x + cellSize - 4, y + cellSize / 2);
+                            mazeCtx.stroke();
+                        } else {
+                            mazeCtx.fillStyle = '#09090b';
+                            mazeCtx.fillRect(x, y, cellSize, cellSize);
+                            mazeCtx.strokeStyle = '#27272a';
+                            mazeCtx.lineWidth = 0.5;
+                            mazeCtx.strokeRect(x, y, cellSize, cellSize);
+                        }
+                    }
+                }
+
+                // Goal Portal at (10, 10)
+                const goalX = 10 * cellSize;
+                const goalY = 10 * cellSize;
+                mazeCtx.fillStyle = 'rgba(16, 185, 129, 0.25)';
+                mazeCtx.fillRect(goalX + 2, goalY + 2, cellSize - 4, cellSize - 4);
+                mazeCtx.strokeStyle = '#10b981';
+                mazeCtx.lineWidth = 2;
+                mazeCtx.strokeRect(goalX + 2, goalY + 2, cellSize - 4, cellSize - 4);
+
+                if (isGameGrabbed && gameAxisLock) {
+                    const cx = playerPos.x * cellSize + cellSize / 2;
+                    const cy = playerPos.y * cellSize + cellSize / 2;
+                    mazeCtx.lineWidth = 2;
+
+                    if (gameAxisLock === 'X') {
+                        mazeCtx.strokeStyle = '#ef4444';
+                        mazeCtx.beginPath();
+                        mazeCtx.moveTo(0, cy);
+                        mazeCtx.lineTo(mazeCanvas.width, cy);
+                        mazeCtx.stroke();
+                    } else if (gameAxisLock === 'Y') {
+                        mazeCtx.strokeStyle = '#22c55e';
+                        mazeCtx.beginPath();
+                        mazeCtx.moveTo(cx, 0);
+                        mazeCtx.lineTo(cx, mazeCanvas.height);
+                        mazeCtx.stroke();
+                    } else if (gameAxisLock === 'Z') {
+                        mazeCtx.strokeStyle = '#3b82f6';
+                        mazeCtx.beginPath();
+                        mazeCtx.arc(cx, cy, cellSize * 0.8, 0, Math.PI * 2);
+                        mazeCtx.stroke();
+                    }
+                }
+
+                const px = playerPos.x * cellSize + 4;
+                const py = playerPos.y * cellSize + 4 - (playerPos.z * 10);
+                const pSize = cellSize - 8;
+
+                if (playerPos.z > 0) {
+                    mazeCtx.fillStyle = 'rgba(0,0,0,0.6)';
+                    mazeCtx.fillRect(playerPos.x * cellSize + 6, playerPos.y * cellSize + 6, pSize, pSize);
+                }
+
+                if (isGameSelected) {
+                    mazeCtx.fillStyle = isGameGrabbed ? '#fbbf24' : '#ea7600';
+                    mazeCtx.strokeStyle = '#ffffff';
+                    mazeCtx.lineWidth = 2;
+                } else {
+                    mazeCtx.fillStyle = '#52525b';
+                    mazeCtx.strokeStyle = '#71717a';
+                    mazeCtx.lineWidth = 1;
+                }
+                mazeCtx.fillRect(px, py, pSize, pSize);
+                mazeCtx.strokeRect(px, py, pSize, pSize);
+
+                const hud = document.getElementById('maze-pos-display');
+                if (hud) {
+                    hud.textContent = `(${playerPos.x}, ${playerPos.y}) | Z: ${playerPos.z ? '1.5m (Fly)' : '0.0m (Ground)'}`;
+                }
+            }
+
+            mazeCanvas?.addEventListener('click', (e) => {
+                const rect = mazeCanvas.getBoundingClientRect();
+                const clickX = Math.floor((e.clientX - rect.left) / (rect.width / MAZE_SIZE));
+                const clickY = Math.floor((e.clientY - rect.top) / (rect.height / MAZE_SIZE));
+
+                if (isGameGrabbed) {
+                    gameConfirmMove(true);
+                } else {
+                    if (clickX === playerPos.x && clickY === playerPos.y) {
+                        isGameSelected = true;
+                    } else {
+                        isGameSelected = false;
+                    }
+                    renderMaze();
+                }
+            });
+
+            mazeCanvas?.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (isGameGrabbed) {
+                    gameConfirmMove(false);
+                }
+            });
+
+            window.gameTriggerHotKey = function(key) {
+                if (!isGameSelected) return;
+
+                if (key === 'G') {
+                    isGameGrabbed = true;
+                    gameAxisLock = null;
+                    startDragPos = { ...playerPos };
+                    renderMaze();
+                } else if (isGameGrabbed && (key === 'X' || key === 'Y' || key === 'Z')) {
+                    gameAxisLock = key;
+                    if (key === 'Z') {
+                        playerPos.z = playerPos.z > 0 ? 0 : 1.5;
+                    }
+                    renderMaze();
+                }
+            };
+
+            mazeCanvas?.addEventListener('mousemove', (e) => {
+                if (!isGameGrabbed || !gameAxisLock || gameAxisLock === 'Z') return;
+                const rect = mazeCanvas.getBoundingClientRect();
+                const targetCol = Math.floor((e.clientX - rect.left) / (rect.width / MAZE_SIZE));
+                const targetRow = Math.floor((e.clientY - rect.top) / (rect.height / MAZE_SIZE));
+
+                if (gameAxisLock === 'X' && targetCol >= 0 && targetCol < MAZE_SIZE) {
+                    const dir = targetCol > playerPos.x ? 1 : -1;
+                    let nextX = playerPos.x;
+                    for (let x = playerPos.x + dir; dir > 0 ? x <= targetCol : x >= targetCol; x += dir) {
+                        const tile = mazeGrid[playerPos.y][x];
+                        if (tile === 1 || (tile === 2 && playerPos.z === 0)) break;
+                        nextX = x;
+                    }
+                    playerPos.x = nextX;
+                } else if (gameAxisLock === 'Y' && targetRow >= 0 && targetRow < MAZE_SIZE) {
+                    const dir = targetRow > playerPos.y ? 1 : -1;
+                    let nextY = playerPos.y;
+                    for (let y = playerPos.y + dir; dir > 0 ? y <= targetRow : y >= targetRow; y += dir) {
+                        const tile = mazeGrid[y][playerPos.x];
+                        if (tile === 1 || (tile === 2 && playerPos.z === 0)) break;
+                        nextY = y;
+                    }
+                    playerPos.y = nextY;
+                }
+
+                renderMaze();
+
+                if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z === 0) {
+                    triggerVictory();
+                }
+            });
+
+            window.gameConfirmMove = function(confirm) {
+                if (!isGameGrabbed) return;
+                if (!confirm) {
+                    playerPos = { ...startDragPos };
+                }
+                isGameGrabbed = false;
+                gameAxisLock = null;
+                renderMaze();
+                if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z === 0) {
+                    triggerVictory();
+                }
+            };
+
+            function triggerVictory() {
+                const card = document.getElementById('maze-victory-card');
+                if (card) card.classList.remove('hidden');
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            window.resetMazeGame = function() {
+                playerPos = { x: 0, y: 0, z: 0 };
+                isGameSelected = false;
+                isGameGrabbed = false;
+                gameAxisLock = null;
+                const card = document.getElementById('maze-victory-card');
+                if (card) card.classList.add('hidden');
+                renderMaze();
+            };
+
+            let initSlide10Done = false;
+            let scene10, camera10, renderer10, controls10, transformControl10, cube10;
+
+            function initSlide10() {
+                const container = document.getElementById('slide10-canvas-container');
+                if (!container || initSlide10Done) return;
+
+                scene10 = new THREE.Scene();
+                scene10.background = new THREE.Color(0x1e1e1e);
+
+                camera10 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera10.position.set(5, 4, 6);
+
+                renderer10 = new THREE.WebGLRenderer({ antialias: true });
+                renderer10.setSize(container.clientWidth, container.clientHeight);
+                renderer10.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer10.domElement);
+
+                controls10 = new THREE.OrbitControls(camera10, renderer10.domElement);
+                controls10.enableDamping = true;
+                controls10.dampingFactor = 0.05;
+                controls10.mouseButtons = {
+                    LEFT: -1,
+                    MIDDLE: THREE.MOUSE.ROTATE,
+                    RIGHT: -1
+                };
+
+                const grid10 = new THREE.GridHelper(10, 10, 0xef4444, 0x3f3f46);
+                scene10.add(grid10);
+
+                const cubeGeo = new THREE.BoxGeometry(1.4, 1.4, 1.4);
+                const cubeMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.3 });
+                cube10 = new THREE.Mesh(cubeGeo, cubeMat);
+                cube10.position.set(0, 0.7, 0);
+                scene10.add(cube10);
+
+                const wireGeo = new THREE.EdgesGeometry(cubeGeo);
+                const wireMat = new THREE.LineBasicMaterial({ color: 0xea7600, linewidth: 2 });
+                cube10.add(new THREE.LineSegments(wireGeo, wireMat));
+
+                transformControl10 = new THREE.TransformControls(camera10, renderer10.domElement);
+                transformControl10.setMode('rotate');
+                transformControl10.size = 0.95;
+                transformControl10.attach(cube10);
+                scene10.add(transformControl10);
+
+                transformControl10.addEventListener('dragging-changed', (event) => {
+                    controls10.enabled = !event.value;
+                });
+
+                transformControl10.addEventListener('change', updateSlide10Readout);
+
+                const ambLight = new THREE.AmbientLight(0xffffff, 0.75);
+                scene10.add(ambLight);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+                dirLight.position.set(5, 8, 5);
+                scene10.add(dirLight);
+
+                function animate10() {
+                    requestAnimationFrame(animate10);
+                    controls10.update();
+                    renderer10.render(scene10, camera10);
+                }
+                animate10();
+                initSlide10Done = true;
+            }
+
+            function updateSlide10Readout() {
+                const readout = document.getElementById('slide10-rot-readout');
+                if (readout && cube10) {
+                    const toDeg = (rad) => {
+                        let d = Math.round(rad * (180 / Math.PI)) % 360;
+                        if (d < 0) d += 360;
+                        return d;
+                    };
+                    readout.textContent = `X: ${toDeg(cube10.rotation.x)}° | Y: ${toDeg(cube10.rotation.z)}° | Z: ${toDeg(cube10.rotation.y)}°`;
+                }
+            }
+
+            window.stepRotateAxis = function(axis, deg) {
+                if (!cube10) return;
+                const rad = deg * (Math.PI / 180);
+                if (axis === 'x') cube10.rotation.x += rad;
+                if (axis === 'y') cube10.rotation.z += rad;
+                if (axis === 'z') cube10.rotation.y += rad;
+                updateSlide10Readout();
+            };
+
+            window.resetRotate3D = function() {
+                if (!cube10) return;
+                cube10.rotation.set(0, 0, 0);
+                updateSlide10Readout();
+            };
+
+            function onSlide10Resize() {
+                const container = document.getElementById('slide10-canvas-container');
+                if (!container || !renderer10 || !camera10) return;
+                camera10.aspect = container.clientWidth / container.clientHeight;
+                camera10.updateProjectionMatrix();
+                renderer10.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            let initSlide11Done = false;
+            let scene11, camera11, renderer11, playerMesh11, wallGroup11;
+            let targetRotations = [
+                { x: 0, y: 0, z: Math.PI / 2 },          // Level 1: 90 deg Z
+                { x: Math.PI / 2, y: 0, z: 0 },          // Level 2: 90 deg X
+                { x: Math.PI / 2, y: 0, z: Math.PI / 2 } // Level 3: 90 deg X + 90 deg Z
+            ];
+            let currentLevel11 = 0;
+            let currentEuler11 = { x: 0, y: 0, z: 0 };
+            let isLaunching11 = false;
+            let startPosZ11 = 4;
+            let wallPosZ11 = -3.5;
+
+            function createTShapeMesh(color = 0x3f3f46, wireColor = 0xea7600) {
+                const group = new THREE.Group();
+                const boxGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+                const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.35, metalness: 0.1 });
+                const wireGeo = new THREE.EdgesGeometry(boxGeo);
+                const wireMat = new THREE.LineBasicMaterial({ color: wireColor, linewidth: 2 });
+
+                const offsets = [
+                    [-0.8, 0.4, 0], [0, 0.4, 0], [0.8, 0.4, 0],
+                    [0, -0.4, 0]
+                ];
+
+                offsets.forEach(pos => {
+                    const block = new THREE.Mesh(boxGeo, mat);
+                    block.position.set(pos[0], pos[1], pos[2]);
+                    const wire = new THREE.LineSegments(wireGeo, wireMat);
+                    block.add(wire);
+                    group.add(block);
+                });
+
+                return group;
+            }
+
+            function createHoleWall(targetRot) {
+                const group = new THREE.Group();
+                group.position.set(0, 0, wallPosZ11);
+
+                const wallMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.8 });
+                const wallLeft = new THREE.Mesh(new THREE.BoxGeometry(4, 8, 0.5), wallMat);
+                wallLeft.position.set(-3.5, 0, 0);
+                const wallRight = new THREE.Mesh(new THREE.BoxGeometry(4, 8, 0.5), wallMat);
+                wallRight.position.set(3.5, 0, 0);
+                const wallTop = new THREE.Mesh(new THREE.BoxGeometry(3, 2.5, 0.5), wallMat);
+                wallTop.position.set(0, 2.75, 0);
+                const wallBottom = new THREE.Mesh(new THREE.BoxGeometry(3, 2.5, 0.5), wallMat);
+                wallBottom.position.set(0, -2.75, 0);
+
+                group.add(wallLeft, wallRight, wallTop, wallBottom);
+
+                const holeOutlineGroup = new THREE.Group();
+                const tHoleMesh = createTShapeMesh(0x047857, 0x10b981);
+                tHoleMesh.scale.set(1.08, 1.08, 1.08); 
+                tHoleMesh.rotation.set(targetRot.x, targetRot.y, targetRot.z);
+                holeOutlineGroup.add(tHoleMesh);
+                group.add(holeOutlineGroup);
+
+                return group;
+            }
+
+            function initSlide11() {
+                const container = document.getElementById('slide11-canvas-container');
+                if (!container || initSlide11Done) return;
+
+                scene11 = new THREE.Scene();
+                scene11.background = new THREE.Color(0x141416);
+
+                camera11 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera11.position.set(0, 1.8, 8.5);
+                camera11.lookAt(0, 0, -1);
+
+                renderer11 = new THREE.WebGLRenderer({ antialias: true });
+                renderer11.setSize(container.clientWidth, container.clientHeight);
+                renderer11.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer11.domElement);
+
+                const grid11 = new THREE.GridHelper(16, 16, 0xef4444, 0x27272a);
+                grid11.position.y = -2;
+                scene11.add(grid11);
+
+                const ambLight = new THREE.AmbientLight(0xffffff, 0.7);
+                scene11.add(ambLight);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                dirLight.position.set(5, 10, 7);
+                scene11.add(dirLight);
+
+                playerMesh11 = createTShapeMesh(0x3f3f46, 0xea7600);
+                playerMesh11.position.set(0, 0, startPosZ11);
+                scene11.add(playerMesh11);
+
+                loadLevel11Wall();
+
+                function animate11() {
+                    requestAnimationFrame(animate11);
+                    renderer11.render(scene11, camera11);
+                }
+                animate11();
+                initSlide11Done = true;
+                updateSlide11HUD();
+            }
+
+            function loadLevel11Wall() {
+                if (wallGroup11) scene11.remove(wallGroup11);
+                const currentTarget = targetRotations[currentLevel11];
+                wallGroup11 = createHoleWall(currentTarget);
+                scene11.add(wallGroup11);
+                updateSlide11HUD();
+            }
+
+            function updateSlide11HUD() {
+                const anglesSpan = document.getElementById('s11-angles-readout');
+                const levelSpan = document.getElementById('s11-level-readout');
+                const matchBadge = document.getElementById('s11-match-badge');
+                const matchText = document.getElementById('s11-match-text');
+
+                const toDeg = (rad) => {
+                    let d = Math.round(rad * (180 / Math.PI)) % 360;
+                    if (d < 0) d += 360;
+                    return d;
+                };
+
+                if (anglesSpan) {
+                    anglesSpan.textContent = `X: ${toDeg(currentEuler11.x)}° | Y: ${toDeg(currentEuler11.y)}° | Z: ${toDeg(currentEuler11.z)}°`;
+                }
+
+                if (levelSpan) {
+                    levelSpan.textContent = `${currentLevel11 + 1} / ${targetRotations.length}`;
+                }
+
+                const isMatched = checkOrientationMatch();
+                if (matchBadge && matchText) {
+                    if (isMatched) {
+                        matchBadge.className = 'p-2.5 rounded-lg bg-emerald-950/60 border border-emerald-500 flex items-center justify-between text-xs font-mono transition-colors';
+                        matchText.className = 'text-emerald-400 font-bold flex items-center gap-1.5';
+                        matchText.innerHTML = '<i class="fa-solid fa-check"></i> Perfect Match! Ready to Launch';
+                    } else {
+                        matchBadge.className = 'p-2.5 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-between text-xs font-mono transition-colors';
+                        matchText.className = 'text-amber-400 font-bold flex items-center gap-1.5';
+                        matchText.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Rotate to align';
+                    }
+                }
+            }
+
+            function checkOrientationMatch() {
+                if (!playerMesh11) return false;
+                const targetRot = targetRotations[currentLevel11];
+
+                const qPlayer = new THREE.Quaternion().setFromEuler(new THREE.Euler(currentEuler11.x, currentEuler11.y, currentEuler11.z));
+                const qTarget = new THREE.Quaternion().setFromEuler(new THREE.Euler(targetRot.x, targetRot.y, targetRot.z));
+
+                const upRef = new THREE.Vector3(0, 1, 0);
+                const rightRef = new THREE.Vector3(1, 0, 0);
+
+                const upP = upRef.clone().applyQuaternion(qPlayer);
+                const rightP = rightRef.clone().applyQuaternion(qPlayer);
+
+                const upT = upRef.clone().applyQuaternion(qTarget);
+                const rightT = rightRef.clone().applyQuaternion(qTarget);
+
+                const diffUp = upP.distanceTo(upT);
+                const diffRight = rightP.distanceTo(rightT);
+
+                return (diffUp < 0.15 && diffRight < 0.15);
+            }
+
+            window.game11RotateAxis = function(axis) {
+                if (isLaunching11 || !playerMesh11) return;
+                const step = Math.PI / 2;
+                if (axis === 'X') currentEuler11.x = (currentEuler11.x + step) % (Math.PI * 2);
+                if (axis === 'Y') currentEuler11.y = (currentEuler11.y + step) % (Math.PI * 2);
+                if (axis === 'Z') currentEuler11.z = (currentEuler11.z + step) % (Math.PI * 2);
+
+                playerMesh11.rotation.set(currentEuler11.x, currentEuler11.y, currentEuler11.z);
+                updateSlide11HUD();
+            };
+
+            window.game11ResetRotation = function() {
+                if (isLaunching11 || !playerMesh11) return;
+                currentEuler11 = { x: 0, y: 0, z: 0 };
+                playerMesh11.rotation.set(0, 0, 0);
+                updateSlide11HUD();
+            };
+
+            window.game11LaunchShape = function() {
+                if (isLaunching11 || !playerMesh11) return;
+                isLaunching11 = true;
+                const isMatched = checkOrientationMatch();
+
+                let startTime = performance.now();
+                const duration = 1200;
+                const startZ = startPosZ11;
+                const targetPassZ = isMatched ? -8 : (wallPosZ11 + 0.9);
+
+                function animateLaunch(time) {
+                    const elapsed = time - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easeProgress = Math.sin((progress * Math.PI) / 2);
+
+                    playerMesh11.position.z = startZ + (targetPassZ - startZ) * easeProgress;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animateLaunch);
+                    } else {
+                        if (isMatched) {
+                            confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+                            const victoryCard = document.getElementById('s11-victory-card');
+                            if (victoryCard) victoryCard.classList.remove('hidden');
+                        } else {
+                            setTimeout(() => {
+                                playerMesh11.position.z = startPosZ11;
+                                isLaunching11 = false;
+                            }, 400);
+                        }
+                    }
+                }
+
+                requestAnimationFrame(animateLaunch);
+            };
+
+            window.game11NextLevel = function() {
+                const victoryCard = document.getElementById('s11-victory-card');
+                if (victoryCard) victoryCard.classList.add('hidden');
+
+                if (currentLevel11 < targetRotations.length - 1) {
+                    currentLevel11++;
+                } else {
+                    currentLevel11 = 0;
+                }
+
+                playerMesh11.position.set(0, 0, startPosZ11);
+                game11ResetRotation();
+                loadLevel11Wall();
+                isLaunching11 = false;
+            };
+
+            window.game11RestartGame = function() {
+                const victoryCard = document.getElementById('s11-victory-card');
+                if (victoryCard) victoryCard.classList.add('hidden');
+                currentLevel11 = 0;
+                playerMesh11.position.set(0, 0, startPosZ11);
+                game11ResetRotation();
+                loadLevel11Wall();
+                isLaunching11 = false;
+            };
+
+            function onSlide11Resize() {
+                const container = document.getElementById('slide11-canvas-container');
+                if (!container || !renderer11 || !camera11) return;
+                camera11.aspect = container.clientWidth / container.clientHeight;
+                camera11.updateProjectionMatrix();
+                renderer11.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            let initSlide12Done = false;
+            let scene12, camera12, renderer12, controls12, transformControl12, cube12;
+
+            function initSlide12() {
+                const container = document.getElementById('slide12-canvas-container');
+                if (!container || initSlide12Done) return;
+
+                scene12 = new THREE.Scene();
+                scene12.background = new THREE.Color(0x1e1e1e);
+
+                camera12 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera12.position.set(5, 4, 6);
+
+                renderer12 = new THREE.WebGLRenderer({ antialias: true });
+                renderer12.setSize(container.clientWidth, container.clientHeight);
+                renderer12.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer12.domElement);
+
+                controls12 = new THREE.OrbitControls(camera12, renderer12.domElement);
+                controls12.enableDamping = true;
+                controls12.dampingFactor = 0.05;
+                controls12.mouseButtons = {
+                    LEFT: -1,
+                    MIDDLE: THREE.MOUSE.ROTATE,
+                    RIGHT: -1
+                };
+
+                const grid12 = new THREE.GridHelper(10, 10, 0xef4444, 0x3f3f46);
+                scene12.add(grid12);
+
+                const cubeGeo = new THREE.BoxGeometry(1.4, 1.4, 1.4);
+                const cubeMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.3 });
+                cube12 = new THREE.Mesh(cubeGeo, cubeMat);
+                cube12.position.set(0, 0.7, 0);
+                scene12.add(cube12);
+
+                const wireGeo = new THREE.EdgesGeometry(cubeGeo);
+                const wireMat = new THREE.LineBasicMaterial({ color: 0xea7600, linewidth: 2 });
+                cube12.add(new THREE.LineSegments(wireGeo, wireMat));
+
+                transformControl12 = new THREE.TransformControls(camera12, renderer12.domElement);
+                transformControl12.setMode('scale');
+                transformControl12.size = 0.95;
+                transformControl12.attach(cube12);
+                scene12.add(transformControl12);
+
+                let scaleStart = new THREE.Vector3(1, 1, 1);
+
+                transformControl12.addEventListener('dragging-changed', (event) => {
+                    controls12.enabled = !event.value;
+                    if (event.value && cube12) {
+                        scaleStart.copy(cube12.scale);
+                    }
+                });
+
+                transformControl12.addEventListener('change', () => {
+                    if (transformControl12.dragging && transformControl12.axis && cube12) {
+                        const axis = transformControl12.axis;
+                        if (axis === 'XZ') {
+                            const ratioX = scaleStart.x > 0 ? cube12.scale.x / scaleStart.x : 1;
+                            const ratioZ = scaleStart.z > 0 ? cube12.scale.z / scaleStart.z : 1;
+                            const factor = (Math.abs(ratioX - 1) > Math.abs(ratioZ - 1)) ? ratioX : ratioZ;
+                            cube12.scale.x = Math.max(0.1, Math.min(4.0, scaleStart.x * factor));
+                            cube12.scale.z = Math.max(0.1, Math.min(4.0, scaleStart.z * factor));
+                            cube12.scale.y = scaleStart.y;
+                        } else if (axis === 'XY') {
+                            const ratioX = scaleStart.x > 0 ? cube12.scale.x / scaleStart.x : 1;
+                            const ratioY = scaleStart.y > 0 ? cube12.scale.y / scaleStart.y : 1;
+                            const factor = (Math.abs(ratioX - 1) > Math.abs(ratioY - 1)) ? ratioX : ratioY;
+                            cube12.scale.x = Math.max(0.1, Math.min(4.0, scaleStart.x * factor));
+                            cube12.scale.y = Math.max(0.1, Math.min(4.0, scaleStart.y * factor));
+                            cube12.scale.z = scaleStart.z;
+                        } else if (axis === 'YZ') {
+                            const ratioZ = scaleStart.z > 0 ? cube12.scale.z / scaleStart.z : 1;
+                            const ratioY = scaleStart.y > 0 ? cube12.scale.y / scaleStart.y : 1;
+                            const factor = (Math.abs(ratioZ - 1) > Math.abs(ratioY - 1)) ? ratioZ : ratioY;
+                            cube12.scale.z = Math.max(0.1, Math.min(4.0, scaleStart.z * factor));
+                            cube12.scale.y = Math.max(0.1, Math.min(4.0, scaleStart.y * factor));
+                            cube12.scale.x = scaleStart.x;
+                        }
+                    }
+                    updateSlide12Readout();
+                });
+
+                const ambLight = new THREE.AmbientLight(0xffffff, 0.75);
+                scene12.add(ambLight);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+                dirLight.position.set(5, 8, 5);
+                scene12.add(dirLight);
+
+                function animate12() {
+                    requestAnimationFrame(animate12);
+                    controls12.update();
+                    renderer12.render(scene12, camera12);
+                }
+                animate12();
+                initSlide12Done = true;
+            }
+
+            function updateSlide12Readout() {
+                const readout = document.getElementById('slide12-scale-readout');
+                if (readout && cube12) {
+                    readout.textContent = `X: ${cube12.scale.x.toFixed(2)}x | Y: ${cube12.scale.z.toFixed(2)}x | Z: ${cube12.scale.y.toFixed(2)}x`;
+                }
+            }
+
+            window.stepScaleUniform = function(factor) {
+                if (!cube12) return;
+                cube12.scale.multiplyScalar(factor);
+                cube12.scale.x = Math.max(0.1, Math.min(4.0, cube12.scale.x));
+                cube12.scale.y = Math.max(0.1, Math.min(4.0, cube12.scale.y));
+                cube12.scale.z = Math.max(0.1, Math.min(4.0, cube12.scale.z));
+                updateSlide12Readout();
+            };
+
+            window.stepScaleAxis = function(axis, delta) {
+                if (!cube12) return;
+                if (axis === 'x') cube12.scale.x = Math.max(0.2, Math.min(4.0, cube12.scale.x + delta));
+                if (axis === 'y') cube12.scale.z = Math.max(0.2, Math.min(4.0, cube12.scale.z + delta));
+                if (axis === 'z') cube12.scale.y = Math.max(0.2, Math.min(4.0, cube12.scale.y + delta));
+                updateSlide12Readout();
+            };
+
+            window.stepScalePlane = function(plane, factor) {
+                if (!cube12) return;
+                if (plane === 'xy') {
+                    cube12.scale.x = Math.max(0.2, Math.min(4.0, cube12.scale.x * factor));
+                    cube12.scale.z = Math.max(0.2, Math.min(4.0, cube12.scale.z * factor));
+                } else if (plane === 'xz') {
+                    cube12.scale.x = Math.max(0.2, Math.min(4.0, cube12.scale.x * factor));
+                    cube12.scale.y = Math.max(0.2, Math.min(4.0, cube12.scale.y * factor));
+                } else if (plane === 'yz') {
+                    cube12.scale.z = Math.max(0.2, Math.min(4.0, cube12.scale.z * factor));
+                    cube12.scale.y = Math.max(0.2, Math.min(4.0, cube12.scale.y * factor));
+                }
+                updateSlide12Readout();
+            };
+
+            window.resetScale3D = function() {
+                if (!cube12) return;
+                cube12.scale.set(1, 1, 1);
+                updateSlide12Readout();
+            };
+
+            function onSlide12Resize() {
+                const container = document.getElementById('slide12-canvas-container');
+                if (!container || !renderer12 || !camera12) return;
+                camera12.aspect = container.clientWidth / container.clientHeight;
+                camera12.updateProjectionMatrix();
+                renderer12.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            let initSlide13Done = false;
+            let scene13, camera13, renderer13, controls13;
+            let cageMesh13, cageLineGroup13, cageHandles13 = [];
+            let cageDim = { x: 2.0, y: 2.0, z: 2.0 };
+            let cageAnchorBase = true;
+            let raycaster13 = new THREE.Raycaster();
+            let mouse13 = new THREE.Vector2();
+            let draggingHandle13 = null;
+            let dragPlane13 = new THREE.Plane();
+            let dragPlaneIntersect13 = new THREE.Vector3();
+
+            function initSlide13() {
+                const container = document.getElementById('slide13-canvas-container');
+                if (!container || initSlide13Done) return;
+
+                scene13 = new THREE.Scene();
+                scene13.background = new THREE.Color(0x1a1a1e);
+
+                camera13 = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera13.position.set(5.5, 4.5, 6.5);
+
+                renderer13 = new THREE.WebGLRenderer({ antialias: true });
+                renderer13.setSize(container.clientWidth, container.clientHeight);
+                renderer13.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer13.domElement);
+
+                controls13 = new THREE.OrbitControls(camera13, renderer13.domElement);
+                controls13.enableDamping = true;
+                controls13.dampingFactor = 0.05;
+                controls13.mouseButtons = {
+                    LEFT: -1,
+                    MIDDLE: THREE.MOUSE.ROTATE,
+                    RIGHT: -1
+                };
+
+                const grid13 = new THREE.GridHelper(12, 12, 0xef4444, 0x3f3f46);
+                scene13.add(grid13);
+
+                const ambLight = new THREE.AmbientLight(0xffffff, 0.75);
+                scene13.add(ambLight);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+                dirLight.position.set(5, 8, 5);
+                scene13.add(dirLight);
+
+                const cubeGeo = new THREE.BoxGeometry(1, 1, 1);
+                const cubeMat = new THREE.MeshStandardMaterial({ 
+                    color: 0x374151, 
+                    roughness: 0.35, 
+                    metalness: 0.1 
+                });
+                cageMesh13 = new THREE.Mesh(cubeGeo, cubeMat);
+                scene13.add(cageMesh13);
+
+                const wireGeo = new THREE.EdgesGeometry(cubeGeo);
+                const wireMat = new THREE.LineBasicMaterial({ color: 0x6b7280, linewidth: 1.5 });
+                cageMesh13.add(new THREE.LineSegments(wireGeo, wireMat));
+
+                cageLineGroup13 = new THREE.Group();
+                scene13.add(cageLineGroup13);
+
+                buildScaleCageHandles();
+                updateCageGeometry();
+
+                renderer13.domElement.addEventListener('pointerdown', (e) => {
+                    const rect = renderer13.domElement.getBoundingClientRect();
+                    mouse13.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                    mouse13.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+                    raycaster13.setFromCamera(mouse13, camera13);
+                    const handleMeshes = cageHandles13.map(h => h.mesh);
+                    const intersects = raycaster13.intersectObjects(handleMeshes);
+
+                    if (intersects.length > 0 && e.button === 0) {
+                        const hit = intersects[0].object;
+                        draggingHandle13 = cageHandles13.find(h => h.mesh === hit);
+                        controls13.enabled = false;
+                        dragPlane13.setFromNormalAndCoplanarPoint(camera13.getWorldDirection(new THREE.Vector3()).negate(), hit.position);
+                    }
+                });
+
+                window.addEventListener('pointermove', (e) => {
+                    if (!draggingHandle13) return;
+                    const rect = renderer13.domElement.getBoundingClientRect();
+                    mouse13.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                    mouse13.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+                    raycaster13.setFromCamera(mouse13, camera13);
+                    if (raycaster13.ray.intersectPlane(dragPlane13, dragPlaneIntersect13)) {
+                        const type = draggingHandle13.type;
+                        if (type === 'top') {
+                            const newHeight = Math.max(0.6, Math.min(5.0, dragPlaneIntersect13.y));
+                            cageDim.y = newHeight;
+                        } else if (type === 'right') {
+                            const newWidth = Math.max(0.6, Math.min(5.0, dragPlaneIntersect13.x * 2));
+                            cageDim.x = newWidth;
+                        } else if (type === 'front') {
+                            const newDepth = Math.max(0.6, Math.min(5.0, dragPlaneIntersect13.z * 2));
+                            cageDim.z = newDepth;
+                        } else if (type === 'corner') {
+                            cageDim.x = Math.max(0.6, Math.min(4.5, Math.abs(dragPlaneIntersect13.x) * 2));
+                            cageDim.y = Math.max(0.6, Math.min(4.5, dragPlaneIntersect13.y));
+                            cageDim.z = Math.max(0.6, Math.min(4.5, Math.abs(dragPlaneIntersect13.z) * 2));
+                        }
+                        updateCageGeometry();
+                    }
+                });
+
+                window.addEventListener('pointerup', () => {
+                    if (draggingHandle13) {
+                        draggingHandle13 = null;
+                        controls13.enabled = true;
+                    }
+                });
+
+                function animate13() {
+                    requestAnimationFrame(animate13);
+                    controls13.update();
+                    renderer13.render(scene13, camera13);
+                }
+                animate13();
+                initSlide13Done = true;
+            }
+
+            function buildScaleCageHandles() {
+                cageHandles13.forEach(h => scene13.remove(h.mesh));
+                cageHandles13 = [];
+
+                const handleMatCorner = new THREE.MeshStandardMaterial({ 
+                    color: 0xea7600, 
+                    emissive: 0x7c3a00, 
+                    roughness: 0.2 
+                });
+                const handleMatFace = new THREE.MeshStandardMaterial({ 
+                    color: 0x38bdf8, 
+                    emissive: 0x0369a1, 
+                    roughness: 0.2 
+                });
+                const handleGeo = new THREE.SphereGeometry(0.12, 16, 16);
+
+                const cornerSigns = [
+                    [1, 1, 1], [-1, 1, 1], [1, 1, -1], [-1, 1, -1],
+                    [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1]
+                ];
+
+                cornerSigns.forEach(s => {
+                    const m = new THREE.Mesh(handleGeo, handleMatCorner);
+                    scene13.add(m);
+                    cageHandles13.push({ mesh: m, type: 'corner', sign: s });
+                });
+
+                const topMesh = new THREE.Mesh(handleGeo, handleMatFace);
+                scene13.add(topMesh);
+                cageHandles13.push({ mesh: topMesh, type: 'top', sign: [0, 1, 0] });
+
+                const rightMesh = new THREE.Mesh(handleGeo, handleMatFace);
+                scene13.add(rightMesh);
+                cageHandles13.push({ mesh: rightMesh, type: 'right', sign: [1, 0.5, 0] });
+
+                const frontMesh = new THREE.Mesh(handleGeo, handleMatFace);
+                scene13.add(frontMesh);
+                cageHandles13.push({ mesh: frontMesh, type: 'front', sign: [0, 0.5, 1] });
+            }
+
+            function updateCageGeometry() {
+                if (!cageMesh13) return;
+
+                const wx = cageDim.x;
+                const hy = cageDim.y;
+                const dz = cageDim.z;
+
+                cageMesh13.scale.set(wx, hy, dz);
+
+                if (cageAnchorBase) {
+                    cageMesh13.position.set(0, hy / 2, 0);
+                } else {
+                    cageMesh13.position.set(0, 1.0, 0);
+                }
+
+                while (cageLineGroup13.children.length > 0) {
+                    cageLineGroup13.remove(cageLineGroup13.children[0]);
+                }
+
+                const boxWireGeo = new THREE.BoxGeometry(wx + 0.05, hy + 0.05, dz + 0.05);
+                const edges = new THREE.EdgesGeometry(boxWireGeo);
+                const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xfbbf24, linewidth: 2 }));
+                line.position.copy(cageMesh13.position);
+                cageLineGroup13.add(line);
+
+                const halfX = (wx + 0.05) / 2;
+                const halfZ = (dz + 0.05) / 2;
+                const baseY = cageAnchorBase ? 0 : (1.0 - hy / 2);
+                const topY = cageAnchorBase ? hy : (1.0 + hy / 2);
+
+                cageHandles13.forEach(h => {
+                    const s = h.sign;
+                    if (h.type === 'corner') {
+                        const yPos = s[1] === 1 ? topY : baseY;
+                        h.mesh.position.set(s[0] * halfX, yPos, s[2] * halfZ);
+                    } else if (h.type === 'top') {
+                        h.mesh.position.set(0, topY, 0);
+                    } else if (h.type === 'right') {
+                        h.mesh.position.set(halfX, (baseY + topY) / 2, 0);
+                    } else if (h.type === 'front') {
+                        h.mesh.position.set(0, (baseY + topY) / 2, halfZ);
+                    }
+                });
+
+                const readout = document.getElementById('slide13-cage-readout');
+                if (readout) {
+                    readout.textContent = `W: ${wx.toFixed(2)}m | D: ${dz.toFixed(2)}m | H: ${hy.toFixed(2)}m`;
+                }
+            }
+
+            window.stepScaleCage = function(handleType, delta) {
+                if (handleType === 'top') cageDim.y = Math.max(0.6, Math.min(4.5, cageDim.y + delta));
+                if (handleType === 'right') cageDim.x = Math.max(0.6, Math.min(4.5, cageDim.x + delta));
+                if (handleType === 'front') cageDim.z = Math.max(0.6, Math.min(4.5, cageDim.z + delta));
+                if (handleType === 'corner') {
+                    cageDim.x = Math.max(0.6, Math.min(4.5, cageDim.x + delta));
+                    cageDim.y = Math.max(0.6, Math.min(4.5, cageDim.y + delta));
+                    cageDim.z = Math.max(0.6, Math.min(4.5, cageDim.z + delta));
+                }
+                updateCageGeometry();
+            };
+
+            window.toggleCageMode = function() {
+                cageAnchorBase = !cageAnchorBase;
+                const btn = document.getElementById('cage-mode-toggle-btn');
+                if (btn) {
+                    btn.innerHTML = cageAnchorBase 
+                        ? 'Mode: <span class="text-blender-orange">Cage (Opposite Anchor)</span>' 
+                        : 'Mode: <span class="text-zinc-400">Center Pivot (Standard)</span>';
+                }
+                updateCageGeometry();
+            };
+
+            window.resetScaleCage3D = function() {
+                cageDim = { x: 2.0, y: 2.0, z: 2.0 };
+                cageAnchorBase = true;
+                const btn = document.getElementById('cage-mode-toggle-btn');
+                if (btn) btn.innerHTML = 'Mode: <span class="text-blender-orange">Cage</span>';
+                updateCageGeometry();
+            };
+
+            function onSlide13Resize() {
+                const container = document.getElementById('slide13-canvas-container');
+                if (!container || !renderer13 || !camera13) return;
+                camera13.aspect = container.clientWidth / container.clientHeight;
+                camera13.updateProjectionMatrix();
+                renderer13.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                // Slide 7 Shortcuts (Move Tool)
+                if (currentSlideIndex === 6 && (e.key === 'g' || e.key === 'G') && e.altKey) {
+                    e.preventDefault();
+                    resetTranslate3D();
+                }
+
+                // Slide 8 Shortcuts (Grab Modal Pipeline)
+                if (currentSlideIndex === 7) {
+                    if (s8IsSelected && (e.key === 'g' || e.key === 'G')) {
+                        triggerS8Grab();
+                    } else if (s8IsGrabbed && (e.key === 'x' || e.key === 'X')) {
+                        triggerS8Axis('X');
+                    } else if (s8IsGrabbed && (e.key === 'y' || e.key === 'Y')) {
+                        triggerS8Axis('Y');
+                    } else if (s8IsGrabbed && (e.key === 'z' || e.key === 'Z')) {
+                        triggerS8Axis('Z');
+                    } else if (s8IsGrabbed && e.key === 'Enter') {
+                        confirmS8Transform(true);
+                    } else if (s8IsGrabbed && e.key === 'Escape') {
+                        confirmS8Transform(false);
+                    } else if (e.altKey && (e.key === 'g' || e.key === 'G')) {
+                        e.preventDefault();
+                        resetS8CubeLocation();
+                    }
+                }
+
+                // Slide 9 Shortcuts (Maze Game)
+                if (currentSlideIndex === 8) {
+                    if (e.key === 'g' || e.key === 'G') gameTriggerHotKey('G');
+                    if (e.key === 'x' || e.key === 'X') gameTriggerHotKey('X');
+                    if (e.key === 'y' || e.key === 'Y') gameTriggerHotKey('Y');
+                    if (e.key === 'z' || e.key === 'Z') gameTriggerHotKey('Z');
+                    if (e.key === 'Enter') gameConfirmMove(true);
+                    if (e.key === 'Escape') gameConfirmMove(false);
+                }
+
+                // Slide 10 Shortcuts (Rotate Tool)
+                if (currentSlideIndex === 9) {
+                    if (e.altKey && (e.key === 'r' || e.key === 'R')) {
+                        e.preventDefault();
+                        resetRotate3D();
+                    } else if (e.key === 'x' || e.key === 'X') {
+                        stepRotateAxis('x', 45);
+                    } else if (e.key === 'y' || e.key === 'Y') {
+                        stepRotateAxis('y', 45);
+                    } else if (e.key === 'z' || e.key === 'Z') {
+                        stepRotateAxis('z', 45);
+                    }
+                }
+
+                // Slide 11 Shortcuts (Hole-in-the-Wall Game)
+                if (currentSlideIndex === 10) {
+                    if (e.altKey && (e.key === 'r' || e.key === 'R')) {
+                        e.preventDefault();
+                        game11ResetRotation();
+                    } else if (e.key === 'x' || e.key === 'X') {
+                        game11RotateAxis('X');
+                    } else if (e.key === 'y' || e.key === 'Y') {
+                        game11RotateAxis('Y');
+                    } else if (e.key === 'z' || e.key === 'Z') {
+                        game11RotateAxis('Z');
+                    } else if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        game11LaunchShape();
+                    }
+                }
+
+                // Slide 12 Shortcuts (Scale Tool & Planes)
+                if (currentSlideIndex === 11) {
+                    if (e.altKey && (e.key === 's' || e.key === 'S')) {
+                        e.preventDefault();
+                        resetScale3D();
+                    } else if (e.shiftKey && (e.key === 'z' || e.key === 'Z')) {
+                        e.preventDefault();
+                        stepScalePlane('xy', 1.2);
+                    } else if (e.shiftKey && (e.key === 'y' || e.key === 'Y')) {
+                        e.preventDefault();
+                        stepScalePlane('xz', 1.2);
+                    } else if (e.shiftKey && (e.key === 'x' || e.key === 'X')) {
+                        e.preventDefault();
+                        stepScalePlane('yz', 1.2);
+                    } else if (e.key === 'x' || e.key === 'X') {
+                        stepScaleAxis('x', 0.5);
+                    } else if (e.key === 'y' || e.key === 'Y') {
+                        stepScaleAxis('y', 0.5);
+                    } else if (e.key === 'z' || e.key === 'Z') {
+                        stepScaleAxis('z', 0.5);
+                    } else if (e.key === '+' || e.key === '=') {
+                        stepScaleUniform(1.2);
+                    } else if (e.key === '-' || e.key === '_') {
+                        stepScaleUniform(0.8);
+                    }
+                }
+
+                // Slide 13 Shortcuts (Scale Cage)
+                if (currentSlideIndex === 12) {
+                    if (e.altKey && (e.key === 's' || e.key === 'S')) {
+                        e.preventDefault();
+                        resetScaleCage3D();
+                    } else if (e.key === 't' || e.key === 'T' || e.key === 'z' || e.key === 'Z') {
+                        stepScaleCage('top', 0.4);
+                    } else if (e.key === 'r' || e.key === 'R' || e.key === 'x' || e.key === 'X') {
+                        stepScaleCage('right', 0.4);
+                    } else if (e.key === 'f' || e.key === 'F' || e.key === 'y' || e.key === 'Y') {
+                        stepScaleCage('front', 0.4);
+                    } else if (e.key === 'c' || e.key === 'C') {
+                        stepScaleCage('corner', 0.3);
+                    } else if (e.key === 'm' || e.key === 'M') {
+                        toggleCageMode();
+                    }
+                }
+
+                // Global Arrow Navigation
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            });
+
+            // Handle Window Resizing for 3D Viewports
+            window.addEventListener('resize', () => {
+                onSlide6Resize();
+                onSlide7Resize();
+                onSlide8Resize();
+                onSlide10Resize();
+                onSlide11Resize();
+                onSlide12Resize();
+                onSlide13Resize();
+            });
+
+            // Start on Slide 1
+            updateUI();
+        });
+    </script>
+</body>
+</html>

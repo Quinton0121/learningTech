@@ -22,7 +22,13 @@ export async function GET(request: Request) {
     const courseId = searchParams.get('courseId');
 
     let course;
-    if (user.role === 'EDUCATOR' || user.role === 'ADMIN') {
+    if (user.role === 'ADMIN') {
+      if (courseId) {
+        course = await prisma.course.findFirst({ where: { id: courseId } });
+      } else {
+        course = await prisma.course.findFirst({ where: { educatorId: user.id } }) || await prisma.course.findFirst();
+      }
+    } else if (user.role === 'EDUCATOR') {
       if (courseId) {
         course = await prisma.course.findFirst({ where: { educatorId: user.id, id: courseId } });
       } else {
@@ -45,6 +51,8 @@ export async function GET(request: Request) {
             currentSlide: clientSlide !== null ? clientSlide : enrollment.currentSlide 
           }
         });
+      } else if (courseId) {
+        course = await prisma.course.findFirst({ where: { id: courseId } });
       }
     }
     
@@ -99,10 +107,18 @@ export async function POST(request: Request) {
     }
 
     let course;
-    if (courseId) {
-      course = await prisma.course.findFirst({ where: { educatorId: user.id, id: courseId } });
+    if (user.role === 'ADMIN') {
+      if (courseId) {
+        course = await prisma.course.findFirst({ where: { id: courseId } });
+      } else {
+        course = await prisma.course.findFirst({ where: { educatorId: user.id } }) || await prisma.course.findFirst();
+      }
     } else {
-      course = await prisma.course.findFirst({ where: { educatorId: user.id } });
+      if (courseId) {
+        course = await prisma.course.findFirst({ where: { educatorId: user.id, id: courseId } });
+      } else {
+        course = await prisma.course.findFirst({ where: { educatorId: user.id } });
+      }
     }
     
     if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });

@@ -28,16 +28,21 @@ export async function GET(req: NextRequest) {
   let html = course.htmlContent;
   
   // Inject UI at the start of <body>
-  const bodyStartIdx = html.indexOf('<body>');
-  if (bodyStartIdx !== -1) {
-    const insertIdx = bodyStartIdx + 6;
+  const bodyMatch = html.match(/<body[^>]*>/i);
+  if (bodyMatch && bodyMatch.index !== undefined) {
+    const insertIdx = bodyMatch.index + bodyMatch[0].length;
     html = html.substring(0, insertIdx) + '\n' + getSyncInjectorHTML() + '\n' + html.substring(insertIdx);
+  } else {
+    html = getSyncInjectorHTML() + '\n' + html;
   }
 
   // Inject JS at the end before </body>
-  const bodyEndIdx = html.lastIndexOf('</body>');
-  if (bodyEndIdx !== -1) {
-    html = html.substring(0, bodyEndIdx) + '\n' + getSyncInjectorJS() + '\n' + html.substring(bodyEndIdx);
+  const bodyEndMatch = html.match(/<\/body>/i);
+  if (bodyEndMatch && bodyEndMatch.index !== undefined) {
+    const bodyEndIdx = bodyEndMatch.index;
+    html = html.substring(0, bodyEndIdx) + '\n' + getSyncInjectorJS(course.id) + '\n' + html.substring(bodyEndIdx);
+  } else {
+    html = html + '\n' + getSyncInjectorJS(course.id);
   }
 
   return new Response(html, {
