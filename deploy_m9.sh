@@ -15,7 +15,11 @@ pm2 stop learningTech || true
 
 echo "Generating Prisma client and pushing schema..."
 npx prisma generate
-npx prisma db push --accept-data-loss
+if ! npx prisma db push --accept-data-loss; then
+    echo "Database image corrupted or locked, resetting clean database..."
+    rm -f prisma/dev.db* dev.db*
+    npx prisma db push --accept-data-loss
+fi
 node sync_and_setup_m9.js
 
 echo "Building Next.js application..."
