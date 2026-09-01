@@ -10,8 +10,9 @@ echo "Using NPM: $(npm -v)"
 
 cd /home/quinton/projects/learningTech
 
-echo "Running course setup and verification..."
-node sync_and_setup_m9.js
+echo "Generating Prisma client and pushing schema..."
+npx prisma generate
+npx prisma db push
 
 echo "Building Next.js application..."
 npm run build

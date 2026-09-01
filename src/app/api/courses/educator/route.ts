@@ -24,25 +24,6 @@ export async function GET(request: Request) {
       }
     });
     
-    // Seed default course if they have none
-    if (courses.length === 0) {
-      const newCourse = await prisma.course.create({
-        data: {
-          title: 'Welcome to Interlectic: Educator Guide (Demo)',
-          description: 'A quick interactive guide on how to create courses, invite students, and manage your classroom on the Interlectic platform.',
-          educatorId: decoded.userId
-        },
-        include: { 
-          enrollments: {
-            include: {
-              user: { select: { id: true, name: true, email: true } }
-            }
-          } 
-        }
-      });
-      courses = [newCourse];
-    }
-    
     const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
 
     // Resolve shared quotas and check expiration
