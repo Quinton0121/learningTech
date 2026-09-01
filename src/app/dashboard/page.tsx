@@ -123,10 +123,61 @@ export default function EducatorDashboard() {
     link.setAttribute('download', 'sample_students.csv');
     document.body.appendChild(link);
     link.click();
+  const exportCourseCSV = (course: any) => {
+    if (!course.enrollments || course.enrollments.length === 0) {
+      alert("No students enrolled in this course to export.");
+      return;
+    }
+
+    const headers = [
+      "Student Name",
+      "Email / ID",
+      "PC ID",
+      "Enrollment Status",
+      "Current Slide",
+      "Slide 16 Final Score",
+      "Range Formula Used",
+      "Submission Date",
+      "Last Active"
+    ];
+
+    const rows = course.enrollments.map((e: any) => {
+      let details: any = {};
+      if (e.gameDetails) {
+        try { details = JSON.parse(e.gameDetails); } catch (err) {}
+      }
+
+      const scoreText = (e.gameScore !== null && e.gameScore !== undefined) ? e.gameScore.toString() : "Not Completed";
+      const formulaText = details.formula || (details.range1 ? `=SUM(${details.range1}) - SUM(${details.range2})` : "-");
+      const submittedDate = details.submittedAt ? new Date(details.submittedAt).toLocaleString() : "-";
+      const lastSeen = e.lastSeenAt ? new Date(e.lastSeenAt).toLocaleString() : "-";
+      const slideNum = (typeof e.currentSlide === 'number') ? (e.currentSlide + 1).toString() : "1";
+
+      return [
+        `"${(e.user?.name || 'Unnamed').replace(/"/g, '""')}"`,
+        `"${(e.user?.email || e.user?.studentId || '-').replace(/"/g, '""')}"`,
+        `"${(e.pcId || '-').replace(/"/g, '""')}"`,
+        `"${e.status}"`,
+        `"Slide ${slideNum}"`,
+        `"${scoreText}"`,
+        `"${formulaText.replace(/"/g, '""')}"`,
+        `"${submittedDate}"`,
+        `"${lastSeen}"`
+      ].join(",");
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeTitle = (course.title || "Course").replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, "_");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${safeTitle}_Student_Scores_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-
 
   const handleTogglePublic = async (courseId: string, currentPublic: boolean) => {
     const res = await fetch('/api/courses/educator/toggle-public', {
@@ -649,8 +700,46 @@ export default function EducatorDashboard() {
                     </div>
 
                     <details open style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px', marginBottom: '16px', border: '1px solid var(--glass-border)' }}>
-                      <summary style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', outline: 'none' }}>
-                        {t('dashboard.rosterTitle')} ({course.enrollments?.length || 0})
+                      <summary style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', outline: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>{t('dashboard.rosterTitle')} ({course.enrollments?.length || 0})</span>
+                        <div style={{ display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => exportCourseCSV(course)}
+                            style={{
+                              background: 'linear-gradient(135deg, #10b981, #059669)',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '4px 10px',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <span>📥</span>
+                            <span>Export CSV</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => router.push('/dashboard/students')}
+                            style={{
+                              background: 'rgba(56, 189, 248, 0.15)',
+                              border: '1px solid rgba(56, 189, 248, 0.4)',
+                              color: '#38bdf8',
+                              padding: '4px 10px',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Gradebook ↗
+                          </button>
+                        </div>
                       </summary>
                       <div style={{ marginTop: '16px', overflowX: 'auto', maxHeight: '300px', overflowY: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
@@ -659,52 +748,74 @@ export default function EducatorDashboard() {
                               <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colName')}</th>
                               <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colEmail')}</th>
                               <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colPcId')}</th>
-                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colStatus')}</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>Status</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>Slide 16 Score</th>
                               <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colActions')}</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {course.enrollments && course.enrollments.map((e: any) => (
-                              <tr key={e.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <td style={{ padding: '12px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: e.status === 'PENDING' ? '#fbbf24' : (e.status === 'REMOVED' ? '#ef4444' : 'var(--primary)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold', color: e.status === 'PENDING' ? '#000' : '#fff' }}>
-                                    {e.user?.name ? e.user.name.charAt(0).toUpperCase() : 'S'}
-                                  </div>
-                                  {e.user?.name || 'Unnamed'}
-                                </td>
-                                <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{e.user?.email || '-'}</td>
-                                <td style={{ padding: '12px 8px', color: '#38bdf8', fontFamily: 'monospace' }}>{e.pcId || '-'}</td>
-                                <td style={{ padding: '12px 8px' }}>
-                                  <span style={{ 
-                                    padding: '4px 8px', 
-                                    borderRadius: '12px', 
-                                    fontSize: '0.75rem', 
-                                    fontWeight: 600,
-                                    background: e.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : (e.status === 'PENDING' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-                                    color: e.status === 'APPROVED' ? '#10b981' : (e.status === 'PENDING' ? '#fbbf24' : '#ef4444')
-                                  }}>
-                                    {e.status}
-                                  </span>
-                                </td>
-                                <td style={{ padding: '12px 8px' }}>
-                                  {e.status === 'PENDING' && (
-                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                      <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: '#10b981', border: 'none', color: '#fff', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Approve</button>
-                                      <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'REJECT'); }} style={{ background: 'transparent', border: '1px solid #ff8a8a', color: '#ff8a8a', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Reject</button>
+                            {course.enrollments && course.enrollments.map((e: any) => {
+                              const hasScore = (e.gameScore !== null && e.gameScore !== undefined);
+                              return (
+                                <tr key={e.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                  <td style={{ padding: '12px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: e.status === 'PENDING' ? '#fbbf24' : (e.status === 'REMOVED' ? '#ef4444' : 'var(--primary)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold', color: e.status === 'PENDING' ? '#000' : '#fff' }}>
+                                      {e.user?.name ? e.user.name.charAt(0).toUpperCase() : 'S'}
                                     </div>
-                                  )}
-                                  {e.status === 'APPROVED' && (
-                                    <button onClick={(event) => { event.preventDefault(); handleRemove(course.id, e.user.id); }} style={{ background: 'transparent', border: 'none', color: '#ff8a8a', cursor: 'pointer', fontSize: '0.85rem' }}>Remove</button>
-                                  )}
-                                  {e.status === 'REMOVED' && (
-                                    <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Restore</button>
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
+                                    {e.user?.name || 'Unnamed'}
+                                  </td>
+                                  <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{e.user?.email || '-'}</td>
+                                  <td style={{ padding: '12px 8px', color: '#38bdf8', fontFamily: 'monospace' }}>{e.pcId || '-'}</td>
+                                  <td style={{ padding: '12px 8px' }}>
+                                    <span style={{ 
+                                      padding: '4px 8px', 
+                                      borderRadius: '12px', 
+                                      fontSize: '0.75rem', 
+                                      fontWeight: 600,
+                                      background: e.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : (e.status === 'PENDING' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
+                                      color: e.status === 'APPROVED' ? '#10b981' : (e.status === 'PENDING' ? '#fbbf24' : '#ef4444')
+                                    }}>
+                                      {e.status}
+                                    </span>
+                                  </td>
+                                  <td style={{ padding: '12px 8px' }}>
+                                    {hasScore ? (
+                                      <span style={{
+                                        padding: '3px 8px',
+                                        borderRadius: '10px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 700,
+                                        fontFamily: 'monospace',
+                                        background: e.gameScore >= 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                        color: e.gameScore >= 0 ? '#34d399' : '#f87171',
+                                        border: `1px solid ${e.gameScore >= 0 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                                      }}>
+                                        {e.gameScore >= 0 ? `+${e.gameScore} pts` : `${e.gameScore} pts`}
+                                      </span>
+                                    ) : (
+                                      <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>Pending</span>
+                                    )}
+                                  </td>
+                                  <td style={{ padding: '12px 8px' }}>
+                                    {e.status === 'PENDING' && (
+                                      <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: '#10b981', border: 'none', color: '#fff', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Approve</button>
+                                        <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'REJECT'); }} style={{ background: 'transparent', border: '1px solid #ff8a8a', color: '#ff8a8a', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Reject</button>
+                                      </div>
+                                    )}
+                                    {e.status === 'APPROVED' && (
+                                      <button onClick={(event) => { event.preventDefault(); handleRemove(course.id, e.user.id); }} style={{ background: 'transparent', border: 'none', color: '#ff8a8a', cursor: 'pointer', fontSize: '0.85rem' }}>Remove</button>
+                                    )}
+                                    {e.status === 'REMOVED' && (
+                                      <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Restore</button>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
                             {(!course.enrollments || course.enrollments.length === 0) && (
                               <tr>
-                                <td colSpan={4} style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)' }}>No students enrolled yet.</td>
+                                <td colSpan={6} style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)' }}>No students enrolled yet.</td>
                               </tr>
                             )}
                           </tbody>
