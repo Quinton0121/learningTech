@@ -425,6 +425,17 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
       if (!token) return;
 
       let isTeacher = false;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload && (payload.role === 'EDUCATOR' || payload.role === 'ADMIN')) {
+          isTeacher = true;
+          document.getElementById('teacher-controls')?.classList.remove('hidden');
+          document.getElementById('back-dashboard-btn')?.classList.remove('hidden');
+          const backBtn = document.getElementById('back-dashboard-btn');
+          if (backBtn) backBtn.style.display = 'flex';
+        }
+      } catch(e) {}
+
       let isSynced = false;
       let publishedSlide = 0;
       let currentSlideIndex = 0;

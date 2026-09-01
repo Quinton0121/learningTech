@@ -22,17 +22,11 @@ export async function GET(request: Request) {
     const courseId = searchParams.get('courseId');
 
     let course;
-    if (user.role === 'ADMIN') {
+    if (user.role === 'ADMIN' || user.role === 'EDUCATOR') {
       if (courseId) {
         course = await prisma.course.findFirst({ where: { id: courseId } });
       } else {
         course = await prisma.course.findFirst({ where: { educatorId: user.id } }) || await prisma.course.findFirst();
-      }
-    } else if (user.role === 'EDUCATOR') {
-      if (courseId) {
-        course = await prisma.course.findFirst({ where: { educatorId: user.id, id: courseId } });
-      } else {
-        course = await prisma.course.findFirst({ where: { educatorId: user.id } });
       }
     } else {
       let enrollment;
@@ -108,17 +102,11 @@ export async function POST(request: Request) {
     }
 
     let course;
-    if (user.role === 'ADMIN') {
+    if (user.role === 'ADMIN' || user.role === 'EDUCATOR') {
       if (courseId) {
         course = await prisma.course.findFirst({ where: { id: courseId } });
       } else {
         course = await prisma.course.findFirst({ where: { educatorId: user.id } }) || await prisma.course.findFirst();
-      }
-    } else {
-      if (courseId) {
-        course = await prisma.course.findFirst({ where: { educatorId: user.id, id: courseId } });
-      } else {
-        course = await prisma.course.findFirst({ where: { educatorId: user.id } });
       }
     }
     

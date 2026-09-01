@@ -46,6 +46,17 @@ export default function Home() {
 
   React.useEffect(() => {
     const checkPcAutoLogin = async () => {
+      const existingToken = localStorage.getItem('token');
+      if (existingToken) {
+        try {
+          const payload = JSON.parse(atob(existingToken.split('.')[1]));
+          if (payload && (payload.role === 'ADMIN' || payload.role === 'EDUCATOR')) {
+            // Do NOT overwrite educator/admin session with PC auto-login
+            return;
+          }
+        } catch(e) {}
+      }
+
       const pcId = localStorage.getItem('pc_id');
       if (!pcId) return;
       
@@ -132,6 +143,9 @@ export default function Home() {
         if (res.ok && data.token) {
           setStatusMsg('Success! Logged in.');
           localStorage.setItem('token', data.token);
+          if (data.user?.role === 'ADMIN' || data.user?.role === 'EDUCATOR') {
+            localStorage.removeItem('pc_id');
+          }
           setTimeout(() => {
             setShowAuthModal(false);
             if (data.user?.role === 'ADMIN' || data.user?.role === 'EDUCATOR') {
