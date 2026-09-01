@@ -1064,7 +1064,7 @@
                             <span class="text-xs font-bold uppercase text-emerald-400 flex items-center gap-1.5">
                                 <i class="fa-solid fa-star"></i> 1. Score Range (Green Gold)
                             </span>
-                            <span id="s16-score-sum" class="text-xs font-bold font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">+75 pts (4 cells)</span>
+                            <span id="s16-score-sum" class="text-xs font-bold font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">+33 pts (4 cells)</span>
                         </div>
                         <div class="flex gap-2 items-center">
                             <input type="text" id="s16-input-pos" value="E5:F6" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-sm font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center" placeholder="e.g. E5:F6">
@@ -1081,7 +1081,7 @@
                             <span class="text-xs font-bold uppercase text-rose-400 flex items-center gap-1.5">
                                 <i class="fa-solid fa-triangle-exclamation"></i> 2. Deduction Range (Red Zone)
                             </span>
-                            <span id="s16-deduct-sum" class="text-xs font-bold font-mono text-rose-300 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">-345 pts (4 cells)</span>
+                            <span id="s16-deduct-sum" class="text-xs font-bold font-mono text-rose-300 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">-350 pts (4 cells)</span>
                         </div>
                         <div class="flex gap-2 items-center">
                             <input type="text" id="s16-input-neg" value="A1:B2" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-sm font-mono text-rose-400 font-bold focus:outline-none focus:border-rose-400 uppercase text-center" placeholder="e.g. A1:B2">
@@ -1102,7 +1102,7 @@
                     </div>
                     <div class="text-right">
                         <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Net Score:</div>
-                        <div id="s16-net-score" class="text-2xl font-extrabold text-amber-400 font-mono">+420</div>
+                        <div id="s16-net-score" class="text-2xl font-extrabold text-amber-400 font-mono">+383</div>
                     </div>
                 </div>
 
@@ -1550,23 +1550,23 @@
             // Scattered positive values surrounded by negative penalties and zeros! No pure positive 4+ blocks!
             var s16GridData = [
                 //   A     B     C     D     E     F     G     H     I     J
-                [  -85,  -90,   15,  -70,   85,  -95,  -15,  -65,   75,  -90 ], // Row 1 (E1=85, I1=75 traps)
-                [  -80,   95,  -90,  -70,  -90,  -85,  -80,  -75,  -85,  -80 ], // Row 2 (B2=95 mega trap)
-                [  -95,  -85,  -85,   18,  -60,  -60,   90,  -95,  -70,   25 ], // Row 3 (G3=90 mega trap)
-                [   10,  -85,  -60,  -75,  -90,  -85,  -90,  -80,  -85,  -85 ], // Row 4
-                [  -70,  -90,  -85,  -25,   20,   22,  -15,  -50,   70,  -90 ], // Row 5 (E5:F6 contains 20, 22, 18, 15 - The Gold Zone!)
-                [  -90,  -95,  -80,  -10,   18,   15,  -20,  -85,  -95,  -80 ], // Row 6
-                [  -80,  -60,   65,  -85,  -15,  -25,  -65,  -90,   85,  -95 ], // Row 7 (I7=85 trap, C7=65 trap)
-                [   70,  -90,  -95,  -80,  -40,   12,  -35,  -85,  -90,  -75 ], // Row 8 (A8=70 trap)
-                [  -85,  -95,  -70,   20,  -55,  -70,   80,  -95,  -60,   10 ], // Row 9 (G9=80 trap)
-                [  -90,  -75,  -80,  -45,  -80,  -85,  -90,  -80,  -75,  -50 ]  // Row 10
+                [  -85,   70,  -90,  -70,   85,  -95,  -75,   20,  -80,  -90 ], // Row 1
+                [  -80,  -95,  -85,   15,  -90,  -80,  -65,  -90,   90,  -95 ], // Row 2
+                [   95,  -90,  -70,  -85,  -40,   75,  -90,  -80,  -85,  -70 ], // Row 3
+                [  -90,  -85,   25,  -80,  -85,  -90,  -60,   18,  -90,   80 ], // Row 4
+                [  -75,   80,  -90,  -65,   20,  -02,  -80,  -85,  -75,  -90 ], // Row 5 (E5=20 Gold zone)
+                [  -85,  -90,  -70,  -80,  -03,   18,  -95,   85,  -95,  -85 ], // Row 6 (F6=18 Gold zone)
+                [   15,  -80,   85,  -90,  -80,  -85,  -90,  -85,   20,  -80 ], // Row 7
+                [  -90,  -85,  -95,   20,  -85,   65,  -90,  -75,  -90,   75 ], // Row 8
+                [  -70,   90,  -85,  -75,  -90,  -85,  -80,   20,  -85,  -90 ], // Row 9
+                [  -85,  -95,  -80,  -90,   70,  -95,  -70,  -90,  -80,  -65 ]  // Row 10
             ];
 
             var s16DragMode = 'pos'; // 'pos' or 'neg'
             var s16IsDragging = false;
             var s16RangeStart = null;
-            var s16PosRange = { minCol: 4, maxCol: 5, minRow: 5, maxRow: 6 }; // E5:F6 (4 cells: +75 pts)
-            var s16NegRange = { minCol: 0, maxCol: 1, minRow: 1, maxRow: 2 }; // A1:B2 (4 cells: -345 pts)
+            var s16PosRange = { minCol: 4, maxCol: 5, minRow: 5, maxRow: 6 }; // E5:F6 (4 cells: +33 pts)
+            var s16NegRange = { minCol: 0, maxCol: 1, minRow: 1, maxRow: 2 }; // A1:B2 (4 cells: -350 pts)
 
             window.setS16DragMode = function(mode) {
                 s16DragMode = mode;
