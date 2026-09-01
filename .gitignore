@@ -66,6 +66,8 @@ update_slide11_v2.js
 create_user.js
 combine_html.py
 translate.py
+test_m9_api.js
+*.zip
 *.tmp
 /courses/
 public/courses/
