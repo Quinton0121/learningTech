@@ -123,6 +123,10 @@ export default function EducatorDashboard() {
     link.setAttribute('download', 'sample_students.csv');
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const exportCourseCSV = (course: any) => {
     if (!course.enrollments || course.enrollments.length === 0) {
       alert("No students enrolled in this course to export.");
