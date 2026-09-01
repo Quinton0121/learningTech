@@ -60,6 +60,59 @@ export default function EducatorStudentsPage() {
     }
   };
 
+  const exportCourseCSV = (course: any) => {
+    if (!course.enrollments || course.enrollments.length === 0) {
+      alert("No students enrolled in this course to export.");
+      return;
+    }
+
+    const headers = [
+      "Student Name",
+      "Email / Account",
+      "Enrollment Status",
+      "Current Slide",
+      "Slide 16 Final Score",
+      "Range Formula Used",
+      "Submission Date",
+      "Last Active"
+    ];
+
+    const rows = course.enrollments.map((e: any) => {
+      let details: any = {};
+      if (e.gameDetails) {
+        try { details = JSON.parse(e.gameDetails); } catch (err) {}
+      }
+
+      const scoreText = (e.gameScore !== null && e.gameScore !== undefined) ? e.gameScore.toString() : "Not Completed";
+      const formulaText = details.formula || (details.range1 ? `=SUM(${details.range1}) - SUM(${details.range2})` : "-");
+      const submittedDate = details.submittedAt ? new Date(details.submittedAt).toLocaleString() : "-";
+      const lastSeen = e.lastSeenAt ? new Date(e.lastSeenAt).toLocaleString() : "-";
+      const slideNum = (typeof e.currentSlide === 'number') ? (e.currentSlide + 1).toString() : "1";
+
+      return [
+        `"${(e.user?.name || 'Unnamed').replace(/"/g, '""')}"`,
+        `"${(e.user?.email || e.user?.studentId || '-').replace(/"/g, '""')}"`,
+        `"${e.status}"`,
+        `"Slide ${slideNum}"`,
+        `"${scoreText}"`,
+        `"${formulaText.replace(/"/g, '""')}"`,
+        `"${submittedDate}"`,
+        `"${lastSeen}"`
+      ].join(",");
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeTitle = (course.title || "Course").replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, "_");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${safeTitle}_Student_Scores_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (!mounted) return null;
 
   return (
@@ -120,74 +173,127 @@ export default function EducatorStudentsPage() {
       </aside>
 
       <main style={{ flex: 1, padding: '48px 48px 48px 0', overflowY: 'auto' }}>
-        <header style={{ marginBottom: '48px' }}>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>Student Management</h1>
-          <p style={{ color: 'var(--text-muted)' }}>View and manage all students across your courses.</p>
+        <header style={{ marginBottom: '36px' }}>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>Student Management & Gradebook</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Track student learning progress, game scores, and export reports to CSV.</p>
         </header>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {courses.map(course => (
             <div key={course.id} className="glass-panel animate-fade-in-up" style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.5rem', margin: '0 0 8px 0', color: course.isArchived ? 'var(--text-muted)' : 'var(--text-main)' }}>{course.title} {course.isArchived && '(Archived)'}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-                    {course.enrollments?.length || 0} Total Students
+                  <h3 style={{ fontSize: '1.4rem', margin: '0 0 4px 0', color: course.isArchived ? 'var(--text-muted)' : 'var(--text-main)' }}>{course.title} {course.isArchived && '(Archived)'}</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                    {course.enrollments?.length || 0} Total Students Enrolled
                   </p>
                 </div>
+
+                <button 
+                  onClick={() => exportCourseCSV(course)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: '#ffffff',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)'
+                  }}
+                  className="hover:scale-105 transition-all"
+                >
+                  <span>📥</span>
+                  <span>Export CSV Report</span>
+                </button>
               </div>
               
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--glass-border)', textAlign: 'left', color: 'var(--text-muted)' }}>
-                      <th style={{ padding: '12px 8px' }}>Name</th>
-                      <th style={{ padding: '12px 8px' }}>Email</th>
+                      <th style={{ padding: '12px 8px' }}>Student</th>
+                      <th style={{ padding: '12px 8px' }}>Email / ID</th>
                       <th style={{ padding: '12px 8px' }}>Status</th>
+                      <th style={{ padding: '12px 8px' }}>Slide 16 Final Score</th>
+                      <th style={{ padding: '12px 8px' }}>Range Formula</th>
                       <th style={{ padding: '12px 8px' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {course.enrollments && course.enrollments.map((e: any) => (
-                      <tr key={e.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <td style={{ padding: '12px 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: e.status === 'PENDING' ? '#fbbf24' : (e.status === 'REMOVED' ? '#ef4444' : 'var(--primary)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: 'bold', color: e.status === 'PENDING' ? '#000' : '#fff' }}>
-                            {e.user?.name ? e.user.name.charAt(0).toUpperCase() : 'S'}
-                          </div>
-                          {e.user?.name || 'Unnamed'}
-                        </td>
-                        <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{e.user?.email || '-'}</td>
-                        <td style={{ padding: '12px 8px' }}>
-                          <span style={{ 
-                            padding: '4px 8px', 
-                            borderRadius: '12px', 
-                            fontSize: '0.75rem', 
-                            fontWeight: 600,
-                            background: e.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : (e.status === 'PENDING' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-                            color: e.status === 'APPROVED' ? '#10b981' : (e.status === 'PENDING' ? '#fbbf24' : '#ef4444')
-                          }}>
-                            {e.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px 8px' }}>
-                          {e.status === 'PENDING' && (
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => handleApprove(course.id, e.user.id, 'APPROVE')} style={{ background: '#10b981', border: 'none', color: '#fff', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Approve</button>
-                              <button onClick={() => handleApprove(course.id, e.user.id, 'REJECT')} style={{ background: 'transparent', border: '1px solid #ff8a8a', color: '#ff8a8a', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Reject</button>
+                    {course.enrollments && course.enrollments.map((e: any) => {
+                      let details: any = {};
+                      if (e.gameDetails) {
+                        try { details = JSON.parse(e.gameDetails); } catch (err) {}
+                      }
+                      const hasScore = (e.gameScore !== null && e.gameScore !== undefined);
+
+                      return (
+                        <tr key={e.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <td style={{ padding: '12px 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: e.status === 'PENDING' ? '#fbbf24' : (e.status === 'REMOVED' ? '#ef4444' : 'var(--primary)'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: 'bold', color: e.status === 'PENDING' ? '#000' : '#fff' }}>
+                              {e.user?.name ? e.user.name.charAt(0).toUpperCase() : 'S'}
                             </div>
-                          )}
-                          {e.status === 'APPROVED' && (
-                            <button onClick={() => handleRemove(course.id, e.user.id)} style={{ background: 'transparent', border: 'none', color: '#ff8a8a', cursor: 'pointer', fontSize: '0.85rem' }}>Remove</button>
-                          )}
-                          {e.status === 'REMOVED' && !course.isArchived && (
-                            <button onClick={() => handleApprove(course.id, e.user.id, 'APPROVE')} style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Restore</button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                            <span style={{ fontWeight: 600 }}>{e.user?.name || 'Unnamed'}</span>
+                          </td>
+                          <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{e.user?.email || e.user?.studentId || '-'}</td>
+                          <td style={{ padding: '12px 8px' }}>
+                            <span style={{ 
+                              padding: '4px 8px', 
+                              borderRadius: '12px', 
+                              fontSize: '0.75rem', 
+                              fontWeight: 600,
+                              background: e.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : (e.status === 'PENDING' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
+                              color: e.status === 'APPROVED' ? '#10b981' : (e.status === 'PENDING' ? '#fbbf24' : '#ef4444')
+                            }}>
+                              {e.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 8px' }}>
+                            {hasScore ? (
+                              <span style={{
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                fontFamily: 'monospace',
+                                background: e.gameScore >= 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                color: e.gameScore >= 0 ? '#34d399' : '#f87171',
+                                border: `1px solid ${e.gameScore >= 0 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                              }}>
+                                {e.gameScore >= 0 ? `+${e.gameScore} pts` : `${e.gameScore} pts`}
+                              </span>
+                            ) : (
+                              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>Pending</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px 8px', fontFamily: 'monospace', fontSize: '0.8rem', color: '#38bdf8' }}>
+                            {details.formula || (details.range1 ? `=SUM(${details.range1}) - SUM(${details.range2})` : '-')}
+                          </td>
+                          <td style={{ padding: '12px 8px' }}>
+                            {e.status === 'PENDING' && (
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => handleApprove(course.id, e.user.id, 'APPROVE')} style={{ background: '#10b981', border: 'none', color: '#fff', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Approve</button>
+                                <button onClick={() => handleApprove(course.id, e.user.id, 'REJECT')} style={{ background: 'transparent', border: '1px solid #ff8a8a', color: '#ff8a8a', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Reject</button>
+                              </div>
+                            )}
+                            {e.status === 'APPROVED' && (
+                              <button onClick={() => handleRemove(course.id, e.user.id)} style={{ background: 'transparent', border: 'none', color: '#ff8a8a', cursor: 'pointer', fontSize: '0.85rem' }}>Remove</button>
+                            )}
+                            {e.status === 'REMOVED' && !course.isArchived && (
+                              <button onClick={() => handleApprove(course.id, e.user.id, 'APPROVE')} style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Restore</button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                     {(!course.enrollments || course.enrollments.length === 0) && (
                       <tr>
-                        <td colSpan={4} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>No students enrolled in this course yet.</td>
+                        <td colSpan={6} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>No students enrolled in this course yet.</td>
                       </tr>
                     )}
                   </tbody>

@@ -88,6 +88,8 @@ model Enrollment {
   lastSeenAt   DateTime?
   currentSlide Int?      @default(0)
   pcId         String?   // Mapped PC ID for this specific class
+  gameScore    Int?      // Final score for Slide 16 range game
+  gameDetails  String?   // JSON details (ranges, formula, timestamp)
 
   user   User   @relation(fields: [userId], references: [id])
   course Course @relation(fields: [courseId], references: [id])
