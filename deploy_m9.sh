@@ -12,7 +12,8 @@ cd /home/quinton/projects/learningTech
 
 echo "Generating Prisma client and pushing schema..."
 npx prisma generate
-npx prisma db push
+npx prisma db push --accept-data-loss
+node sync_and_setup_m9.js
 
 echo "Building Next.js application..."
 npm run build
