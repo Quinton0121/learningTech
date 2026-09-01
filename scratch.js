@@ -275,11 +275,6 @@ const slides13_16_HTML = `
                     <i class="fa-solid fa-cloud-arrow-up text-amber-300"></i> Save Score to Teacher Dashboard
                 </button>
                 <div id="s16-save-status" class="text-[11px] text-center font-bold mb-2 hidden"></div>
-
-                <!-- Launch Interactive Sandbox Button -->
-                <button id="s16-sandbox-btn" class="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2" onclick="document.getElementById('sandbox-wrapper').style.display = 'flex';">
-                    <i class="fa-solid fa-flask"></i> Open Full Interactive Sandbox <i class="fa-solid fa-arrow-right"></i>
-                </button>
             </div>
             
             <!-- Right Panel: 10x10 Grid -->
