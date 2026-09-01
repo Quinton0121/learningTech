@@ -189,27 +189,52 @@ export default function EducatorStudentsPage() {
                   </p>
                 </div>
 
-                <button 
-                  onClick={() => exportCourseCSV(course)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    borderRadius: '8px',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
-                    color: '#ffffff',
-                    border: 'none',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)'
-                  }}
-                  className="hover:scale-105 transition-all"
-                >
-                  <span>📥</span>
-                  <span>Export CSV Report</span>
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <button 
+                    onClick={() => window.open(`/dashboard/gradebook-sheet?courseId=${course.id}`, '_blank')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                      color: '#ffffff',
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 10px rgba(2, 132, 199, 0.3)'
+                    }}
+                    className="hover:scale-105 transition-all"
+                    title="Open Excel Spreadsheet view in new tab"
+                  >
+                    <span>📊</span>
+                    <span>Open HTML Sheet</span>
+                  </button>
+
+                  <button 
+                    onClick={() => exportCourseCSV(course)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #10b981, #059669)',
+                      color: '#ffffff',
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)'
+                    }}
+                    className="hover:scale-105 transition-all"
+                  >
+                    <span>📥</span>
+                    <span>Export CSV Report</span>
+                  </button>
+                </div>
               </div>
               
               <div style={{ overflowX: 'auto' }}>

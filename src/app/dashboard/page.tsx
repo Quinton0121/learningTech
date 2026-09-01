@@ -706,7 +706,29 @@ export default function EducatorDashboard() {
                     <details open style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px', marginBottom: '16px', border: '1px solid var(--glass-border)' }}>
                       <summary style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', outline: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>{t('dashboard.rosterTitle')} ({course.enrollments?.length || 0})</span>
-                        <div style={{ display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }} onClick={e => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => window.open(`/dashboard/gradebook-sheet?courseId=${course.id}`, '_blank')}
+                            style={{
+                              background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '4px 10px',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                            title="Open Excel Spreadsheet view in new tab"
+                          >
+                            <span>📊</span>
+                            <span>Open HTML</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => exportCourseCSV(course)}
