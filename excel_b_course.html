@@ -340,13 +340,11 @@
         .task-done i { color: #10b981; }
 
     
-        /* 10x10 Strategic Range Battle Highlight Classes */
+        /* 10x10 Strategic Range Highlight Classes */
         .s16-pos-range { background-color: rgba(16, 185, 129, 0.45) !important; border: 1.5px solid #10b981 !important; color: #ffffff !important; font-weight: bold; }
-        .s16-neg-range { background-color: rgba(244, 63, 94, 0.45) !important; border: 1.5px solid #f43f5e !important; color: #ffffff !important; font-weight: bold; }
+        .s16-neg-range { background-color: rgba(6, 182, 212, 0.45) !important; border: 1.5px solid #06b6d4 !important; color: #ffffff !important; font-weight: bold; }
         .s16-overlap-range { background-color: rgba(245, 158, 11, 0.5) !important; border: 1.5px dashed #f59e0b !important; color: #ffffff !important; font-weight: bold; }
-        .s16-cell-pos { color: #34d399; font-weight: 600; }
-        .s16-cell-zero { color: #64748b; }
-        .s16-cell-neg { color: #fb7185; font-weight: bold; }
+        .s16-cell-val { color: #e2e8f0; font-weight: 600; }
 
     </style>
 </head>
@@ -1056,40 +1054,28 @@
                     </div>
                 </div>
 
-                <!-- Dual Range Input Cards -->
+                <!-- Dual Range Input Cards (Typing Only) -->
                 <div class="space-y-2.5 mb-3">
                     <!-- Range 1 -->
                     <div class="bg-slate-800/90 p-3 rounded-xl border border-emerald-500/40 shadow-lg">
-                        <div class="flex justify-between items-center mb-1">
+                        <div class="flex justify-between items-center mb-1.5">
                             <span class="text-xs font-bold uppercase text-emerald-400 flex items-center gap-1.5">
-                                <i class="fa-solid fa-star"></i> 1. Range 1 Selection
+                                <i class="fa-solid fa-keyboard"></i> 1. Type Range 1
                             </span>
                             <span id="s16-score-sum" class="text-xs font-bold font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">+140 pts (9 cells)</span>
                         </div>
-                        <div class="flex gap-2 items-center">
-                            <input type="text" id="s16-input-pos" value="C3:E5" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-sm font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center" placeholder="e.g. C3:E5">
-                            <button id="s16-mode-pos-btn" onclick="setS16DragMode('pos')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 ring-2 ring-emerald-400">
-                                <i class="fa-solid fa-hand-pointer"></i> Drag
-                            </button>
-                            <span class="text-[11px] text-slate-400">Primary block</span>
-                        </div>
+                        <input type="text" id="s16-input-pos" value="C3:E5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center tracking-wider" placeholder="e.g. C3:E5">
                     </div>
 
                     <!-- Range 2 -->
                     <div class="bg-slate-800/90 p-3 rounded-xl border border-cyan-500/40 shadow-lg">
-                        <div class="flex justify-between items-center mb-1">
+                        <div class="flex justify-between items-center mb-1.5">
                             <span class="text-xs font-bold uppercase text-cyan-400 flex items-center gap-1.5">
-                                <i class="fa-solid fa-shapes"></i> 2. Range 2 Selection
+                                <i class="fa-solid fa-keyboard"></i> 2. Type Range 2
                             </span>
                             <span id="s16-deduct-sum" class="text-xs font-bold font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">-10 pts (6 cells)</span>
                         </div>
-                        <div class="flex gap-2 items-center">
-                            <input type="text" id="s16-input-neg" value="G7:I8" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-sm font-mono text-cyan-400 font-bold focus:outline-none focus:border-cyan-400 uppercase text-center" placeholder="e.g. G7:I8">
-                            <button id="s16-mode-neg-btn" onclick="setS16DragMode('neg')" class="px-2.5 py-1 bg-slate-700 hover:bg-cyan-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
-                                <i class="fa-solid fa-hand-pointer"></i> Drag
-                            </button>
-                            <span class="text-[11px] text-slate-400">Secondary block</span>
-                        </div>
+                        <input type="text" id="s16-input-neg" value="G7:I8" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-cyan-400 font-bold focus:outline-none focus:border-cyan-400 uppercase text-center tracking-wider" placeholder="e.g. G7:I8">
                     </div>
                 </div>
 
@@ -1115,20 +1101,14 @@
             
             <!-- Right Panel: 10x10 Grid -->
             <div class="flex-1 flex flex-col items-center justify-center select-none">
-                <!-- Current Drag Mode Notice -->
-                <div class="flex items-center justify-between w-full max-w-[360px] mb-1.5 text-xs">
-                    <span class="text-slate-400">Tool:</span>
-                    <span id="s16-mode-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">🟢 Score Range (Green)</span>
-                </div>
-
                 <!-- 10x10 Grid Container -->
-                <div id="grid-s16" class="demo-grid perspective-1000 shadow-2xl" style="grid-template-columns: 26px repeat(10, 33px); grid-auto-rows: 27px; cursor: crosshair;">
+                <div id="grid-s16" class="demo-grid perspective-1000 shadow-2xl" style="grid-template-columns: 26px repeat(10, 33px); grid-auto-rows: 27px; cursor: default;">
                     <!-- JS will populate 10x10 cells -->
                 </div>
                 
                 <!-- Success / Strategy Status -->
                 <div id="s16-status-banner" class="mt-2.5 text-emerald-400 font-bold text-xs flex items-center gap-2 animate-fade-in">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> Valid Strategy! Scattered positive rewards balanced against risk!
+                    <i class="fa-solid fa-trophy text-amber-400"></i> Type ranges in boxes above to highlight and calculate score!
                 </div>
             </div>
         </div>
@@ -1562,34 +1542,8 @@
                 [  -50,  -60,  -70,  -80,  -70,  -50,  -40,  -30,  -30,  -50 ]  // Row 10
             ];
 
-            var s16DragMode = 'pos'; // 'pos' or 'neg'
-            var s16IsDragging = false;
-            var s16RangeStart = null;
             var s16PosRange = { minCol: 2, maxCol: 4, minRow: 3, maxRow: 5 }; // C3:E5 (9 cells: +140 pts)
             var s16NegRange = { minCol: 6, maxCol: 8, minRow: 7, maxRow: 8 }; // G7:I8 (6 cells: -10 pts)
-
-            window.setS16DragMode = function(mode) {
-                s16DragMode = mode;
-                var badge = document.getElementById('s16-mode-badge');
-                var posBtn = document.getElementById('s16-mode-pos-btn');
-                var negBtn = document.getElementById('s16-mode-neg-btn');
-
-                if (mode === 'pos') {
-                    if (badge) {
-                        badge.className = 'px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-                        badge.textContent = '🟢 Range 1 Selection';
-                    }
-                    if (posBtn) posBtn.className = 'px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 ring-2 ring-emerald-400';
-                    if (negBtn) negBtn.className = 'px-2.5 py-1 bg-slate-700 hover:bg-cyan-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1';
-                } else {
-                    if (badge) {
-                        badge.className = 'px-2 py-0.5 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
-                        badge.textContent = '🔵 Range 2 Selection';
-                    }
-                    if (posBtn) posBtn.className = 'px-2.5 py-1 bg-slate-700 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1';
-                    if (negBtn) negBtn.className = 'px-2.5 py-1 bg-cyan-600 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 ring-2 ring-cyan-400';
-                }
-            };
 
             function parseS16RangeStr(str) {
                 if (!str) return null;
@@ -1649,46 +1603,23 @@
                     container.appendChild(createCell(c, 'demo-header text-[11px] font-bold text-slate-400'));
                 });
 
-                // Rows 1-10
+                // Rows 1-10 (Uniform single color for all numbers)
                 for (var r = 1; r <= s16Rows; r++) {
                     container.appendChild(createCell(r, 'demo-header text-[11px] font-bold text-slate-400'));
 
                     for (var c = 0; c < s16Cols.length; c++) {
                         (function(colIdx, rowIdx) {
                             var val = s16GridData[rowIdx - 1][colIdx];
-                            var colorClass = val > 0 ? 's16-cell-pos' : (val < 0 ? 's16-cell-neg' : 's16-cell-zero');
-                            var cell = createCell(val, 'demo-cell text-[11px] font-mono cursor-pointer transition-colors duration-100 ' + colorClass);
+                            var cell = createCell(val, 'demo-cell text-[11px] font-mono select-none text-slate-200 transition-colors duration-100');
                             cell.id = 's16-' + s16Cols[colIdx] + rowIdx;
                             cell.dataset.col = colIdx;
                             cell.dataset.row = rowIdx;
-
-                            cell.addEventListener('mousedown', function(e) {
-                                e.preventDefault();
-                                s16IsDragging = true;
-                                s16RangeStart = { col: colIdx, row: rowIdx };
-                                updateS16DragCurrent(colIdx, rowIdx);
-                            });
-
-                            cell.addEventListener('mouseenter', function() {
-                                if (s16IsDragging && s16RangeStart) {
-                                    updateS16DragCurrent(colIdx, rowIdx);
-                                }
-                            });
-
                             container.appendChild(cell);
                         })(c, r);
                     }
                 }
 
-                window.addEventListener('mouseup', function() {
-                    if (s16IsDragging) {
-                        s16IsDragging = false;
-                        s16RangeStart = null;
-                        recalcS16();
-                    }
-                });
-
-                // Input event listeners
+                // Input event listeners (Typing only)
                 var posInput = document.getElementById('s16-input-pos');
                 var negInput = document.getElementById('s16-input-neg');
 
@@ -1710,27 +1641,6 @@
                             recalcS16();
                         }
                     });
-                }
-
-                recalcS16();
-            }
-
-            function updateS16DragCurrent(curCol, curRow) {
-                var rangeObj = {
-                    minCol: Math.min(s16RangeStart.col, curCol),
-                    maxCol: Math.max(s16RangeStart.col, curCol),
-                    minRow: Math.min(s16RangeStart.row, curRow),
-                    maxRow: Math.max(s16RangeStart.row, curRow)
-                };
-
-                if (s16DragMode === 'pos') {
-                    s16PosRange = rangeObj;
-                    var posInput = document.getElementById('s16-input-pos');
-                    if (posInput) posInput.value = formatS16RangeObj(s16PosRange);
-                } else {
-                    s16NegRange = rangeObj;
-                    var negInput = document.getElementById('s16-input-neg');
-                    if (negInput) negInput.value = formatS16RangeObj(s16NegRange);
                 }
 
                 recalcS16();
