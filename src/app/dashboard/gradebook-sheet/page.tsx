@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function GradebookSheetPage() {
+function GradebookSheetContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const courseId = searchParams.get('courseId');
@@ -510,5 +510,19 @@ export default function GradebookSheetPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function GradebookSheetPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f3f4f6', fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
+        <div style={{ width: '48px', height: '48px', border: '4px solid #107c41', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <p style={{ marginTop: '16px', color: '#107c41', fontWeight: 600, fontSize: '1.1rem' }}>Starting Microsoft Excel...</p>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      </div>
+    }>
+      <GradebookSheetContent />
+    </Suspense>
   );
 }
