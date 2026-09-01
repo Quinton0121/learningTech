@@ -1,0 +1,3307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is Excel? | Interactive Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc;
+            overflow: hidden; /* Prevent scrolling, we control transitions */
+        }
+
+        /* Slide Container */
+        .slide-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease-in-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translateY(20px);
+            padding: 2rem;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .slide-container.previous {
+            transform: translateY(-20px);
+        }
+
+        /* Visual Grid Animations */
+        .demo-grid {
+            display: grid;
+            gap: 2px;
+            background-color: #334155;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        .demo-cell {
+            background-color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .demo-header {
+            background-color: #0f172a;
+            color: #cbd5e1;
+            font-weight: bold;
+        }
+
+        /* Specific Highlight Classes triggered by JS */
+        .highlight-col { background-color: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #e0f2fe; }
+        .highlight-row { background-color: rgba(167, 139, 250, 0.2); border: 1px solid #a78bfa; color: #ede9fe; }
+        .highlight-cell { 
+            background-color: #10b981; 
+            color: white; 
+            font-weight: bold; 
+            transform: scale(1.1); 
+            z-index: 10; 
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+        
+        .pulse-cell {
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Formula Animation */
+        .formula-beam {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            width: 100px;
+            opacity: 0;
+            z-index: 20;
+        }
+
+        @keyframes shootBeam {
+            0% { transform: translateX(-50px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(150px); opacity: 0; }
+        }
+
+        /* Slide 6 Excel Interaction Styles */
+        .excel-selected-blue { border: 2px dashed #38bdf8 !important; background-color: rgba(56, 189, 248, 0.1); z-index: 5; }
+        .excel-selected-red { border: 2px dashed #f87171 !important; background-color: rgba(248, 113, 113, 0.1); z-index: 5; }
+        .active-typing { border: 2px solid #10b981 !important; box-shadow: inset 0 0 10px rgba(16,185,129,0.2); background-color: #1e293b; color: white;}
+        
+        /* Slide 7 Range Selection Styles */
+        .range-selected { 
+            background-color: rgba(56, 189, 248, 0.3) !important; 
+            border: 1px solid #38bdf8 !important;
+            color: #fff;
+        }
+
+        /* Slide 12 Fill Handle Styles */
+        .fill-handle {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 10px;
+            height: 10px;
+            background-color: #10b981;
+            border: 1px solid white;
+            cursor: crosshair;
+            z-index: 30;
+        }
+        .fill-preview {
+            background-color: rgba(16, 185, 129, 0.2) !important;
+            border-left: 2px solid #10b981 !important;
+            border-right: 2px solid #10b981 !important;
+        }
+        .fill-preview-bottom {
+            border-bottom: 2px solid #10b981 !important;
+        }
+
+        /* Slide 11 Manim-style Animations */
+        .manim-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background-color: #0f172a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .manim-grid-line {
+            position: absolute;
+            background-color: #334155;
+        }
+
+        .manim-formula-box {
+            position: absolute;
+            font-family: monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth easing */
+            z-index: 10;
+        }
+
+        .manim-highlight-text {
+            color: #fuchsia;
+            display: inline-block;
+            transition: color 0.5s ease;
+        }
+
+        .manim-arrow {
+            position: absolute;
+            width: 2px;
+            background-color: #64748b;
+            transform-origin: top center;
+            opacity: 0;
+            transition: opacity 0.5s ease, height 1s ease;
+        }
+        
+        .manim-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            border-bottom: 2px solid #64748b;
+            border-right: 2px solid #64748b;
+            transform: rotate(45deg);
+        }
+
+/* Sandbox CSS */
+
+        .layout-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .instructions-pane {
+            width: 35%;
+            min-width: 300px;
+            background-color: #1e293b;
+            border-right: 1px solid #334155;
+            padding: 2rem;
+            overflow-y: auto;
+            box-shadow: inset -10px 0 20px rgba(0,0,0,0.2);
+        }
+
+        .spreadsheet-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #0f172a;
+        }
+
+        /* Formula Bar */
+        .formula-bar-container {
+            display: flex;
+            align-items: center;
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 0.5rem 1rem;
+            gap: 1rem;
+        }
+
+        .active-cell-indicator {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: #cbd5e1;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            min-width: 3rem;
+            text-align: center;
+        }
+
+        .formula-input {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: #f8fafc;
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        
+        .formula-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Grid Styles */
+        .grid-wrapper {
+            flex: 1;
+            overflow: auto;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .spreadsheet {
+            display: grid;
+            border-collapse: collapse;
+            background-color: #334155;
+            border: 1px solid #475569;
+            width: max-content;
+        }
+
+        .cell {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            min-width: 100px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            color: #e2e8f0;
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            user-select: none;
+            position: relative;
+            cursor: cell;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .cell.header {
+            background-color: #0f172a;
+            color: #94a3b8;
+            justify-content: center;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .cell.row-header {
+            min-width: 40px;
+            justify-content: center;
+        }
+
+        /* Selection States */
+        .cell.selected {
+            border: 2px solid #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+            z-index: 10;
+        }
+
+        .cell-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: none;
+            outline: none;
+            padding: 0 0.5rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            z-index: 20;
+        }
+
+        /* Challenge Checkmarks */
+        .task-item { transition: all 0.3s ease; }
+        .task-done { color: #10b981; text-decoration: line-through; opacity: 0.7; }
+        .task-done i { color: #10b981; }
+
+    
+        /* 10x10 Strategic Range Battle Highlight Classes */
+        .s16-pos-range { background-color: rgba(16, 185, 129, 0.45) !important; border: 1.5px solid #10b981 !important; color: #ffffff !important; font-weight: bold; }
+        .s16-neg-range { background-color: rgba(244, 63, 94, 0.45) !important; border: 1.5px solid #f43f5e !important; color: #ffffff !important; font-weight: bold; }
+        .s16-overlap-range { background-color: rgba(245, 158, 11, 0.5) !important; border: 1.5px dashed #f59e0b !important; color: #ffffff !important; font-weight: bold; }
+        .s16-cell-pos { color: #34d399; font-weight: 600; }
+        .s16-cell-zero { color: #64748b; }
+        .s16-cell-neg { color: #fb7185; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Progress Indicator -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-800 z-50">
+        <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-500 w-0"></div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50 bg-slate-800/80 backdrop-blur-md px-6 py-3 rounded-full border border-slate-700 shadow-xl">
+        <button id="prev-btn" class="text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors" disabled>
+            <i class="fa-solid fa-chevron-left text-xl"></i>
+        </button>
+        <div class="text-slate-300 font-mono text-sm tracking-widest">
+            <span id="current-slide-num">1</span> / <span id="total-slide-num">16</span>
+        </div>
+        <button id="next-btn" class="text-emerald-400 hover:text-emerald-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            <i class="fa-solid fa-chevron-right text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Slide 1 -->
+    <div class="slide-container active" id="slide-1">
+        <div class="text-center max-w-3xl">
+            <div class="w-24 h-24 bg-emerald-600 rounded-2xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-emerald-900/50 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                <i class="fa-solid fa-file-excel text-5xl text-white"></i>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+                What is a Spreadsheet?
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-400 mb-12 leading-relaxed">
+                Before we write formulas, we need to understand the grid. It's simpler than you think.
+            </p>
+            <p class="text-slate-500 text-sm uppercase tracking-widest animate-pulse">
+                Press Right Arrow or Click Next to begin
+            </p>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide-2">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 1: THE STRUCTURE
+                </div>
+                <h2 class="text-4xl font-bold mb-6">It's just Columns and Rows.</h2>
+                <div class="space-y-6">
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-cyan-500/50 transition-colors cursor-pointer group" onmouseenter="highlightColumn()" onmouseleave="resetGrid1()">
+                        <h3 class="text-xl font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-down"></i> Columns go down
+                        </h3>
+                        <p class="text-slate-400">They are named with letters. Hover here to see Column B.</p>
+                    </div>
+                    
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-purple-500/50 transition-colors cursor-pointer group" onmouseenter="highlightRow()" onmouseleave="resetGrid1()">
+                        <h3 class="text-xl font-semibold text-purple-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-right"></i> Rows go across
+                        </h3>
+                        <p class="text-slate-400">They are named with numbers. Hover here to see Row 3.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex justify-center perspective-1000">
+                <!-- Grid 1 -->
+                <div id="grid-structure" class="demo-grid" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide-3">
+        <div class="flex flex-col md:flex-row-reverse items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 2: THE ADDRESS
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Where they meet is a <span class="text-emerald-400">Cell</span>.</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    Every box on the screen has a unique name, created by combining its Column Letter and Row Number.
+                </p>
+                
+                <div class="bg-slate-800 p-8 rounded-2xl border border-emerald-900/50 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl rounded-full"></div>
+                    <p class="text-slate-400 mb-4">Try it! Type a cell address (like B2 or D3):</p>
+                    <div class="flex items-center gap-4">
+                        <input type="text" id="cell-input" class="bg-slate-900 border-2 border-slate-600 rounded-lg px-4 py-2 text-2xl font-mono text-white w-32 uppercase focus:outline-none focus:border-emerald-500 transition-colors" placeholder="C2" maxlength="2">
+                        <button onclick="triggerCustomAnimation()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                            Find Cell
+                        </button>
+                    </div>
+                    <div id="cell-error" class="text-red-400 mt-2 text-sm hidden">Please enter a valid cell between A1 and D3.</div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex justify-center">
+                <!-- Grid 2 -->
+                <div id="grid-intersection" class="demo-grid" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide-4">
+        <div class="flex flex-col items-center max-w-5xl w-full text-center">
+            <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-4 tracking-wide">
+                STEP 3: THE MAGIC
+            </div>
+            <h2 class="text-4xl font-bold mb-4">Cells talk to each other.</h2>
+            <p class="text-xl text-slate-400 mb-12 max-w-2xl">
+                Instead of adding numbers together, you add the <em>Cells</em> together. If the numbers inside change, the total updates automatically.
+            </p>
+
+            <div class="w-full max-w-3xl bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+                
+                <div class="flex justify-between items-center mb-8">
+                    <!-- Value 1 -->
+                    <div class="text-center">
+                        <div class="text-sm font-mono text-slate-500 mb-2">Cell A1</div>
+                        <div id="demo-cell-a1" class="w-24 h-24 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
+                            100
+                        </div>
+                    </div>
+                    
+                    <div class="text-4xl text-slate-600"><i class="fa-solid fa-plus"></i></div>
+                    
+                    <!-- Value 2 -->
+                    <div class="text-center">
+                        <div class="text-sm font-mono text-slate-500 mb-2">Cell B1</div>
+                        <div id="demo-cell-b1" class="w-24 h-24 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
+                            50
+                        </div>
+                    </div>
+
+                    <div class="text-4xl text-slate-600"><i class="fa-solid fa-equals"></i></div>
+
+                    <!-- Result -->
+                    <div class="text-center relative">
+                        <div class="text-sm font-mono text-amber-400 mb-2 font-bold animate-pulse">=A1+B1</div>
+                        <div id="calc-result" class="w-32 h-24 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-4xl font-bold text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all duration-500">
+                            150
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="changeValues()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-rotate"></i> Change Numbers Automatically
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Syntax -->
+    <div class="slide-container" id="slide-5">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-pink-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 4: THE SECRET KEY
+                </div>
+                <h2 class="text-5xl font-bold mb-6">The Magic <span class="text-pink-400">Equals</span> Sign</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    By default, if you type "5+5" into a cell, Excel just thinks it's a piece of text. 
+                </p>
+                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                    To tell Excel you want it to act as a calculator, you <strong>must</strong> start with an equals sign (<code>=</code>). This is called <strong>Syntax</strong>.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-pink-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold">Try it out in the Formula Bar below:</p>
+                    <ol class="list-decimal list-inside text-slate-300 space-y-2 mb-6 ml-2">
+                        <li>Type <code class="bg-slate-900 px-2 py-1 rounded text-pink-400">10+20</code></li>
+                        <li>Then, add an equals sign at the front: <code class="bg-slate-900 px-2 py-1 rounded text-pink-400">=10+20</code></li>
+                    </ol>
+                    
+                    <div class="flex items-center gap-4 bg-slate-900 p-2 rounded-lg border border-slate-700">
+                        <div class="text-slate-500 px-3 font-mono border-r border-slate-700 italic">fx</div>
+                        <input type="text" id="syntax-input" class="bg-transparent w-full px-2 py-2 text-xl font-mono text-white focus:outline-none placeholder-slate-600" placeholder="Type here...">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-center items-center w-full">
+                <h3 class="text-slate-400 uppercase tracking-widest text-sm mb-4">What you see in the cell:</h3>
+                <div class="relative w-full max-w-sm">
+                    <div id="syntax-badge" class="absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 transition-colors shadow-lg z-10">
+                        Empty
+                    </div>
+                    <div id="syntax-result" class="w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-slate-300 relative transition-all duration-300">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Point and Click Formula -->
+    <div class="slide-container" id="slide-6">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-indigo-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 5: POINT AND CLICK
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Building Formulas by Clicking</h2>
+                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                    You don't have to type cell addresses manually. It's much faster to just click them! Let's try calculating <code>=A2-B1</code>.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-indigo-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
+                    <ul id="step-list" class="space-y-4 text-lg">
+                        <li id="s6-step-1" class="text-indigo-400 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>C2</strong></li>
+                        <li id="s6-step-2" class="text-slate-500 transition-all duration-300">2. Type the equal sign (<strong>=</strong>)</li>
+                        <li id="s6-step-3" class="text-slate-500 transition-all duration-300">3. Click cell <strong>A2</strong> (320)</li>
+                        <li id="s6-step-4" class="text-slate-500 transition-all duration-300">4. Type the minus sign (<strong>-</strong>)</li>
+                        <li id="s6-step-5" class="text-slate-500 transition-all duration-300">5. Click cell <strong>B1</strong> (39)</li>
+                        <li id="s6-step-6" class="text-slate-500 transition-all duration-300">6. Hit the <strong>Enter</strong> button</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full">
+                <!-- Grid 6 -->
+                <div id="grid-s6" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(3, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+
+                <!-- Success Message (Hidden initially) -->
+                <div id="s6-success" class="mt-12 hidden flex-col items-center animate-fade-in transition-all duration-500">
+                     <p class="text-emerald-400 font-bold text-xl mb-4"><i class="fa-solid fa-check-circle"></i> You did it! 281 is correct.</p>
+                     <p class="text-slate-400">Press the Right Arrow to continue.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Entire Rows and Columns -->
+    <div class="slide-container" id="slide-7">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 6: ENTIRE ROWS & COLUMNS
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Selecting Everything</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    Need to select an entire line of data? You can click the <strong>Column Letter</strong> or the <strong>Row Number</strong> at the edges of the grid. Excel uses a colon without numbers to indicate a full column (like <code>A:A</code>).
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-cyan-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-hand-pointer text-cyan-400"></i> Click on a Letter (A-D) or Number (1-4) on the grid:</p>
+                    
+                    <div class="flex flex-col items-center justify-center bg-slate-900 p-6 rounded-xl border border-slate-700 mt-6">
+                        <span class="text-slate-500 text-sm mb-2 uppercase tracking-widest">Excel Syntax</span>
+                        <div id="s7-range-display" class="text-5xl font-mono font-bold text-cyan-400 transition-all duration-200">
+                            -
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 7 -->
+                <div id="grid-s7" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Ranges -->
+    <div class="slide-container" id="slide-8">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-sky-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 7: RANGES
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Grouping Cells Together</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    A <strong>Range</strong> is a collection of two or more cells. Instead of writing <code>=A1+A2+A3+A4</code>, Excel uses a colon (<strong>:</strong>) to connect the first and last cells.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-sky-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-sky-400"></i> Click and drag on the grid to create a range:</p>
+                    
+                    <div class="flex flex-col items-center justify-center bg-slate-900 p-6 rounded-xl border border-slate-700 mt-6">
+                        <span class="text-slate-500 text-sm mb-2 uppercase tracking-widest">Selected Range</span>
+                        <div id="range-display" class="text-5xl font-mono font-bold text-sky-400 transition-all duration-200">
+                            A1
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 8 -->
+                <div id="grid-s8" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px; cursor: crosshair;">
+                    <!-- JS will populate this -->
+                </div>
+                
+                <!-- Success indicator for Slide 8 -->
+                <div id="s8-success" class="mt-8 text-sky-400 font-bold opacity-0 transition-opacity duration-500">
+                    <i class="fa-solid fa-check-circle"></i> Range Selected! Press Right Arrow to continue.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Math Operators -->
+    <div class="slide-container" id="slide-9">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-yellow-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 8: THE MATH OPERATORS
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Excel's Calculator Keys</h2>
+                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                    Excel can do any math you want, but the symbols might look a little different than a math textbook.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-yellow-900/50 shadow-xl space-y-4">
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-900 text-xl">+</kbd>
+                        <span class="text-slate-300 text-lg">Addition</span>
+                    </div>
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-900 text-xl">-</kbd>
+                        <span class="text-slate-300 text-lg">Subtraction</span>
+                    </div>
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-yellow-500/10"></div>
+                        <kbd class="bg-yellow-600 text-white font-mono px-3 py-1 rounded border-b-2 border-yellow-800 text-xl relative z-10">*</kbd>
+                        <span class="text-slate-200 text-lg font-bold relative z-10">Multiplication (Asterisk)</span>
+                    </div>
+                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
+                         <div class="absolute inset-0 bg-yellow-500/10"></div>
+                        <kbd class="bg-yellow-600 text-white font-mono px-3 py-1 rounded border-b-2 border-yellow-800 text-xl relative z-10">/</kbd>
+                        <span class="text-slate-200 text-lg font-bold relative z-10">Division (Forward Slash)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full">
+                <div class="w-full max-w-md bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+                    <p class="text-slate-400 mb-6 text-center font-semibold uppercase tracking-wider text-sm">Try the different operators:</p>
+                    <div class="flex justify-center gap-3 mb-8">
+                        <button id="btn-op-add" onclick="setOperator('+')" class="s9-op-btn w-12 h-12 bg-emerald-600 border-2 border-emerald-400 rounded-lg text-2xl font-mono text-white transition-colors">+</button>
+                        <button id="btn-op-sub" onclick="setOperator('-')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">-</button>
+                        <button id="btn-op-mul" onclick="setOperator('*')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">*</button>
+                        <button id="btn-op-div" onclick="setOperator('/')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">/</button>
+                    </div>
+
+                    <div class="flex justify-center items-center gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-sm font-mono text-slate-500 mb-1">A1</div>
+                            <div class="w-16 h-16 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-xl font-bold text-white">120</div>
+                        </div>
+                        <div id="s9-formula-op" class="text-3xl text-emerald-400 font-mono font-bold">+</div>
+                        <div class="text-center">
+                            <div class="text-sm font-mono text-slate-500 mb-1">B1</div>
+                            <div class="w-16 h-16 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-xl font-bold text-white">10</div>
+                        </div>
+                        <div class="text-3xl text-slate-600 font-mono">=</div>
+                    </div>
+
+                    <div class="text-center">
+                        <div id="s9-result" class="w-full h-20 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-5xl font-bold text-emerald-400 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.2)]">130</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Formulas Application -->
+    <div class="slide-container" id="slide-10">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 9: PUTTING IT TOGETHER
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Calculate the Cost</h2>
+                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                    Let's use multiplication in a real scenario. Find the Total Cost of the Apples by multiplying Quantity by Price (<code>=B2*C2</code>).
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-amber-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
+                    <ul id="s10-step-list" class="space-y-4 text-lg">
+                        <li id="s10-step-1" class="text-amber-400 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>D2</strong></li>
+                        <li id="s10-step-2" class="text-slate-500 transition-all duration-300">2. Type the equal sign (<strong>=</strong>)</li>
+                        <li id="s10-step-3" class="text-slate-500 transition-all duration-300">3. Click cell <strong>B2</strong> (5)</li>
+                        <li id="s10-step-4" class="text-slate-500 transition-all duration-300">4. Type the multiply sign (<strong>*</strong>)</li>
+                        <li id="s10-step-5" class="text-slate-500 transition-all duration-300">5. Click cell <strong>C2</strong> (20)</li>
+                        <li id="s10-step-6" class="text-slate-500 transition-all duration-300">6. Hit the <strong>Enter</strong> button</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full">
+                <!-- Grid 10 -->
+                <div id="grid-s10" class="demo-grid perspective-1000" style="grid-template-columns: 40px repeat(4, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Relative References Concept -->
+    <div class="slide-container" id="slide-11">
+        <div class="flex flex-col items-center max-w-5xl w-full text-center">
+            <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-fuchsia-400 text-sm font-semibold mb-4 tracking-wide">
+                STEP 10: RELATIVE REFERENCES
+            </div>
+            <h2 class="text-4xl font-bold mb-4">The True Power of Excel</h2>
+            <p class="text-xl text-slate-400 mb-8 max-w-3xl">
+                Why do we use cell addresses like <code>A1</code> instead of typing the numbers directly? Because when you copy a formula down to the next row, Excel changes the numbers automatically. 
+            </p>
+
+            <div class="w-full bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+                
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-slate-300 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-eye text-fuchsia-400 mr-2"></i> Visualize the Shift</h3>
+                    <button id="s11-play-btn" onclick="playManimAnimation()" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i> Play Animation
+                    </button>
+                </div>
+
+                <!-- Animation Canvas -->
+                <div class="manim-container" id="manim-canvas">
+                    <!-- Grid Lines (Background) -->
+                    <div class="manim-grid-line" style="top: 33%; left: 0; width: 100%; height: 1px;"></div>
+                    <div class="manim-grid-line" style="top: 66%; left: 0; width: 100%; height: 1px;"></div>
+                    
+                    <div class="manim-grid-line" style="top: 0; left: 15%; width: 1px; height: 100%;"></div>
+                    <div class="manim-grid-line" style="top: 0; left: 50%; width: 1px; height: 100%;"></div>
+
+                    <!-- Row Labels -->
+                    <div class="absolute text-slate-500 font-mono text-xl" style="top: 10%; left: 5%;">Row 1</div>
+                    <div class="absolute text-slate-500 font-mono text-xl" style="top: 45%; left: 5%;">Row 2</div>
+                    <div class="absolute text-slate-500 font-mono text-xl" style="top: 78%; left: 5%;">Row 3</div>
+
+                    <!-- Data Cells -->
+                    <div class="absolute text-slate-300 font-mono text-2xl" style="top: 10%; left: 30%;">Data A</div>
+                    <div class="absolute text-slate-300 font-mono text-2xl" style="top: 45%; left: 30%;">Data B</div>
+                    <div class="absolute text-slate-300 font-mono text-2xl" style="top: 78%; left: 30%;">Data C</div>
+
+                    <!-- The Moving Formula -->
+                    <div id="manim-formula" class="manim-formula-box bg-slate-900 border-2 border-fuchsia-500 px-6 py-2 rounded-xl shadow-[0_0_20px_rgba(217,70,239,0.3)]" style="top: 8%; left: 65%;">
+                        =A<span id="manim-num-1" class="manim-highlight-text mx-1">1</span> + B<span id="manim-num-2" class="manim-highlight-text mx-1">1</span>
+                    </div>
+
+                    <!-- Visual Arrow -->
+                    <div id="manim-arrow" class="manim-arrow" style="top: 25%; left: 75%; height: 0px;"></div>
+                </div>
+                
+                <p id="s11-explanation" class="text-fuchsia-400 mt-6 font-semibold opacity-0 transition-opacity duration-500">
+                    Notice how the row numbers in the formula increase exactly by 1 as the formula moves down 1 row.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: The Fill Handle -->
+    <div class="slide-container" id="slide-12">
+        <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-sm font-semibold mb-4 tracking-wide">
+                    STEP 11: THE FILL HANDLE
+                </div>
+                <h2 class="text-4xl font-bold mb-6">Drag to Copy</h2>
+                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                    Let's see relative references in action. In Excel, the bottom-right corner of a selected cell has a small green square called the <strong>Fill Handle</strong>.
+                </p>
+
+                <div class="bg-slate-800 p-8 rounded-2xl border border-emerald-900/50 shadow-xl">
+                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-emerald-400"></i> Try it yourself:</p>
+                    <ol class="list-decimal list-inside text-slate-300 space-y-3">
+                        <li>Look at cell <strong>C2</strong>. It already has the formula <code>=A2+B2</code>.</li>
+                        <li>Click and hold the tiny green square on <strong>C2</strong>.</li>
+                        <li>Drag it down to row 4 to instantly calculate the rest!</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 12 -->
+                <div id="grid-s12" class="demo-grid perspective-1000 mb-8" style="grid-template-columns: 40px repeat(3, 80px); grid-auto-rows: 40px;">
+                    <!-- JS will populate this -->
+                </div>
+
+                <!-- Success Message -->
+                <div id="s12-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500 mb-6">
+                     <p class="text-emerald-400 font-bold text-xl mb-2"><i class="fa-solid fa-check-circle"></i> Awesome! The formula adapted automatically.</p>
+                </div>
+
+                <button id="final-sandbox-btn" class="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-105 flex items-center gap-3" onclick="document.getElementById('sandbox-wrapper').style.display = 'flex';">
+                    Start Coding in the Sandbox <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: Practice 1 - Mini Theme Park Ticket Booth -->
+    <div class="slide-container" id="slide-13">
+        <div class="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-3 tracking-wide">
+                    PRACTICE 1: THEME PARK TICKET BOOTH
+                </div>
+                <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-ticket text-amber-400"></i> Live Sales Calculator
+                </h2>
+                <p class="text-slate-300 mb-5 leading-relaxed text-base">
+                    Calculate ticket sales for visitors. Start each formula with <code class="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">=</code> and multiply Quantity by Price (<code class="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">*</code>).
+                </p>
+
+                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3 mb-4">
+                    <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-amber-400"></i> Tasks to complete:
+                    </p>
+                    <div id="s13-task-1" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                        <i class="fa-regular fa-circle text-slate-500"></i>
+                        <span><strong>Adults:</strong> In <code>D2</code>, enter <code>=B2*C2</code></span>
+                    </div>
+                    <div id="s13-task-2" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                        <i class="fa-regular fa-circle text-slate-500"></i>
+                        <span><strong>Children:</strong> In <code>D3</code>, enter <code>=B3*C3</code></span>
+                    </div>
+                    <div id="s13-task-3" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                        <i class="fa-regular fa-circle text-slate-500"></i>
+                        <span><strong>VIP:</strong> In <code>D4</code>, enter <code>=B4*C4</code></span>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-3 text-xs text-indigo-300 flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i>
+                    <span><strong>Pro Tip:</strong> After formulas are entered, use the <strong>+ / -</strong> buttons on quantities to watch the revenue auto-update live!</span>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 13 -->
+                <div id="grid-s13" class="demo-grid perspective-1000 mb-6" style="grid-template-columns: 36px 90px 75px 65px 85px; grid-auto-rows: 38px;">
+                    <!-- JS will populate this -->
+                </div>
+
+                <!-- Total Revenue Banner -->
+                <div id="s13-total-banner" class="w-full max-w-sm bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 flex justify-between items-center mb-4">
+                    <span class="text-xs uppercase font-bold text-slate-400">Total Theme Park Revenue:</span>
+                    <span id="s13-grand-total" class="text-xl font-extrabold text-amber-400 font-mono">$0</span>
+                </div>
+
+                <!-- Success Message -->
+                <div id="s13-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500">
+                     <p class="text-emerald-400 font-bold text-base mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i> Excellent! All ticket lines calculated!
+                     </p>
+                     <span class="text-xs text-slate-400">Try clicking the + and - steppers to see the live math in action.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 14: Practice 2 - RPG Battle Damage Calculator -->
+    <div class="slide-container" id="slide-14">
+        <div class="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-3 tracking-wide">
+                    PRACTICE 2: RPG BATTLE CALCULATOR
+                </div>
+                <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-shield-halved text-cyan-400"></i> Hero Combat Formulas
+                </h2>
+                <p class="text-slate-300 mb-5 leading-relaxed text-base">
+                    Combine addition (<code class="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">+</code>) and subtraction (<code class="text-rose-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">-</code>) to calculate damage against the Dragon Boss!
+                </p>
+
+                <!-- Formula Rule -->
+                <div class="bg-slate-800/90 p-4 rounded-xl border border-cyan-900/50 mb-4">
+                    <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Combat Formula Rule:</div>
+                    <div class="text-base font-mono text-cyan-300 font-bold">
+                        Final DMG = (Base ATK + Buff) - Boss DEF
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3 mb-4">
+                    <div id="s14-task-1" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                        <i class="fa-regular fa-circle text-slate-500"></i>
+                        <span><strong>Knight:</strong> In <code>E2</code>, build <code>=B2+C2-D2</code></span>
+                    </div>
+                    <div id="s14-task-2" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                        <i class="fa-regular fa-circle text-slate-500"></i>
+                        <span><strong>Mage:</strong> In <code>E3</code>, build <code>=B3+C3-D3</code></span>
+                    </div>
+                    <div id="s14-task-3" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                        <i class="fa-regular fa-circle text-slate-500"></i>
+                        <span><strong>Archer:</strong> In <code>E4</code>, build <code>=B4+C4-D4</code></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Boss Status Bar -->
+                <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-xl p-3 mb-4 shadow-xl">
+                    <div class="flex justify-between items-center text-xs font-bold mb-1.5">
+                        <span class="text-rose-400 flex items-center gap-1.5"><i class="fa-solid fa-dragon"></i> Dragon Boss HP</span>
+                        <span id="s14-boss-hp" class="text-white font-mono">1000 / 1000</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+                        <div id="s14-hp-bar" class="bg-gradient-to-r from-rose-500 to-amber-500 h-full w-full transition-all duration-700"></div>
+                    </div>
+                </div>
+
+                <!-- Grid 14 -->
+                <div id="grid-s14" class="demo-grid perspective-1000 mb-6" style="grid-template-columns: 32px 75px 65px 65px 65px 75px; grid-auto-rows: 36px;">
+                    <!-- JS will populate this -->
+                </div>
+
+                <!-- Success Message -->
+                <div id="s14-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500">
+                     <p class="text-cyan-400 font-bold text-base mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-yellow-400"></i> Critical Strike! Party damage evaluated!
+                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 15: Practice 3 - Pizza Party Budget & Drag-to-Copy -->
+    <div class="slide-container" id="slide-15">
+        <div class="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
+            <div class="flex-1 text-left">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-sm font-semibold mb-3 tracking-wide">
+                    PRACTICE 3: PIZZA PARTY BUDGET
+                </div>
+                <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-pizza-slice text-emerald-400"></i> Drag-to-Copy Master
+                </h2>
+                <p class="text-slate-300 mb-5 leading-relaxed text-base">
+                    You have 5 items for the class pizza party. Don't write 5 separate formulas! Cell <code>D2</code> already has <code class="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">=B2*C2</code> ($90).
+                </p>
+
+                <div class="bg-slate-800/90 p-5 rounded-2xl border border-emerald-900/50 shadow-xl space-y-3 mb-5">
+                    <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-hand-pointer text-emerald-400"></i> How to Drag & Fill:
+                    </p>
+                    <ol class="list-decimal list-inside text-sm text-slate-300 space-y-2">
+                        <li>Locate the tiny green square (<strong>Fill Handle</strong>) at the bottom-right of cell <strong>D2</strong>.</li>
+                        <li>Click and hold, then <strong>drag straight down</strong> across rows 3, 4, 5, and 6.</li>
+                        <li>Release to auto-fill the calculations for all 5 party items instantly!</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
+                <!-- Grid 15 -->
+                <div id="grid-s15" class="demo-grid perspective-1000 mb-6" style="grid-template-columns: 32px 105px 55px 70px 75px; grid-auto-rows: 35px;">
+                    <!-- JS will populate this -->
+                </div>
+
+                <!-- Grand Total Banner -->
+                <div class="w-full max-w-sm bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2 flex justify-between items-center mb-4">
+                    <span class="text-xs uppercase font-bold text-slate-400">Party Budget Grand Total:</span>
+                    <span id="s15-grand-total" class="text-lg font-extrabold text-emerald-400 font-mono">$90.00</span>
+                </div>
+
+                <!-- Success Message & Sandbox Launcher -->
+                <div id="s15-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500">
+                     <p class="text-emerald-400 font-bold text-base mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Superb! Party budget completely solved with 1 drag!
+                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 16: Practice 4 - 10x10 Strategic Range Minefield Game -->
+    <div class="slide-container" id="slide-16">
+        <div class="flex flex-col lg:flex-row items-center gap-7 max-w-7xl w-full px-2">
+            <!-- Left Panel: Game Rules & Controls -->
+            <div class="flex-1 text-left max-w-lg">
+                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-2 tracking-wide">
+                    PRACTICE 4: 10×10 STRATEGIC RANGE MINING
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-gem text-cyan-400"></i> Find Gold, Dodge Traps!
+                </h2>
+                
+                <!-- Game Rules Bar -->
+                <div class="grid grid-cols-3 gap-2 mb-3">
+                    <div id="s16-rule-r1" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-400 font-bold">Range 1</div>
+                        <div id="s16-r1-count" class="text-emerald-400 font-bold font-mono">4 cells ✅</div>
+                        <div class="text-[10px] text-slate-500">Min 4 cells</div>
+                    </div>
+                    <div id="s16-rule-r2" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-400 font-bold">Range 2</div>
+                        <div id="s16-r2-count" class="text-rose-400 font-bold font-mono">4 cells ✅</div>
+                        <div class="text-[10px] text-slate-500">Min 4 cells</div>
+                    </div>
+                    <div id="s16-rule-total" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-400 font-bold">Combined</div>
+                        <div id="s16-tot-count" class="text-cyan-400 font-bold font-mono">8 / 20 ✅</div>
+                        <div class="text-[10px] text-slate-500">Max 20 cells</div>
+                    </div>
+                </div>
+
+                <!-- Dual Range Input Cards -->
+                <div class="space-y-2.5 mb-3">
+                    <!-- Positive Range 1 -->
+                    <div class="bg-slate-800/90 p-3 rounded-xl border border-emerald-500/40 shadow-lg">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold uppercase text-emerald-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-star"></i> 1. Score Range (Green Gold)
+                            </span>
+                            <span id="s16-score-sum" class="text-xs font-bold font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">+75 pts (4 cells)</span>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <input type="text" id="s16-input-pos" value="E5:F6" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-sm font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center" placeholder="e.g. E5:F6">
+                            <button id="s16-mode-pos-btn" onclick="setS16DragMode('pos')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 ring-2 ring-emerald-400">
+                                <i class="fa-solid fa-hand-pointer"></i> Drag
+                            </button>
+                            <span class="text-[11px] text-slate-400">Scattered gold</span>
+                        </div>
+                    </div>
+
+                    <!-- Deduction Range 2 -->
+                    <div class="bg-slate-800/90 p-3 rounded-xl border border-rose-500/40 shadow-lg">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold uppercase text-rose-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-triangle-exclamation"></i> 2. Deduction Range (Red Zone)
+                            </span>
+                            <span id="s16-deduct-sum" class="text-xs font-bold font-mono text-rose-300 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">-345 pts (4 cells)</span>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <input type="text" id="s16-input-neg" value="A1:B2" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-sm font-mono text-rose-400 font-bold focus:outline-none focus:border-rose-400 uppercase text-center" placeholder="e.g. A1:B2">
+                            <button id="s16-mode-neg-btn" onclick="setS16DragMode('neg')" class="px-2.5 py-1 bg-slate-700 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
+                                <i class="fa-solid fa-hand-pointer"></i> Drag
+                            </button>
+                            <span class="text-[11px] text-slate-400">Subtract penalties</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Formula Math Output -->
+                <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-3 flex justify-between items-center shadow-md mb-3">
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Net Score Formula:</div>
+                        <div id="s16-formula-preview" class="text-xs font-mono text-cyan-300 font-bold">=SUM(E5:F6) - SUM(A1:B2)</div>
+                        <div id="s16-rule-warning" class="text-[11px] text-rose-400 font-bold mt-0.5 hidden">⚠️ Rule violated!</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Net Score:</div>
+                        <div id="s16-net-score" class="text-2xl font-extrabold text-amber-400 font-mono">+420</div>
+                    </div>
+                </div>
+
+                <!-- Save Score to Teacher Button -->
+                <button id="s16-submit-score-btn" onclick="submitS16Score()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 mb-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-amber-300"></i> Save Score to Teacher Dashboard
+                </button>
+                <div id="s16-save-status" class="text-[11px] text-center font-bold mb-2 hidden"></div>
+
+                <!-- Launch Interactive Sandbox Button -->
+                <button id="s16-sandbox-btn" class="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2" onclick="document.getElementById('sandbox-wrapper').style.display = 'flex';">
+                    <i class="fa-solid fa-flask"></i> Open Full Interactive Sandbox <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+            
+            <!-- Right Panel: 10x10 Grid -->
+            <div class="flex-1 flex flex-col items-center justify-center select-none">
+                <!-- Current Drag Mode Notice -->
+                <div class="flex items-center justify-between w-full max-w-[360px] mb-1.5 text-xs">
+                    <span class="text-slate-400">Tool:</span>
+                    <span id="s16-mode-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">🟢 Score Range (Green)</span>
+                </div>
+
+                <!-- 10x10 Grid Container -->
+                <div id="grid-s16" class="demo-grid perspective-1000 shadow-2xl" style="grid-template-columns: 26px repeat(10, 33px); grid-auto-rows: 27px; cursor: crosshair;">
+                    <!-- JS will populate 10x10 cells -->
+                </div>
+                
+                <!-- Success / Strategy Status -->
+                <div id="s16-status-banner" class="mt-2.5 text-emerald-400 font-bold text-xs flex items-center gap-2 animate-fade-in">
+                    <i class="fa-solid fa-trophy text-amber-400"></i> Valid Strategy! Scattered positive rewards balanced against risk!
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide-container');
+            const totalSlides = slides.length;
+            let currentSlideIndex = 0;
+
+            // ==========================================
+            // --- Slide 13 Logic (Theme Park Booth) ---
+            // ==========================================
+            var s13Data = {
+                2: { item: 'Adults', qty: 4, price: 50, formula: '', solved: false },
+                3: { item: 'Children', qty: 6, price: 25, formula: '', solved: false },
+                4: { item: 'VIP Pass', qty: 2, price: 100, formula: '', solved: false }
+            };
+
+            function buildSlide13Grid() {
+                var container = document.getElementById('grid-s13');
+                if (!container) return;
+                container.innerHTML = '';
+                var cols = ['A', 'B', 'C', 'D'];
+
+                // Top left header
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(function(c) { container.appendChild(createCell(c, 'demo-header')); });
+
+                // Row 1 (Header row)
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('Ticket', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('Qty', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('Price', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('Total', 'demo-cell font-bold text-amber-400 text-xs'));
+
+                // Rows 2-4
+                for (var r = 2; r <= 4; r++) {
+                    (function(row) {
+                        container.appendChild(createCell(row, 'demo-header'));
+                        
+                        // Col A: Ticket Name
+                        container.appendChild(createCell(s13Data[row].item, 'demo-cell text-slate-200 text-xs font-semibold'));
+
+                        // Col B: Qty with stepper
+                        var qtyCell = createCell('', 'demo-cell flex items-center justify-between px-1 text-xs text-white');
+                        qtyCell.id = 's13-b' + row;
+                        qtyCell.innerHTML = '<button type="button" class="w-4 h-4 bg-slate-700 hover:bg-slate-600 rounded text-[10px] flex items-center justify-center text-slate-300" onclick="updateS13Qty(' + row + ', -1)">-</button><span id="s13-qty-val-' + row + '" class="font-bold font-mono">' + s13Data[row].qty + '</span><button type="button" class="w-4 h-4 bg-slate-700 hover:bg-slate-600 rounded text-[10px] flex items-center justify-center text-slate-300" onclick="updateS13Qty(' + row + ', 1)">+</button>';
+                        container.appendChild(qtyCell);
+
+                        // Col C: Price
+                        var priceCell = createCell('$' + s13Data[row].price, 'demo-cell text-slate-300 text-xs font-mono');
+                        priceCell.id = 's13-c' + row;
+                        container.appendChild(priceCell);
+
+                        // Col D: Interactive Total Input
+                        var dCell = createCell('', 'demo-cell relative p-0');
+                        dCell.id = 's13-d' + row + '-container';
+
+                        var dInput = document.createElement('input');
+                        dInput.type = 'text';
+                        dInput.id = 's13-d' + row;
+                        dInput.placeholder = '=...';
+                        dInput.className = 'w-full h-full bg-transparent text-center font-bold text-amber-400 text-xs focus:outline-none focus:bg-slate-800/80 focus:ring-1 focus:ring-amber-400 rounded';
+                        
+                        dInput.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                evaluateS13Input(row, dInput.value.trim());
+                            }
+                        });
+
+                        dInput.addEventListener('blur', function() {
+                            if (dInput.value.trim()) {
+                                evaluateS13Input(row, dInput.value.trim());
+                            }
+                        });
+
+                        dCell.appendChild(dInput);
+                        container.appendChild(dCell);
+                    })(r);
+                }
+            }
+
+            window.updateS13Qty = function(row, delta) {
+                s13Data[row].qty = Math.max(1, s13Data[row].qty + delta);
+                var span = document.getElementById('s13-qty-val-' + row);
+                if (span) span.textContent = s13Data[row].qty;
+
+                if (s13Data[row].solved) {
+                    var dInput = document.getElementById('s13-d' + row);
+                    var val = s13Data[row].qty * s13Data[row].price;
+                    if (dInput) dInput.value = '$' + val;
+                }
+                updateS13GrandTotal();
+            };
+
+            function evaluateS13Input(row, raw) {
+                var dInput = document.getElementById('s13-d' + row);
+                var upper = raw.toUpperCase().replace(/\s+/g, '');
+                var expected = '=B' + row + '*C' + row;
+                var expectedAlt = '=C' + row + '*B' + row;
+
+                if (upper === expected || upper === expectedAlt || upper === ('=' + s13Data[row].qty + '*' + s13Data[row].price)) {
+                    s13Data[row].solved = true;
+                    s13Data[row].formula = upper;
+                    var val = s13Data[row].qty * s13Data[row].price;
+                    dInput.value = '$' + val;
+                    dInput.className = 'w-full h-full bg-emerald-950/40 text-center font-bold text-emerald-400 text-xs rounded border border-emerald-500/50';
+
+                    var taskEl = document.getElementById('s13-task-' + (row - 1));
+                    if (taskEl) {
+                        taskEl.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400"></i> <span class="line-through text-slate-400">' + taskEl.innerText + '</span>';
+                    }
+
+                    updateS13GrandTotal();
+                    checkS13Complete();
+                } else if (raw !== '') {
+                    dInput.classList.add('animate-shake');
+                    setTimeout(function() { dInput.classList.remove('animate-shake'); }, 400);
+                }
+            }
+
+            function updateS13GrandTotal() {
+                var total = 0;
+                for (var r = 2; r <= 4; r++) {
+                    if (s13Data[r].solved) {
+                        total += s13Data[r].qty * s13Data[r].price;
+                    }
+                }
+                var grandEl = document.getElementById('s13-grand-total');
+                if (grandEl) grandEl.textContent = '$' + total;
+            }
+
+            function checkS13Complete() {
+                if (s13Data[2].solved && s13Data[3].solved && s13Data[4].solved) {
+                    var succ = document.getElementById('s13-success');
+                    if (succ) {
+                        succ.classList.remove('hidden');
+                        succ.classList.add('flex');
+                    }
+                }
+            }
+
+            // ==========================================
+            // --- Slide 14 Logic (RPG Damage Battle) ---
+            // ==========================================
+            var s14Data = {
+                2: { hero: 'Knight', atk: 120, buff: 45, def: 35, expected: 130, solved: false },
+                3: { hero: 'Mage', atk: 180, buff: 60, def: 40, expected: 200, solved: false },
+                4: { hero: 'Archer', atk: 150, buff: 30, def: 25, expected: 155, solved: false }
+            };
+
+            function buildSlide14Grid() {
+                var container = document.getElementById('grid-s14');
+                if (!container) return;
+                container.innerHTML = '';
+                var cols = ['A', 'B', 'C', 'D', 'E'];
+
+                // Top left header
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(function(c) { container.appendChild(createCell(c, 'demo-header')); });
+
+                // Row 1
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('Hero', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('ATK', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('Buff', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('DEF', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('DMG', 'demo-cell font-bold text-cyan-400 text-xs'));
+
+                // Rows 2-4
+                for (var r = 2; r <= 4; r++) {
+                    (function(row) {
+                        container.appendChild(createCell(row, 'demo-header'));
+                        
+                        // Col A: Hero
+                        container.appendChild(createCell(s14Data[row].hero, 'demo-cell text-slate-200 text-xs font-semibold'));
+
+                        // Col B: Base ATK (clickable)
+                        var bCell = createCell(s14Data[row].atk, 'demo-cell text-white text-xs font-mono cursor-pointer hover:bg-slate-700');
+                        bCell.id = 's14-B' + row;
+                        bCell.onclick = function() { insertS14CellRef(row, 'B' + row); };
+                        container.appendChild(bCell);
+
+                        // Col C: Buff (clickable)
+                        var cCell = createCell(s14Data[row].buff, 'demo-cell text-emerald-300 text-xs font-mono cursor-pointer hover:bg-slate-700');
+                        cCell.id = 's14-C' + row;
+                        cCell.onclick = function() { insertS14CellRef(row, 'C' + row); };
+                        container.appendChild(cCell);
+
+                        // Col D: Boss DEF (clickable)
+                        var dCell = createCell(s14Data[row].def, 'demo-cell text-rose-300 text-xs font-mono cursor-pointer hover:bg-slate-700');
+                        dCell.id = 's14-D' + row;
+                        dCell.onclick = function() { insertS14CellRef(row, 'D' + row); };
+                        container.appendChild(dCell);
+
+                        // Col E: Final DMG Input
+                        var eCell = createCell('', 'demo-cell relative p-0');
+                        var eInput = document.createElement('input');
+                        eInput.type = 'text';
+                        eInput.id = 's14-e' + row;
+                        eInput.placeholder = '=...';
+                        eInput.className = 'w-full h-full bg-transparent text-center font-bold text-cyan-400 text-xs focus:outline-none focus:bg-slate-800/80 focus:ring-1 focus:ring-cyan-400 rounded';
+
+                        eInput.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                evaluateS14Input(row, eInput.value.trim());
+                            }
+                        });
+                        eInput.addEventListener('blur', function() {
+                            if (eInput.value.trim()) {
+                                evaluateS14Input(row, eInput.value.trim());
+                            }
+                        });
+
+                        eCell.appendChild(eInput);
+                        container.appendChild(eCell);
+                    })(r);
+                }
+            }
+
+            function insertS14CellRef(row, cellId) {
+                var eInput = document.getElementById('s14-e' + row);
+                if (!eInput || s14Data[row].solved) return;
+                
+                if (!eInput.value.startsWith('=')) {
+                    eInput.value = '=' + cellId;
+                } else {
+                    eInput.value += cellId;
+                }
+                eInput.focus();
+            }
+
+            function evaluateS14Input(row, raw) {
+                var eInput = document.getElementById('s14-e' + row);
+                var upper = raw.toUpperCase().replace(/\s+/g, '');
+                var expected = '=B' + row + '+C' + row + '-D' + row;
+                var expectedVal = s14Data[row].expected;
+
+                if (upper === expected || upper === ('=(' + expected.substring(1) + ')') || upper === ('=' + s14Data[row].atk + '+' + s14Data[row].buff + '-' + s14Data[row].def) || upper === ('=' + expectedVal)) {
+                    s14Data[row].solved = true;
+                    eInput.value = expectedVal + ' DMG';
+                    eInput.className = 'w-full h-full bg-cyan-950/40 text-center font-bold text-cyan-400 text-xs rounded border border-cyan-500/50';
+
+                    var taskEl = document.getElementById('s14-task-' + (row - 1));
+                    if (taskEl) {
+                        taskEl.innerHTML = '<i class="fa-solid fa-check-circle text-cyan-400"></i> <span class="line-through text-slate-400">' + taskEl.innerText + '</span>';
+                    }
+
+                    updateBossHP();
+                    checkS14Complete();
+                } else if (raw !== '') {
+                    eInput.classList.add('animate-shake');
+                    setTimeout(function() { eInput.classList.remove('animate-shake'); }, 400);
+                }
+            }
+
+            function updateBossHP() {
+                var damage = 0;
+                for (var r = 2; r <= 4; r++) {
+                    if (s14Data[r].solved) damage += s14Data[r].expected;
+                }
+                var remaining = Math.max(0, 1000 - damage);
+                var hpEl = document.getElementById('s14-boss-hp');
+                var barEl = document.getElementById('s14-hp-bar');
+                if (hpEl) hpEl.textContent = remaining + ' / 1000';
+                if (barEl) barEl.style.width = ((remaining / 1000) * 100) + '%';
+            }
+
+            function checkS14Complete() {
+                if (s14Data[2].solved && s14Data[3].solved && s14Data[4].solved) {
+                    var succ = document.getElementById('s14-success');
+                    if (succ) {
+                        succ.classList.remove('hidden');
+                        succ.classList.add('flex');
+                    }
+                }
+            }
+
+            // ==========================================
+            // --- Slide 15 Logic (Pizza Party Fill Handle) ---
+            // ==========================================
+            var isFillingS15 = false;
+            var s15FillEndRow = null;
+            var s15Data = [
+                { item: 'Pizza', qty: 5, price: 18, total: 90 },
+                { item: 'Soda Cans', qty: 24, price: 2, total: 48 },
+                { item: 'Garlic Bread', qty: 8, price: 4, total: 32 },
+                { item: 'Ice Cream Tub', qty: 3, price: 12, total: 36 },
+                { item: 'Party Cake', qty: 1, price: 35, total: 35 }
+            ];
+
+            function buildSlide15Grid() {
+                var container = document.getElementById('grid-s15');
+                if (!container) return;
+                container.innerHTML = '';
+                var cols = ['A', 'B', 'C', 'D'];
+
+                // Top left header
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(function(c) { container.appendChild(createCell(c, 'demo-header')); });
+
+                // Row 1
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('Item', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('Qty', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('Price', 'demo-cell font-bold text-slate-400 text-xs'));
+                container.appendChild(createCell('Total', 'demo-cell font-bold text-emerald-400 text-xs'));
+
+                // Rows 2-6
+                for (var r = 2; r <= 6; r++) {
+                    (function(row) {
+                        var d = s15Data[row - 2];
+                        container.appendChild(createCell(row, 'demo-header'));
+                        
+                        container.appendChild(createCell(d.item, 'demo-cell text-slate-200 text-xs font-semibold'));
+                        container.appendChild(createCell(d.qty, 'demo-cell text-white text-xs font-mono'));
+                        container.appendChild(createCell('$' + d.price, 'demo-cell text-slate-300 text-xs font-mono'));
+
+                        var cellD = createCell('', 'demo-cell relative transition-all text-xs font-mono');
+                        cellD.id = 's15-D' + row;
+
+                        if (row === 2) {
+                            cellD.textContent = '$' + d.total;
+                            cellD.classList.add('text-emerald-400', 'font-bold');
+                            cellD.style.border = '2px solid #10b981';
+
+                            var handle = document.createElement('div');
+                            handle.className = 'fill-handle';
+                            handle.title = 'Drag down to fill';
+
+                            handle.addEventListener('mousedown', function(e) {
+                                isFillingS15 = true;
+                                s15FillEndRow = 2;
+                                e.preventDefault();
+                            });
+
+                            cellD.appendChild(handle);
+                        }
+
+                        cellD.addEventListener('mouseenter', function() {
+                            if (isFillingS15 && row > 2) {
+                                s15FillEndRow = row;
+                                renderS15FillPreview();
+                            }
+                        });
+
+                        container.appendChild(cellD);
+                    })(r);
+                }
+
+                window.addEventListener('mouseup', function() {
+                    if (isFillingS15) {
+                        isFillingS15 = false;
+                        applyS15Fill();
+                    }
+                });
+            }
+
+            function renderS15FillPreview() {
+                for (var r = 3; r <= 6; r++) {
+                    var cell = document.getElementById('s15-D' + r);
+                    if (!cell) continue;
+                    cell.classList.remove('fill-preview', 'fill-preview-bottom');
+
+                    if (r <= s15FillEndRow) {
+                        cell.classList.add('fill-preview');
+                        if (r === s15FillEndRow) {
+                            cell.classList.add('fill-preview-bottom');
+                        }
+                    }
+                }
+            }
+
+            function applyS15Fill() {
+                var filledCount = 0;
+                var currentGrand = s15Data[0].total;
+
+                for (var r = 3; r <= 6; r++) {
+                    var cell = document.getElementById('s15-D' + r);
+                    if (!cell) continue;
+                    cell.classList.remove('fill-preview', 'fill-preview-bottom');
+
+                    if (r <= s15FillEndRow) {
+                        var d = s15Data[r - 2];
+                        cell.textContent = '$' + d.total;
+                        cell.classList.add('text-emerald-400', 'font-bold', 'bg-slate-800');
+                        currentGrand += d.total;
+                        filledCount++;
+
+                        cell.style.transform = 'scale(0.92)';
+                        (function(c) {
+                            setTimeout(function() { c.style.transform = 'scale(1)'; }, 150);
+                        })(cell);
+                    }
+                }
+
+                var grandEl = document.getElementById('s15-grand-total');
+                if (grandEl) grandEl.textContent = '$' + currentGrand.toFixed(2);
+
+                if (filledCount >= 4 && s15FillEndRow === 6) {
+                    var succ = document.getElementById('s15-success');
+                    if (succ) {
+                        succ.classList.remove('hidden');
+                        succ.classList.add('flex');
+                    }
+                }
+            }
+
+            // ========================================================
+            // --- Slide 16 Logic (10x10 Strategic Range Minefield) ---
+            // ========================================================
+            var s16Cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+            var s16Rows = 10;
+            // Scattered positive values surrounded by negative penalties and zeros! No pure positive 4+ blocks!
+            var s16GridData = [
+                //   A     B     C     D     E     F     G     H     I     J
+                [  -85,  -90,   15,  -70,   85,  -95,  -15,  -65,   75,  -90 ], // Row 1 (E1=85, I1=75 traps)
+                [  -80,   95,  -90,  -70,  -90,  -85,  -80,  -75,  -85,  -80 ], // Row 2 (B2=95 mega trap)
+                [  -95,  -85,  -85,   18,  -60,  -60,   90,  -95,  -70,   25 ], // Row 3 (G3=90 mega trap)
+                [   10,  -85,  -60,  -75,  -90,  -85,  -90,  -80,  -85,  -85 ], // Row 4
+                [  -70,  -90,  -85,  -25,   20,   22,  -15,  -50,   70,  -90 ], // Row 5 (E5:F6 contains 20, 22, 18, 15 - The Gold Zone!)
+                [  -90,  -95,  -80,  -10,   18,   15,  -20,  -85,  -95,  -80 ], // Row 6
+                [  -80,  -60,   65,  -85,  -15,  -25,  -65,  -90,   85,  -95 ], // Row 7 (I7=85 trap, C7=65 trap)
+                [   70,  -90,  -95,  -80,  -40,   12,  -35,  -85,  -90,  -75 ], // Row 8 (A8=70 trap)
+                [  -85,  -95,  -70,   20,  -55,  -70,   80,  -95,  -60,   10 ], // Row 9 (G9=80 trap)
+                [  -90,  -75,  -80,  -45,  -80,  -85,  -90,  -80,  -75,  -50 ]  // Row 10
+            ];
+
+            var s16DragMode = 'pos'; // 'pos' or 'neg'
+            var s16IsDragging = false;
+            var s16RangeStart = null;
+            var s16PosRange = { minCol: 4, maxCol: 5, minRow: 5, maxRow: 6 }; // E5:F6 (4 cells: +75 pts)
+            var s16NegRange = { minCol: 0, maxCol: 1, minRow: 1, maxRow: 2 }; // A1:B2 (4 cells: -345 pts)
+
+            window.setS16DragMode = function(mode) {
+                s16DragMode = mode;
+                var badge = document.getElementById('s16-mode-badge');
+                var posBtn = document.getElementById('s16-mode-pos-btn');
+                var negBtn = document.getElementById('s16-mode-neg-btn');
+
+                if (mode === 'pos') {
+                    if (badge) {
+                        badge.className = 'px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                        badge.textContent = '🟢 Score Range (Green)';
+                    }
+                    if (posBtn) posBtn.className = 'px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 ring-2 ring-emerald-400';
+                    if (negBtn) negBtn.className = 'px-2.5 py-1 bg-slate-700 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1';
+                } else {
+                    if (badge) {
+                        badge.className = 'px-2 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                        badge.textContent = '🔴 Deduction Range (Red)';
+                    }
+                    if (posBtn) posBtn.className = 'px-2.5 py-1 bg-slate-700 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1';
+                    if (negBtn) negBtn.className = 'px-2.5 py-1 bg-rose-600 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 ring-2 ring-rose-400';
+                }
+            };
+
+            function parseS16RangeStr(str) {
+                if (!str) return null;
+                var clean = str.trim().toUpperCase().replace(/\s+/g, '');
+                var parts = clean.split(':');
+                if (parts.length === 1) parts = [parts[0], parts[0]];
+                if (parts.length !== 2) return null;
+
+                var m1 = parts[0].match(/^([A-J])(10|[1-9])$/);
+                var m2 = parts[1].match(/^([A-J])(10|[1-9])$/);
+                if (!m1 || !m2) return null;
+
+                var col1 = s16Cols.indexOf(m1[1]);
+                var row1 = parseInt(m1[2]);
+                var col2 = s16Cols.indexOf(m2[1]);
+                var row2 = parseInt(m2[2]);
+
+                return {
+                    minCol: Math.min(col1, col2),
+                    maxCol: Math.max(col1, col2),
+                    minRow: Math.min(row1, row2),
+                    maxRow: Math.max(row1, row2)
+                };
+            }
+
+            function formatS16RangeObj(obj) {
+                if (!obj) return '';
+                var start = s16Cols[obj.minCol] + obj.minRow;
+                var end = s16Cols[obj.maxCol] + obj.maxRow;
+                return start === end ? start : (start + ':' + end);
+            }
+
+            function getRangeCellCount(rangeObj) {
+                if (!rangeObj) return 0;
+                return (rangeObj.maxCol - rangeObj.minCol + 1) * (rangeObj.maxRow - rangeObj.minRow + 1);
+            }
+
+            function calcS16RangeSum(rangeObj) {
+                if (!rangeObj) return 0;
+                var sum = 0;
+                for (var r = rangeObj.minRow; r <= rangeObj.maxRow; r++) {
+                    for (var c = rangeObj.minCol; c <= rangeObj.maxCol; c++) {
+                        sum += s16GridData[r - 1][c];
+                    }
+                }
+                return sum;
+            }
+
+            function buildSlide16Grid() {
+                var container = document.getElementById('grid-s16');
+                if (!container) return;
+                container.innerHTML = '';
+
+                // Header Row (Top-left empty, then Cols A-J)
+                container.appendChild(createCell('', 'demo-header text-[10px]'));
+                s16Cols.forEach(function(c) {
+                    container.appendChild(createCell(c, 'demo-header text-[11px] font-bold text-slate-400'));
+                });
+
+                // Rows 1-10
+                for (var r = 1; r <= s16Rows; r++) {
+                    container.appendChild(createCell(r, 'demo-header text-[11px] font-bold text-slate-400'));
+
+                    for (var c = 0; c < s16Cols.length; c++) {
+                        (function(colIdx, rowIdx) {
+                            var val = s16GridData[rowIdx - 1][colIdx];
+                            var colorClass = val > 0 ? 's16-cell-pos' : (val < 0 ? 's16-cell-neg' : 's16-cell-zero');
+                            var cell = createCell(val, 'demo-cell text-[11px] font-mono cursor-pointer transition-colors duration-100 ' + colorClass);
+                            cell.id = 's16-' + s16Cols[colIdx] + rowIdx;
+                            cell.dataset.col = colIdx;
+                            cell.dataset.row = rowIdx;
+
+                            cell.addEventListener('mousedown', function(e) {
+                                e.preventDefault();
+                                s16IsDragging = true;
+                                s16RangeStart = { col: colIdx, row: rowIdx };
+                                updateS16DragCurrent(colIdx, rowIdx);
+                            });
+
+                            cell.addEventListener('mouseenter', function() {
+                                if (s16IsDragging && s16RangeStart) {
+                                    updateS16DragCurrent(colIdx, rowIdx);
+                                }
+                            });
+
+                            container.appendChild(cell);
+                        })(c, r);
+                    }
+                }
+
+                window.addEventListener('mouseup', function() {
+                    if (s16IsDragging) {
+                        s16IsDragging = false;
+                        s16RangeStart = null;
+                        recalcS16();
+                    }
+                });
+
+                // Input event listeners
+                var posInput = document.getElementById('s16-input-pos');
+                var negInput = document.getElementById('s16-input-neg');
+
+                if (posInput) {
+                    posInput.addEventListener('input', function() {
+                        var parsed = parseS16RangeStr(posInput.value);
+                        if (parsed) {
+                            s16PosRange = parsed;
+                            recalcS16();
+                        }
+                    });
+                }
+
+                if (negInput) {
+                    negInput.addEventListener('input', function() {
+                        var parsed = parseS16RangeStr(negInput.value);
+                        if (parsed) {
+                            s16NegRange = parsed;
+                            recalcS16();
+                        }
+                    });
+                }
+
+                recalcS16();
+            }
+
+            function updateS16DragCurrent(curCol, curRow) {
+                var rangeObj = {
+                    minCol: Math.min(s16RangeStart.col, curCol),
+                    maxCol: Math.max(s16RangeStart.col, curCol),
+                    minRow: Math.min(s16RangeStart.row, curRow),
+                    maxRow: Math.max(s16RangeStart.row, curRow)
+                };
+
+                if (s16DragMode === 'pos') {
+                    s16PosRange = rangeObj;
+                    var posInput = document.getElementById('s16-input-pos');
+                    if (posInput) posInput.value = formatS16RangeObj(s16PosRange);
+                } else {
+                    s16NegRange = rangeObj;
+                    var negInput = document.getElementById('s16-input-neg');
+                    if (negInput) negInput.value = formatS16RangeObj(s16NegRange);
+                }
+
+                recalcS16();
+            }
+
+            function recalcS16() {
+                // Clear highlights
+                for (var r = 1; r <= s16Rows; r++) {
+                    for (var c = 0; c < s16Cols.length; c++) {
+                        var cell = document.getElementById('s16-' + s16Cols[c] + r);
+                        if (cell) {
+                            cell.classList.remove('s16-pos-range', 's16-neg-range', 's16-overlap-range');
+                        }
+                    }
+                }
+
+                // Apply Positive Range highlights
+                if (s16PosRange) {
+                    for (var r = s16PosRange.minRow; r <= s16PosRange.maxRow; r++) {
+                        for (var c = s16PosRange.minCol; c <= s16PosRange.maxCol; c++) {
+                            var cell = document.getElementById('s16-' + s16Cols[c] + r);
+                            if (cell) cell.classList.add('s16-pos-range');
+                        }
+                    }
+                }
+
+                // Apply Negative Range highlights
+                if (s16NegRange) {
+                    for (var r = s16NegRange.minRow; r <= s16NegRange.maxRow; r++) {
+                        for (var c = s16NegRange.minCol; c <= s16NegRange.maxCol; c++) {
+                            var cell = document.getElementById('s16-' + s16Cols[c] + r);
+                            if (cell) {
+                                if (cell.classList.contains('s16-pos-range')) {
+                                    cell.classList.remove('s16-pos-range');
+                                    cell.classList.add('s16-overlap-range');
+                                } else {
+                                    cell.classList.add('s16-neg-range');
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var r1Count = getRangeCellCount(s16PosRange);
+                var r2Count = getRangeCellCount(s16NegRange);
+                var totCount = r1Count + r2Count;
+
+                var posSum = calcS16RangeSum(s16PosRange);
+                var negSum = calcS16RangeSum(s16NegRange);
+                var net = posSum - negSum;
+
+                // Rule Validations
+                var r1Valid = r1Count >= 4;
+                var r2Valid = r2Count >= 4;
+                var totValid = totCount <= 20 && totCount > 0;
+                var isAllValid = r1Valid && r2Valid && totValid;
+
+                var r1CountEl = document.getElementById('s16-r1-count');
+                var r2CountEl = document.getElementById('s16-r2-count');
+                var totCountEl = document.getElementById('s16-tot-count');
+
+                if (r1CountEl) {
+                    r1CountEl.textContent = r1Count + ' cells ' + (r1Valid ? '✅' : '❌ (min 4)');
+                    r1CountEl.className = 'font-bold font-mono ' + (r1Valid ? 'text-emerald-400' : 'text-rose-400');
+                }
+                if (r2CountEl) {
+                    r2CountEl.textContent = r2Count + ' cells ' + (r2Valid ? '✅' : '❌ (min 4)');
+                    r2CountEl.className = 'font-bold font-mono ' + (r2Valid ? 'text-emerald-400' : 'text-rose-400');
+                }
+                if (totCountEl) {
+                    totCountEl.textContent = totCount + ' / 20 ' + (totValid ? '✅' : '❌ (max 20)');
+                    totCountEl.className = 'font-bold font-mono ' + (totValid ? 'text-cyan-400' : 'text-rose-400');
+                }
+
+                var scoreSumEl = document.getElementById('s16-score-sum');
+                var deductSumEl = document.getElementById('s16-deduct-sum');
+                var formulaEl = document.getElementById('s16-formula-preview');
+                var warningEl = document.getElementById('s16-rule-warning');
+                var netEl = document.getElementById('s16-net-score');
+                var statusEl = document.getElementById('s16-status-banner');
+
+                if (scoreSumEl) scoreSumEl.textContent = (posSum >= 0 ? '+' : '') + posSum + ' pts (' + r1Count + ' cells)';
+                if (deductSumEl) deductSumEl.textContent = (negSum >= 0 ? '-' : '+') + Math.abs(negSum) + ' pts (' + r2Count + ' cells)';
+                
+                if (formulaEl) {
+                    var posStr = formatS16RangeObj(s16PosRange) || 'A1';
+                    var negStr = formatS16RangeObj(s16NegRange) || 'A1';
+                    formulaEl.textContent = '=SUM(' + posStr + ') - SUM(' + negStr + ')';
+                }
+
+                if (warningEl) {
+                    if (!isAllValid) {
+                        warningEl.classList.remove('hidden');
+                        if (!r1Valid || !r2Valid) {
+                            warningEl.textContent = '⚠️ Rule: Each range must have at least 4 cells!';
+                        } else if (!totValid) {
+                            warningEl.textContent = '⚠️ Rule: Combined ranges cannot exceed 20 cells!';
+                        }
+                    } else {
+                        warningEl.classList.add('hidden');
+                    }
+                }
+
+                if (netEl) {
+                    if (!isAllValid) {
+                        netEl.textContent = 'INVALID';
+                        netEl.className = 'text-xl font-extrabold font-mono text-rose-500 animate-pulse';
+                    } else {
+                        netEl.textContent = (net >= 0 ? '+' : '') + net;
+                        netEl.className = 'text-2xl font-extrabold font-mono ' + (net >= 0 ? 'text-amber-400' : 'text-rose-400');
+                    }
+                }
+
+                if (statusEl) {
+                    if (!isAllValid) {
+                        statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> <span class="text-rose-400">Rules not met: Min 4 cells per range, Max 20 cells combined!</span>';
+                    } else if (net > 200) {
+                        statusEl.innerHTML = '<i class="fa-solid fa-trophy text-amber-400"></i> <span class="text-emerald-400">High Score! Well-balanced range selection with minimal mine penalty!</span>';
+                    } else {
+                        statusEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-slate-300">Valid strategy! Search for better scattered rewards.</span>';
+                    }
+                }
+            }
+
+            window.submitS16Score = async function() {
+                var r1Count = getRangeCellCount(s16PosRange);
+                var r2Count = getRangeCellCount(s16NegRange);
+                var totCount = r1Count + r2Count;
+                if (r1Count < 4 || r2Count < 4 || totCount > 20) {
+                    alert("Please satisfy all rules before submitting: Min 4 cells per range, Max 20 combined!");
+                    return;
+                }
+                var posSum = calcS16RangeSum(s16PosRange);
+                var negSum = calcS16RangeSum(s16NegRange);
+                var net = posSum - negSum;
+                var posStr = formatS16RangeObj(s16PosRange);
+                var negStr = formatS16RangeObj(s16NegRange);
+                var formula = '=SUM(' + posStr + ') - SUM(' + negStr + ')';
+
+                var token = localStorage.getItem('token');
+                var urlParams = new URLSearchParams(window.location.search);
+                var courseId = window.__SYNC_COURSE_ID__ || urlParams.get('id') || urlParams.get('courseId') || '';
+
+                var statusEl = document.getElementById('s16-save-status');
+
+                if (!token || !courseId) {
+                    localStorage.setItem('s16_saved_score', JSON.stringify({ score: net, formula: formula, timestamp: new Date().toISOString() }));
+                    if (statusEl) {
+                        statusEl.className = 'text-[11px] text-center font-bold mb-2 text-emerald-400 block';
+                        statusEl.textContent = '✅ Score ' + (net >= 0 ? '+' : '') + net + ' saved locally!';
+                    }
+                    return;
+                }
+
+                try {
+                    var res = await fetch('/api/courses/submit-score', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ courseId: courseId, score: net, range1: posStr, range2: negStr, formula: formula })
+                    });
+                    if (res.ok) {
+                        if (statusEl) {
+                            statusEl.className = 'text-[11px] text-center font-bold mb-2 text-emerald-400 block';
+                            statusEl.textContent = '✅ Score ' + (net >= 0 ? '+' : '') + net + ' saved to Teacher Gradebook!';
+                        }
+                    } else {
+                        var d = await res.json();
+                        if (statusEl) {
+                            statusEl.className = 'text-[11px] text-center font-bold mb-2 text-amber-400 block';
+                            statusEl.textContent = 'Saved: ' + (d.error || 'Locally');
+                        }
+                    }
+                } catch (err) {
+                    if (statusEl) {
+                        statusEl.className = 'text-[11px] text-center font-bold mb-2 text-emerald-400 block';
+                        statusEl.textContent = '✅ Score saved locally!';
+                    }
+                }
+            };
+
+
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const currentNumSpan = document.getElementById('current-slide-num');
+            const progressBar = document.getElementById('progress-bar');
+
+            // Initialize Grids
+            buildGrid('grid-structure', 5, 4); // Cols A-D, Rows 1-3
+            buildGrid('grid-intersection', 5, 4);
+            buildSlide6Grid();
+            buildSlide7Grid();
+            buildSlide8Grid();
+            buildSlide10Grid();
+            buildSlide12Grid();
+            buildSlide13Grid();
+            buildSlide14Grid();
+            buildSlide15Grid();
+            buildSlide16Grid();
+            
+            // Automatically sync total slide display with actual DOM elements
+            document.getElementById('total-slide-num').textContent = totalSlides;
+
+            function updateUI() {
+                // Update slides visibility
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'previous');
+                    if (index === currentSlideIndex) {
+                        slide.classList.add('active');
+                    } else if (index < currentSlideIndex) {
+                        slide.classList.add('previous');
+                    }
+                });
+
+                // Update controls
+                prevBtn.disabled = currentSlideIndex === 0;
+                nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+                currentNumSpan.textContent = currentSlideIndex + 1;
+                
+                // Update Progress bar
+                progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
+
+                // Trigger specific slide animations
+                if (currentSlideIndex === 2) {
+                    setTimeout(animateIntersection, 500);
+                }
+            }
+
+            function nextSlide() {
+                if (currentSlideIndex < totalSlides - 1) {
+                    currentSlideIndex++;
+                    updateUI();
+                }
+            }
+
+            function prevSlide() {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    updateUI();
+                }
+            }
+
+            // Event Listeners
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                // Prevent slide navigation when typing in inputs
+                if (e.target.tagName === 'INPUT') return;
+
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            });
+
+            // --- Grid Building Utilities ---
+            function buildGrid(containerId, cols, rows) {
+                const container = document.getElementById(containerId);
+                const letters = ['A', 'B', 'C', 'D'];
+
+                // Top left empty
+                container.appendChild(createCell('', 'demo-header'));
+
+                // Col Headers
+                for (let i = 0; i < cols - 1; i++) {
+                    container.appendChild(createCell(letters[i], 'demo-header'));
+                }
+
+                // Rows
+                for (let r = 1; r < rows; r++) {
+                    container.appendChild(createCell(r, 'demo-header')); // Row Header
+                    for (let c = 0; c < cols - 1; c++) {
+                        const cell = createCell('', 'demo-cell');
+                        cell.id = `${containerId}-${letters[c]}${r}`;
+                        container.appendChild(cell);
+                    }
+                }
+            }
+
+            function createCell(text, className) {
+                const div = document.createElement('div');
+                div.className = className;
+                div.textContent = text;
+                return div;
+            }
+
+            // --- Slide 2 Interactions ---
+            window.highlightColumn = function() {
+                resetGrid1();
+                const containerId = 'grid-structure';
+                // Highlight Col B (Header + cells)
+                const cells = document.getElementById(containerId).children;
+                // Hardcoded indices based on grid structure (5 cols)
+                // Header B is index 2. Cells below are 2+5, 2+10, 2+15
+                cells[2].classList.add('highlight-col');
+                cells[7].classList.add('highlight-col');
+                cells[12].classList.add('highlight-col');
+                cells[17].classList.add('highlight-col');
+            }
+
+            window.highlightRow = function() {
+                resetGrid1();
+                const containerId = 'grid-structure';
+                const cells = document.getElementById(containerId).children;
+                // Highlight Row 3
+                // Header 3 is index 15. Cells are 16, 17, 18, 19
+                for(let i=15; i<=19; i++) {
+                    cells[i].classList.add('highlight-row');
+                }
+            }
+
+            window.resetGrid1 = function() {
+                const containerId = 'grid-structure';
+                const cells = document.getElementById(containerId).children;
+                for (let cell of cells) {
+                    cell.classList.remove('highlight-col', 'highlight-row');
+                }
+            }
+
+            // --- Slide 3 Animations ---
+            function animateIntersection(targetCol = 'C', targetRow = '2') {
+                const containerId = 'grid-intersection';
+                const cells = document.getElementById(containerId).children;
+                
+                // Clear previous
+                for (let cell of cells) {
+                    cell.classList.remove('highlight-col', 'highlight-row', 'highlight-cell');
+                    if (cell.classList.contains('demo-cell')) {
+                        cell.textContent = '';
+                    }
+                }
+
+                const columns = ['A', 'B', 'C', 'D'];
+                const colIndex = columns.indexOf(targetCol);
+                const rowIndex = parseInt(targetRow);
+
+                if (colIndex === -1 || isNaN(rowIndex) || rowIndex < 1 || rowIndex > 3) {
+                     document.getElementById('cell-error').classList.remove('hidden');
+                     return;
+                }
+                
+                document.getElementById('cell-error').classList.add('hidden');
+
+                // Calculate Indices based on a 5x4 grid (0-indexed)
+                // Col Header is at index: colIndex + 1
+                // Cells in that col are at: (row * 5) + (colIndex + 1)
+                
+                const colHeaderIndex = colIndex + 1;
+                const colCells = [
+                    colHeaderIndex,
+                    1 * 5 + colHeaderIndex,
+                    2 * 5 + colHeaderIndex,
+                    3 * 5 + colHeaderIndex
+                ];
+
+                // Row Header is at index: rowIndex * 5
+                // Cells in that row are at: (rowIndex * 5) + 1 to 4
+                const rowHeaderIndex = rowIndex * 5;
+                const rowCells = [
+                    rowHeaderIndex,
+                    rowHeaderIndex + 1,
+                    rowHeaderIndex + 2,
+                    rowHeaderIndex + 3,
+                    rowHeaderIndex + 4
+                ];
+                
+                const targetCellIndex = (rowIndex * 5) + colIndex + 1;
+
+                // Highlight Column
+                colCells.forEach((idx, i) => {
+                     setTimeout(() => {
+                         if(cells[idx]) cells[idx].classList.add('highlight-col');
+                     }, i * 200);
+                });
+
+                // Highlight Row
+                setTimeout(() => {
+                    rowCells.forEach((idx, i) => {
+                         setTimeout(() => {
+                             if(cells[idx]) cells[idx].classList.add('highlight-row');
+                         }, i * 200);
+                    });
+                    
+                    // Highlight Intersection
+                    setTimeout(() => {
+                        if (cells[targetCellIndex]) {
+                            cells[targetCellIndex].classList.remove('highlight-col'); 
+                            cells[targetCellIndex].classList.add('highlight-cell'); 
+                            cells[targetCellIndex].textContent = `${targetCol}${targetRow}`;
+                        }
+                    }, rowCells.length * 200 + 200);
+                }, colCells.length * 200 + 200);
+            }
+
+            window.triggerCustomAnimation = function() {
+                const input = document.getElementById('cell-input').value.toUpperCase();
+                if (input.length >= 2) {
+                    const col = input.charAt(0);
+                    const row = input.charAt(1);
+                    animateIntersection(col, row);
+                } else {
+                     document.getElementById('cell-error').classList.remove('hidden');
+                }
+            }
+            
+            // Allow pressing Enter in the input
+            document.getElementById('cell-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    triggerCustomAnimation();
+                }
+            });
+
+            // --- Slide 4 Interactions ---
+            window.changeValues = function() {
+                const val1 = document.getElementById('demo-cell-a1');
+                const val2 = document.getElementById('demo-cell-b1');
+                const result = document.getElementById('calc-result');
+
+                // Generate new random numbers
+                const newNum1 = Math.floor(Math.random() * 500);
+                const newNum2 = Math.floor(Math.random() * 500);
+                
+                // Animate change to cells
+                val1.style.transform = 'scale(0.9)';
+                val2.style.transform = 'scale(0.9)';
+                result.style.transform = 'scale(0.9)';
+                result.style.backgroundColor = '#1e293b'; 
+                
+                setTimeout(() => {
+                    // Update numbers
+                    val1.textContent = newNum1;
+                    val2.textContent = newNum2;
+                    val1.style.transform = 'scale(1)';
+                    val2.style.transform = 'scale(1)';
+                    
+                    // Force re-calculation based on the generated numbers
+                    const sum = newNum1 + newNum2;
+                    
+                    // Update result with delay for visual effect
+                    setTimeout(() => {
+                        result.textContent = sum;
+                        result.style.transform = 'scale(1.1)';
+                        result.style.backgroundColor = 'rgba(16, 185, 129, 0.4)';
+                        setTimeout(() => result.style.transform = 'scale(1)', 200);
+                    }, 400); 
+                }, 200);
+            }
+
+            const syntaxInput = document.getElementById('syntax-input');
+            const syntaxResult = document.getElementById('syntax-result');
+            const syntaxBadge = document.getElementById('syntax-badge');
+
+            if (syntaxInput) {
+                syntaxInput.addEventListener('input', (e) => {
+                    const val = e.target.value.trim();
+                    
+                    if (val === '') {
+                        syntaxResult.textContent = '';
+                        syntaxBadge.textContent = 'Empty';
+                        syntaxBadge.className = 'absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 transition-colors shadow-lg';
+                        syntaxResult.className = 'w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-slate-300 relative transition-all duration-300';
+                        return;
+                    }
+
+                    if (val.startsWith('=')) {
+                        const mathExpression = val.substring(1);
+                        try {
+                            // Using a simple regex to allow only numbers and basic math operators for safety
+                            if (/^[0-9+\-*/.\s()]+$/.test(mathExpression)) {
+                                // Evaluate the safe string 
+                                const result = new Function('return ' + mathExpression)();
+                                syntaxResult.textContent = result !== undefined ? result : '#ERROR!';
+                                
+                                if (result !== undefined && !isNaN(result) && result !== Infinity) {
+                                    syntaxBadge.innerHTML = '<i class="fa-solid fa-bolt text-yellow-300 mr-1"></i> Formula Active!';
+                                    syntaxBadge.className = 'absolute -top-3 -right-3 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 shadow-[0_0_15px_rgba(16,185,129,0.8)] z-10';
+                                    syntaxResult.className = 'w-full h-32 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-6xl font-bold text-emerald-400 relative transition-all duration-300 scale-105 shadow-[0_0_30px_rgba(16,185,129,0.2)]';
+                                } else {
+                                    throw new Error();
+                                }
+                            } else if (mathExpression === '') {
+                                 syntaxResult.textContent = '';
+                                 syntaxBadge.textContent = 'Waiting for math...';
+                                 syntaxBadge.className = 'absolute -top-3 -right-3 bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 shadow-lg';
+                                 syntaxResult.className = 'w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-white relative transition-all duration-300';
+                            } else {
+                                throw new Error();
+                            }
+                        } catch (err) {
+                            // Trigger Error State (e.g., if they divide by zero or type bad syntax like =+-)
+                            syntaxResult.textContent = '#NAME?';
+                            syntaxBadge.textContent = 'Syntax Error';
+                            syntaxBadge.className = 'absolute -top-3 -right-3 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 shadow-lg';
+                            syntaxResult.className = 'w-full h-32 bg-rose-900/20 rounded-xl border-2 border-rose-500 flex items-center justify-center text-4xl font-bold text-rose-400 relative transition-all duration-300';
+                        }
+                    } else {
+                        // Standard Text State
+                        syntaxResult.textContent = val;
+                        syntaxBadge.textContent = 'Just Text';
+                        syntaxBadge.className = 'absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 transition-colors shadow-lg';
+                        syntaxResult.className = 'w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-slate-300 relative transition-all duration-300';
+                    }
+                });
+            }
+            
+            // --- Slide 6 Utilities ---
+            function buildSlide6Grid() {
+                const container = document.getElementById('grid-s6');
+                const cols = ['A', 'B', 'C'];
+
+                // Header Row
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+
+                // Row 1
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('', 'demo-cell')); // A1
+                const b1 = createCell('39', 'demo-cell font-bold text-white');
+                b1.id = 's6-b1';
+                b1.style.cursor = 'pointer';
+                container.appendChild(b1);
+                container.appendChild(createCell('', 'demo-cell')); // C1
+
+                // Row 2
+                container.appendChild(createCell('2', 'demo-header'));
+                const a2 = createCell('320', 'demo-cell font-bold text-white');
+                a2.id = 's6-a2';
+                a2.style.cursor = 'pointer';
+                container.appendChild(a2);
+                container.appendChild(createCell('', 'demo-cell')); // B2
+                
+                // Transformed C2 into a true input field container
+                const c2Container = createCell('', 'demo-cell relative p-0');
+                c2Container.id = 's6-c2-container';
+                
+                const c2Input = document.createElement('input');
+                c2Input.type = 'text';
+                c2Input.id = 's6-c2';
+                c2Input.className = 'absolute inset-0 w-full h-full bg-transparent text-center font-bold text-emerald-400 focus:outline-none cursor-pointer';
+                c2Input.readOnly = true; // Readonly until clicked
+                c2Container.appendChild(c2Input);
+                
+                container.appendChild(c2Container);
+
+                // Row 3
+                container.appendChild(createCell('3', 'demo-header'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                
+                initSlide6Interaction();
+            }
+
+            window.s6State = 0;
+            
+            window.updateS6State = function(newState) {
+                window.s6State = newState;
+                for(let i=1; i<=6; i++) {
+                    const stepEl = document.getElementById('s6-step-'+i);
+                    if (!stepEl) continue;
+                    
+                    if(i === newState + 1) {
+                        stepEl.className = 'text-indigo-400 font-bold scale-105 origin-left transform transition-all duration-300';
+                    } else if (i <= newState) {
+                        stepEl.className = 'text-emerald-500 opacity-60 transition-all duration-300 flex items-center gap-2';
+                        if (!stepEl.innerHTML.includes('fa-check')) {
+                             stepEl.innerHTML = '<i class="fa-solid fa-check"></i> ' + stepEl.innerHTML;
+                        }
+                    } else {
+                        stepEl.className = 'text-slate-500 transition-all duration-300';
+                    }
+                }
+            }
+
+            function initSlide6Interaction() {
+                const c2Input = document.getElementById('s6-c2');
+                const c2Container = document.getElementById('s6-c2-container');
+                const a2 = document.getElementById('s6-a2');
+                const b1 = document.getElementById('s6-b1');
+
+                c2Container.addEventListener('click', () => {
+                    if (window.s6State === 0) {
+                        c2Container.classList.add('active-typing');
+                        c2Input.readOnly = false;
+                        c2Input.focus();
+                        updateS6State(1);
+                    } else if (window.s6State === 1 || window.s6State === 3 || window.s6State === 5) {
+                        c2Input.focus();
+                    }
+                });
+
+                // Listen to actual typing instead of global keystrokes
+                c2Input.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    if (window.s6State === 1) {
+                        if (val.includes('=')) {
+                            e.target.value = '=';
+                            updateS6State(2);
+                        } else {
+                            e.target.value = ''; // Enforce strict tutorial logic
+                        }
+                    } else if (window.s6State === 3) {
+                        if (val.includes('-')) {
+                            e.target.value = '=A2-';
+                            updateS6State(4);
+                        } else {
+                            e.target.value = '=A2';
+                        }
+                    } else if (window.s6State === 5) {
+                        e.target.value = '=A2-B1'; // Don't allow changing before enter
+                    }
+                });
+                
+                c2Input.addEventListener('keydown', (e) => {
+                    if (window.s6State === 5 && e.key === 'Enter') {
+                        e.preventDefault();
+                        c2Input.value = '281';
+                        c2Input.readOnly = true;
+                        c2Input.blur();
+                        
+                        c2Input.classList.remove('text-emerald-400');
+                        c2Input.classList.add('text-white');
+                        
+                        c2Container.classList.remove('active-typing');
+                        c2Container.classList.add('highlight-cell');
+                        a2.classList.remove('excel-selected-blue');
+                        b1.classList.remove('excel-selected-red');
+                        updateS6State(6);
+                        document.getElementById('s6-success').classList.remove('hidden');
+                        document.getElementById('s6-success').classList.add('flex');
+                    }
+                });
+
+                a2.addEventListener('click', () => {
+                    if (window.s6State === 2) {
+                        a2.classList.add('excel-selected-blue');
+                        c2Input.value = '=A2';
+                        c2Input.readOnly = false;
+                        c2Input.focus(); // Keep focus active to type the minus sign
+                        updateS6State(3);
+                    }
+                });
+                
+                b1.addEventListener('click', () => {
+                    if (window.s6State === 4) {
+                        b1.classList.add('excel-selected-red');
+                        c2Input.value = '=A2-B1';
+                        c2Input.readOnly = false;
+                        c2Input.focus(); // Keep focus active to press Enter
+                        updateS6State(5);
+                    }
+                });
+            }
+
+            // --- Slide 7 logic (Rows & Cols) ---
+            function buildSlide7Grid() {
+                const container = document.getElementById('grid-s7');
+                const cols = ['A', 'B', 'C', 'D'];
+                const numRows = 4;
+
+                // Top-left empty
+                container.appendChild(createCell('', 'demo-header'));
+                
+                // Col Headers
+                cols.forEach(c => {
+                    const th = createCell(c, 'demo-header hover:bg-slate-600 hover:text-white cursor-pointer transition-colors');
+                    th.addEventListener('click', () => selectFullColumn(c));
+                    container.appendChild(th);
+                });
+
+                for (let r = 1; r <= numRows; r++) {
+                    const rh = createCell(r, 'demo-header hover:bg-slate-600 hover:text-white cursor-pointer transition-colors');
+                    rh.addEventListener('click', () => selectFullRow(r));
+                    container.appendChild(rh);
+                    
+                    for (let c = 0; c < cols.length; c++) {
+                        const cell = createCell('', 'demo-cell transition-colors duration-200');
+                        cell.id = `s7-cell-${cols[c]}${r}`;
+                        cell.dataset.colName = cols[c];
+                        cell.dataset.row = r;
+                        container.appendChild(cell);
+                    }
+                }
+            }
+
+            function selectFullColumn(colName) {
+                clearS7Selection();
+                const display = document.getElementById('s7-range-display');
+                display.textContent = `${colName}:${colName}`;
+                
+                document.querySelectorAll('#grid-s7 .demo-cell').forEach(cell => {
+                    if (cell.dataset.colName === colName) {
+                        cell.classList.add('range-selected');
+                    }
+                });
+            }
+
+            function selectFullRow(rowNum) {
+                clearS7Selection();
+                const display = document.getElementById('s7-range-display');
+                display.textContent = `${rowNum}:${rowNum}`;
+                
+                document.querySelectorAll('#grid-s7 .demo-cell').forEach(cell => {
+                    if (parseInt(cell.dataset.row) === rowNum) {
+                        cell.classList.add('range-selected');
+                    }
+                });
+            }
+
+            function clearS7Selection() {
+                document.querySelectorAll('#grid-s7 .demo-cell').forEach(cell => {
+                    cell.classList.remove('range-selected');
+                });
+            }
+
+            // --- Slide 8 Range Logic ---
+            let isDragging = false;
+            let rangeStart = null;
+            let rangeEnd = null;
+
+            function buildSlide8Grid() {
+                const container = document.getElementById('grid-s8');
+                const cols = ['A', 'B', 'C', 'D'];
+                const numRows = 5;
+
+                // Header Row
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+
+                // Rows
+                for (let r = 1; r <= numRows; r++) {
+                    container.appendChild(createCell(r, 'demo-header'));
+                    
+                    for (let c = 0; c < cols.length; c++) {
+                        const cell = createCell('', 'demo-cell transition-colors duration-100');
+                        // Store coordinates for easy math later
+                        cell.dataset.col = c;
+                        cell.dataset.row = r;
+                        cell.dataset.colName = cols[c];
+                        cell.id = `s8-${cols[c]}${r}`;
+                        
+                        // Event Listeners for dragging
+                        cell.addEventListener('mousedown', (e) => startRangeSelect(e, c, r, cols[c]));
+                        cell.addEventListener('mouseenter', (e) => updateRangeSelect(e, c, r, cols[c]));
+                        
+                        container.appendChild(cell);
+                    }
+                }
+                
+                // Stop dragging when mouse goes up anywhere on the window
+                window.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        document.getElementById('s8-success').classList.remove('opacity-0');
+                    }
+                });
+            }
+
+            function startRangeSelect(e, colIdx, rowIdx, colName) {
+                isDragging = true;
+                rangeStart = { colIdx, rowIdx, colName };
+                rangeEnd = { colIdx, rowIdx, colName };
+                renderRange();
+            }
+
+            function updateRangeSelect(e, colIdx, rowIdx, colName) {
+                if (!isDragging) return;
+                rangeEnd = { colIdx, rowIdx, colName };
+                renderRange();
+            }
+
+            function renderRange() {
+                if (!rangeStart || !rangeEnd) return;
+
+                const minCol = Math.min(rangeStart.colIdx, rangeEnd.colIdx);
+                const maxCol = Math.max(rangeStart.colIdx, rangeEnd.colIdx);
+                const minRow = Math.min(rangeStart.rowIdx, rangeEnd.rowIdx);
+                const maxRow = Math.max(rangeStart.rowIdx, rangeEnd.rowIdx);
+
+                const cols = ['A', 'B', 'C', 'D'];
+                const displayArea = document.getElementById('range-display');
+
+                // Clear previous selection
+                document.querySelectorAll('#grid-s8 .demo-cell').forEach(cell => {
+                    cell.classList.remove('range-selected');
+                });
+
+                // Apply new selection
+                for (let r = minRow; r <= maxRow; r++) {
+                    for (let c = minCol; c <= maxCol; c++) {
+                        const cellId = `s8-${cols[c]}${r}`;
+                        const cell = document.getElementById(cellId);
+                        if (cell) {
+                            cell.classList.add('range-selected');
+                        }
+                    }
+                }
+
+                // Update text display
+                const startLabel = `${cols[minCol]}${minRow}`;
+                const endLabel = `${cols[maxCol]}${maxRow}`;
+                
+                if (startLabel === endLabel) {
+                    displayArea.textContent = startLabel;
+                } else {
+                    displayArea.textContent = `${startLabel}:${endLabel}`;
+                }
+            }
+
+            // --- Slide 9 Logic ---
+            window.setOperator = function(op) {
+                const resultEl = document.getElementById('s9-result');
+                const formulaEl = document.getElementById('s9-formula-op');
+                
+                document.querySelectorAll('.s9-op-btn').forEach(btn => {
+                    btn.classList.remove('bg-emerald-600', 'border-emerald-400');
+                    btn.classList.add('bg-slate-700', 'border-slate-600');
+                });
+                
+                const activeBtn = document.getElementById('btn-op-' + (op === '*' ? 'mul' : op === '/' ? 'div' : op === '+' ? 'add' : 'sub'));
+                activeBtn.classList.remove('bg-slate-700', 'border-slate-600');
+                activeBtn.classList.add('bg-emerald-600', 'border-emerald-400');
+                
+                formulaEl.textContent = op;
+                
+                let val1 = 120;
+                let val2 = 10;
+                let res = 0;
+                
+                if (op === '+') res = val1 + val2;
+                if (op === '-') res = val1 - val2;
+                if (op === '*') res = val1 * val2;
+                if (op === '/') res = val1 / val2;
+                
+                resultEl.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    resultEl.textContent = res;
+                    resultEl.style.transform = 'scale(1.1)';
+                    setTimeout(() => resultEl.style.transform = 'scale(1)', 200);
+                }, 150);
+            }
+
+            // --- Slide 10 Logic ---
+            function buildSlide10Grid() {
+                const container = document.getElementById('grid-s10');
+                const cols = ['A', 'B', 'C', 'D'];
+
+                // Header Row
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+
+                // Row 1 (Headers)
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('Item', 'demo-cell font-bold text-slate-400 text-sm')); 
+                container.appendChild(createCell('Qty', 'demo-cell font-bold text-slate-400 text-sm')); 
+                container.appendChild(createCell('Price', 'demo-cell font-bold text-slate-400 text-sm')); 
+                container.appendChild(createCell('Total', 'demo-cell font-bold text-amber-400 text-sm')); 
+
+                // Row 2 (Data)
+                container.appendChild(createCell('2', 'demo-header'));
+                container.appendChild(createCell('Apples', 'demo-cell text-slate-300 text-sm')); 
+                
+                const b2 = createCell('5', 'demo-cell font-bold text-white');
+                b2.id = 's10-b2';
+                b2.style.cursor = 'pointer';
+                container.appendChild(b2);
+                
+                const c2 = createCell('20', 'demo-cell font-bold text-white');
+                c2.id = 's10-c2';
+                c2.style.cursor = 'pointer';
+                container.appendChild(c2);
+                
+                // D2 Input
+                const d2Container = createCell('', 'demo-cell relative p-0');
+                d2Container.id = 's10-d2-container';
+                
+                const d2Input = document.createElement('input');
+                d2Input.type = 'text';
+                d2Input.id = 's10-d2';
+                d2Input.className = 'absolute inset-0 w-full h-full bg-transparent text-center font-bold text-amber-400 focus:outline-none cursor-pointer';
+                d2Input.readOnly = true; 
+                d2Container.appendChild(d2Input);
+                
+                container.appendChild(d2Container);
+
+                // Row 3 (Empty)
+                container.appendChild(createCell('3', 'demo-header'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                container.appendChild(createCell('', 'demo-cell'));
+                
+                initSlide10Interaction();
+            }
+
+            window.s10State = 0;
+            
+            window.updateS10State = function(newState) {
+                window.s10State = newState;
+                for(let i=1; i<=6; i++) {
+                    const stepEl = document.getElementById('s10-step-'+i);
+                    if (!stepEl) continue;
+                    
+                    if(i === newState + 1) {
+                        stepEl.className = 'text-amber-400 font-bold scale-105 origin-left transform transition-all duration-300';
+                    } else if (i <= newState) {
+                        stepEl.className = 'text-emerald-500 opacity-60 transition-all duration-300 flex items-center gap-2';
+                        if (!stepEl.innerHTML.includes('fa-check')) {
+                             stepEl.innerHTML = '<i class="fa-solid fa-check"></i> ' + stepEl.innerHTML;
+                        }
+                    } else {
+                        stepEl.className = 'text-slate-500 transition-all duration-300';
+                    }
+                }
+            }
+
+            function initSlide10Interaction() {
+                const d2Input = document.getElementById('s10-d2');
+                const d2Container = document.getElementById('s10-d2-container');
+                const b2 = document.getElementById('s10-b2');
+                const c2 = document.getElementById('s10-c2');
+
+                d2Container.addEventListener('click', () => {
+                    if (window.s10State === 0) {
+                        d2Container.classList.add('active-typing');
+                        // Use !important rules matching slide 6 behavior
+                        d2Container.style.border = '2px solid #10b981';
+                        d2Input.readOnly = false;
+                        d2Input.focus();
+                        updateS10State(1);
+                    } else if (window.s10State === 1 || window.s10State === 3 || window.s10State === 5) {
+                        d2Input.focus();
+                    }
+                });
+
+                d2Input.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    if (window.s10State === 1) {
+                        if (val.includes('=')) {
+                            e.target.value = '=';
+                            updateS10State(2);
+                        } else {
+                            e.target.value = '';
+                        }
+                    } else if (window.s10State === 3) {
+                        if (val.includes('*')) {
+                            e.target.value = '=B2*';
+                            updateS10State(4);
+                        } else {
+                            e.target.value = '=B2';
+                        }
+                    } else if (window.s10State === 5) {
+                        e.target.value = '=B2*C2'; 
+                    }
+                });
+                
+                d2Input.addEventListener('keydown', (e) => {
+                    if (window.s10State === 5 && e.key === 'Enter') {
+                        e.preventDefault();
+                        d2Input.value = '100';
+                        d2Input.readOnly = true;
+                        d2Input.blur();
+                        
+                        d2Input.classList.remove('text-amber-400');
+                        d2Input.classList.add('text-white');
+                        
+                        d2Container.style.border = 'none';
+                        d2Container.classList.remove('active-typing');
+                        d2Container.classList.add('highlight-cell'); 
+                        b2.classList.remove('excel-selected-blue');
+                        c2.classList.remove('excel-selected-red');
+                        updateS10State(6);
+                        
+                        document.getElementById('final-sandbox-btn').classList.remove('opacity-0', 'pointer-events-none');
+                        document.getElementById('final-sandbox-btn').classList.add('opacity-100');
+                    }
+                });
+
+                b2.addEventListener('click', () => {
+                    if (window.s10State === 2) {
+                        b2.classList.add('excel-selected-blue');
+                        d2Input.value = '=B2';
+                        d2Input.readOnly = false;
+                        d2Input.focus();
+                        updateS10State(3);
+                    }
+                });
+                
+                c2.addEventListener('click', () => {
+                    if (window.s10State === 4) {
+                        c2.classList.add('excel-selected-red');
+                        d2Input.value = '=B2*C2';
+                        d2Input.readOnly = false;
+                        d2Input.focus();
+                        updateS10State(5);
+                    }
+                });
+            }
+
+            // --- Slide 11 Manim Animation Logic ---
+            let manimState = 0;
+            
+            window.playManimAnimation = function() {
+                const formula = document.getElementById('manim-formula');
+                const num1 = document.getElementById('manim-num-1');
+                const num2 = document.getElementById('manim-num-2');
+                const arrow = document.getElementById('manim-arrow');
+                const btn = document.getElementById('s11-play-btn');
+                const explanation = document.getElementById('s11-explanation');
+
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                if (manimState === 0) {
+                    // Move to Row 2
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Animating...';
+                    
+                    // 1. Show Arrow
+                    arrow.style.opacity = '1';
+                    arrow.style.height = '60px'; // Point down
+                    
+                    setTimeout(() => {
+                        // 2. Move Formula Box down
+                        formula.style.top = '41%';
+                        
+                        // 3. Transform the numbers inside while moving
+                        setTimeout(() => {
+                            num1.style.color = '#10b981'; // Emerald
+                            num2.style.color = '#10b981';
+                            
+                            // Flicker effect for transformation
+                            num1.style.opacity = '0';
+                            num2.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                num1.textContent = '2';
+                                num2.textContent = '2';
+                                num1.style.opacity = '1';
+                                num2.style.opacity = '1';
+                            }, 200);
+
+                        }, 400); // Trigger mid-flight
+                        
+                        setTimeout(() => {
+                            // Reset Arrow for next step, update button
+                            arrow.style.opacity = '0';
+                            arrow.style.height = '0px';
+                            arrow.style.top = '58%'; // Move origin for next jump
+                            
+                            btn.disabled = false;
+                            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            btn.innerHTML = 'Continue Animation <i class="fa-solid fa-forward-step"></i>';
+                            manimState = 1;
+                        }, 1200);
+                        
+                    }, 800);
+                } else if (manimState === 1) {
+                    // Move to Row 3
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Animating...';
+                    
+                    arrow.style.opacity = '1';
+                    arrow.style.height = '60px'; 
+                    
+                    setTimeout(() => {
+                        formula.style.top = '74%';
+                        
+                        setTimeout(() => {
+                            num1.style.color = '#38bdf8'; // Sky Blue
+                            num2.style.color = '#38bdf8';
+                            
+                            num1.style.opacity = '0';
+                            num2.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                num1.textContent = '3';
+                                num2.textContent = '3';
+                                num1.style.opacity = '1';
+                                num2.style.opacity = '1';
+                            }, 200);
+                        }, 400); 
+                        
+                        setTimeout(() => {
+                            arrow.style.opacity = '0';
+                            explanation.classList.remove('opacity-0');
+                            
+                            btn.disabled = false;
+                            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Reset';
+                            manimState = 2;
+                        }, 1200);
+                        
+                    }, 800);
+                } else {
+                    // Reset to initial state
+                    btn.innerHTML = '<i class="fa-solid fa-play"></i> Play Animation';
+                    
+                    formula.style.transition = 'none'; // Instant snap back
+                    formula.style.top = '8%';
+                    
+                    num1.style.transition = 'none';
+                    num2.style.transition = 'none';
+                    num1.style.color = '#fuchsia';
+                    num2.style.color = '#fuchsia';
+                    num1.textContent = '1';
+                    num2.textContent = '1';
+                    
+                    arrow.style.transition = 'none';
+                    arrow.style.top = '25%';
+                    arrow.style.height = '0px';
+                    arrow.style.opacity = '0';
+                    
+                    explanation.classList.add('opacity-0');
+                    
+                    // Restore transitions after snapping
+                    setTimeout(() => {
+                         formula.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+                         num1.style.transition = 'color 0.5s ease, opacity 0.2s ease';
+                         num2.style.transition = 'color 0.5s ease, opacity 0.2s ease';
+                         arrow.style.transition = 'opacity 0.5s ease, height 1s ease';
+                    }, 50);
+
+                    manimState = 0;
+                }
+            }
+
+            // --- Slide 12 Logic (Fill Handle) ---
+            let isFilling = false;
+            let fillEndRow = null;
+
+            function buildSlide12Grid() {
+                const container = document.getElementById('grid-s12');
+                const cols = ['A', 'B', 'C'];
+                
+                // Header
+                container.appendChild(createCell('', 'demo-header'));
+                cols.forEach(c => container.appendChild(createCell(c, 'demo-header')));
+                
+                // Header row 1
+                container.appendChild(createCell('1', 'demo-header'));
+                container.appendChild(createCell('Value 1', 'demo-cell font-bold text-slate-400 text-xs')); 
+                container.appendChild(createCell('Value 2', 'demo-cell font-bold text-slate-400 text-xs')); 
+                container.appendChild(createCell('Total', 'demo-cell font-bold text-emerald-400 text-xs'));
+                
+                const data = [
+                    { A: 10, B: 20 },
+                    { A: 25, B: 30 },
+                    { A: 50, B: 50 }
+                ];
+                
+                for (let r = 2; r <= 4; r++) {
+                    container.appendChild(createCell(r, 'demo-header'));
+                    
+                    container.appendChild(createCell(data[r-2].A, 'demo-cell text-white'));
+                    container.appendChild(createCell(data[r-2].B, 'demo-cell text-white'));
+                    
+                    const cellC = createCell('', 'demo-cell relative transition-all');
+                    cellC.id = `s12-C${r}`;
+                    
+                    if (r === 2) {
+                        cellC.textContent = '30';
+                        cellC.classList.add('text-emerald-400', 'font-bold');
+                        cellC.style.border = '2px solid #10b981';
+                        
+                        const handle = document.createElement('div');
+                        handle.className = 'fill-handle';
+                        
+                        handle.addEventListener('mousedown', (e) => {
+                            isFilling = true;
+                            fillEndRow = 2;
+                            e.preventDefault();
+                        });
+                        
+                        cellC.appendChild(handle);
+                    }
+                    
+                    cellC.addEventListener('mouseenter', () => {
+                        if (isFilling && r > 2) {
+                            fillEndRow = r;
+                            renderFillPreview();
+                        }
+                    });
+                    
+                    container.appendChild(cellC);
+                }
+                
+                window.addEventListener('mouseup', () => {
+                    if (isFilling) {
+                        isFilling = false;
+                        applyFill(data);
+                    }
+                });
+            }
+
+            function renderFillPreview() {
+                for (let r = 3; r <= 4; r++) {
+                    const cell = document.getElementById(`s12-C${r}`);
+                    cell.classList.remove('fill-preview', 'fill-preview-bottom');
+                    
+                    if (r <= fillEndRow) {
+                        cell.classList.add('fill-preview');
+                        if (r === fillEndRow) {
+                            cell.classList.add('fill-preview-bottom');
+                        }
+                    }
+                }
+            }
+
+            function applyFill(data) {
+                let filled = false;
+                for (let r = 3; r <= 4; r++) {
+                    const cell = document.getElementById(`s12-C${r}`);
+                    cell.classList.remove('fill-preview', 'fill-preview-bottom');
+                    
+                    if (r <= fillEndRow) {
+                        const sum = data[r-2].A + data[r-2].B;
+                        cell.textContent = sum;
+                        cell.classList.add('text-emerald-400', 'font-bold', 'bg-slate-800');
+                        filled = true;
+                        
+                        // Small animation
+                        cell.style.transform = 'scale(0.95)';
+                        setTimeout(() => cell.style.transform = 'scale(1)', 150);
+                    }
+                }
+                
+                if (filled && fillEndRow === 4) {
+                    document.getElementById('s12-success').classList.remove('hidden');
+                    document.getElementById('s12-success').classList.add('flex');
+                }
+            }
+
+            // Init first UI state
+            updateUI();
+        });
+    </script>
+
+    <!-- MERGED SANDBOX -->
+    <div id="sandbox-wrapper" class="absolute top-0 left-0 w-full h-full z-50 bg-[#0f172a] flex-col" style="display: none;">
+        <!-- Top Navigation -->
+        <header class="bg-slate-900 border-b border-slate-700 py-3 px-6 flex justify-between items-center z-10">
+            <div class="flex items-center gap-3">
+                <button onclick="document.getElementById('sandbox-wrapper').style.display = 'none';" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Lesson
+                </button>
+                <div class="h-6 w-px bg-slate-700 mx-2"></div>
+                <div class="text-emerald-400 font-bold text-xl flex items-center gap-2">
+                    <i class="fa-solid fa-flask"></i> Interactive Sandbox
+                </div>
+            </div>
+            <div class="text-slate-400 text-sm">
+                W3Schools Style Practice
+            </div>
+        </header>
+
+        <!-- Split Pane Container -->
+        <div class="layout-container">
+            <!-- Left Pane: Instructions -->
+            <div class="instructions-pane flex flex-col">
+                <h1 class="text-3xl font-bold text-white mb-2">Exercise: Revenue Total</h1>
+                <p class="text-slate-400 mb-8 leading-relaxed">
+                    Use the grid on the right to calculate the total revenue for our fruit stand. Remember to start all formulas with an equals sign (<code class="text-emerald-400 bg-slate-800 px-1 rounded">=</code>).
+                </p>
+
+                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700 mb-8 flex-1">
+                    <h2 class="text-lg font-semibold text-white mb-4 uppercase tracking-wider text-sm">Your Tasks:</h2>
+                    <ul class="space-y-4">
+                        <li id="task-1" class="task-item flex items-start gap-3 text-slate-300">
+                            <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
+                            <div>
+                                <strong>Apples Total:</strong> In cell <code>D2</code>, multiply the Quantity (B2) by the Price (C2).
+                                <div class="text-sm text-slate-500 mt-1">Hint: Type =B2*C2</div>
+                            </div>
+                        </li>
+                        <li id="task-2" class="task-item flex items-start gap-3 text-slate-300">
+                            <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
+                            <div>
+                                <strong>Oranges Total:</strong> In cell <code>D4</code>, multiply the Quantity (B4) by the Price (C4).
+                            </div>
+                        </li>
+                        <li id="task-3" class="task-item flex items-start gap-3 text-slate-300">
+                            <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
+                            <div>
+                                <strong>Grand Total:</strong> In cell <code>D5</code>, use the SUM function to add up all the totals in column D.
+                                <div class="text-sm text-slate-500 mt-1">Hint: Type =SUM(D2:D4)</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Success Message -->
+                <div id="success-banner" class="bg-emerald-900/40 border border-emerald-500 rounded-xl p-6 text-center transform scale-95 opacity-0 transition-all duration-500 hidden">
+                    <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-[0_0_20px_rgba(16,185,129,0.5)]">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-emerald-400 mb-2">Excellent Work!</h3>
+                    <p class="text-slate-300 mb-6">You've successfully mastered cell references, math operators, and functions.</p>
+                    <button class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-2 rounded-lg font-bold transition-colors w-full" onclick="document.getElementById('sandbox-wrapper').style.display = 'none';">
+                        Return to Lesson <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Pane: Spreadsheet -->
+            <div class="spreadsheet-pane">
+                <div class="formula-bar-container">
+                    <div id="active-cell-label" class="active-cell-indicator">A1</div>
+                    <div class="text-slate-500 font-mono italic px-2">fx</div>
+                    <input type="text" id="main-formula-input" class="formula-input" placeholder="Select a cell to start typing...">
+                </div>
+                <div class="grid-wrapper">
+                    <div id="grid-container" class="spreadsheet">
+                        <!-- JS will generate -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    /* Sandbox JS */
+    document.addEventListener('DOMContentLoaded', () => {
+        const COLS = ['A', 'B', 'C', 'D', 'E'];
+        const ROWS = 8;
+        
+        const cellData = {
+            'A1': { value: 'Item', formula: 'Item', readonly: true },
+            'B1': { value: 'Quantity', formula: 'Quantity', readonly: true },
+            'C1': { value: 'Price ($)', formula: 'Price ($)', readonly: true },
+            'D1': { value: 'Total ($)', formula: 'Total ($)', readonly: true },
+            
+            'A2': { value: 'Apples', formula: 'Apples' },
+            'B2': { value: '10', formula: '10' },
+            'C2': { value: '2', formula: '2' },
+            'D2': { value: '', formula: '' },
+            
+            'A3': { value: 'Bananas', formula: 'Bananas' },
+            'B3': { value: '5', formula: '5' },
+            'C3': { value: '3', formula: '3' },
+            'D3': { value: '15', formula: '=B3*C3' },
+            
+            'A4': { value: 'Oranges', formula: 'Oranges' },
+            'B4': { value: '8', formula: '8' },
+            'C4': { value: '4', formula: '4' },
+            'D4': { value: '', formula: '' },
+
+            'C5': { value: 'GRAND TOTAL:', formula: 'GRAND TOTAL:', readonly: true },
+            'D5': { value: '', formula: '' }
+        };
+
+        let activeCellId = null;
+        let isEditing = false;
+
+        const gridContainer = document.getElementById('grid-container');
+        const formulaBar = document.getElementById('main-formula-input');
+        const activeCellLabel = document.getElementById('active-cell-label');
+
+        function buildGrid() {
+            gridContainer.style.gridTemplateColumns = `40px repeat(${COLS.length}, 120px)`;
+            gridContainer.appendChild(createDiv('cell header', ''));
+            COLS.forEach(col => gridContainer.appendChild(createDiv('cell header', col)));
+
+            for (let r = 1; r <= ROWS; r++) {
+                gridContainer.appendChild(createDiv('cell header row-header', r));
+                COLS.forEach(col => {
+                    const cellId = `${col}${r}`;
+                    const cellEl = createDiv('cell', '');
+                    cellEl.id = `cell-${cellId}`;
+                    cellEl.dataset.id = cellId;
+                    
+                    if (cellData[cellId]) {
+                        cellEl.textContent = cellData[cellId].value;
+                        if (cellData[cellId].readonly) {
+                            cellEl.classList.add('bg-slate-800', 'font-semibold');
+                        }
+                    } else {
+                        cellData[cellId] = { value: '', formula: '' };
+                    }
+
+                    cellEl.addEventListener('mousedown', () => selectCell(cellId));
+                    cellEl.addEventListener('dblclick', () => startEditing(cellId));
+                    gridContainer.appendChild(cellEl);
+                });
+            }
+        }
+
+        function createDiv(className, text) {
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = text;
+            return div;
+        }
+
+        function selectCell(cellId) {
+            if (isEditing) finishEditing();
+            if (activeCellId) {
+                const prev = document.getElementById(`cell-${activeCellId}`);
+                if(prev) prev.classList.remove('selected');
+            }
+            activeCellId = cellId;
+            const activeCellEl = document.getElementById(`cell-${activeCellId}`);
+            activeCellEl.classList.add('selected');
+            activeCellLabel.textContent = cellId;
+            formulaBar.value = cellData[cellId].formula || '';
+            formulaBar.disabled = cellData[cellId].readonly === true;
+        }
+
+        function startEditing(cellId) {
+            if (cellData[cellId].readonly) return;
+            isEditing = true;
+            const cellEl = document.getElementById(`cell-${cellId}`);
+            const input = document.createElement('input');
+            input.className = 'cell-input';
+            input.value = cellData[cellId].formula;
+            cellEl.textContent = '';
+            cellEl.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', () => saveCell(cellId, input.value));
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    saveCell(cellId, input.value);
+                    const col = cellId.charAt(0);
+                    const row = parseInt(cellId.substring(1));
+                    if (row < ROWS) selectCell(`${col}${row + 1}`);
+                }
+            });
+        }
+
+        function finishEditing() {
+            if (!activeCellId || !isEditing) return;
+            const cellEl = document.getElementById(`cell-${activeCellId}`);
+            const input = cellEl.querySelector('input');
+            if (input) saveCell(activeCellId, input.value);
+        }
+
+        formulaBar.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && activeCellId) {
+                saveCell(activeCellId, formulaBar.value);
+                formulaBar.blur(); 
+                selectCell(activeCellId);
+            }
+        });
+
+        function saveCell(cellId, rawInput) {
+            isEditing = false;
+            cellData[cellId].formula = rawInput;
+            const displayValue = evaluateFormula(rawInput);
+            cellData[cellId].value = displayValue;
+            const cellEl = document.getElementById(`cell-${cellId}`);
+            cellEl.innerHTML = '';
+            cellEl.textContent = displayValue;
+            formulaBar.value = rawInput;
+            recalculateGrid();
+            checkTasks();
+        }
+
+        function recalculateGrid() {
+            Object.keys(cellData).forEach(id => {
+                if (cellData[id].formula && cellData[id].formula.toString().startsWith('=')) {
+                    const newVal = evaluateFormula(cellData[id].formula);
+                    cellData[id].value = newVal;
+                    document.getElementById(`cell-${id}`).textContent = newVal;
+                }
+            });
+        }
+
+        function evaluateFormula(expr) {
+            if (!expr) return '';
+            expr = expr.toString().trim().toUpperCase();
+            if (!expr.startsWith('=')) return expr;
+
+            let mathString = expr.substring(1);
+            try {
+                if (mathString.startsWith('SUM(')) {
+                    const sumRegex = /SUM\(([A-Z])([0-9]+):([A-Z])([0-9]+)\)/;
+                    const match = mathString.match(sumRegex);
+                    if (match) {
+                        const startCol = match[1];
+                        const startRow = parseInt(match[2]);
+                        const endCol = match[3];
+                        const endRow = parseInt(match[4]);
+                        let total = 0;
+                        if (startCol === endCol) {
+                            for (let r = startRow; r <= endRow; r++) {
+                                const refId = `${startCol}${r}`;
+                                const val = parseFloat(cellData[refId]?.value) || 0;
+                                total += val;
+                            }
+                            return total;
+                        } else return '#REF!';
+                    } else return '#SYNTAX!';
+                }
+
+                const cellRefRegex = /[A-Z][0-9]+/g;
+                mathString = mathString.replace(cellRefRegex, (match) => {
+                    const val = parseFloat(cellData[match]?.value);
+                    return isNaN(val) ? 0 : val;
+                });
+
+                if (/^[0-9+\-*/.\s()]+$/.test(mathString)) {
+                    const result = new Function('return ' + mathString)();
+                    return Math.round(result * 100) / 100;
+                } else throw new Error("Invalid characters");
+
+            } catch (error) {
+                return '#ERROR!';
+            }
+        }
+
+        let task1Done = false;
+        let task2Done = false;
+        let task3Done = false;
+
+        function checkTasks() {
+            if (!task1Done && cellData['D2'].value == 20 && cellData['D2'].formula.startsWith('=')) {
+                completeTask('task-1');
+                task1Done = true;
+            }
+            if (!task2Done && cellData['D4'].value == 32 && cellData['D4'].formula.startsWith('=')) {
+                completeTask('task-2');
+                task2Done = true;
+            }
+            if (task1Done && task2Done && !task3Done && cellData['D5'].value == 67) {
+                if (cellData['D5'].formula.includes('SUM')) {
+                    completeTask('task-3');
+                    task3Done = true;
+                    setTimeout(() => {
+                        const banner = document.getElementById('success-banner');
+                        banner.classList.remove('hidden');
+                        void banner.offsetWidth;
+                        banner.classList.remove('opacity-0', 'scale-95');
+                        banner.classList.add('opacity-100', 'scale-100');
+                    }, 500);
+                }
+            }
+        }
+
+        function completeTask(taskId) {
+            const li = document.getElementById(taskId);
+            li.classList.add('task-done');
+            li.querySelector('i').className = 'fa-solid fa-check-circle';
+        }
+
+        buildGrid();
+        selectCell('A1');
+        
+        document.addEventListener('keydown', (e) => {
+            if (isEditing || !activeCellId) return;
+            // Prevent navigation if the sandbox is actually open
+            if (document.getElementById('sandbox-wrapper').style.display === 'flex') {
+                if (document.activeElement === formulaBar && e.key !== 'Enter') return;
+                
+                const col = activeCellId.charCodeAt(0);
+                const row = parseInt(activeCellId.substring(1));
+                let nextCellId = null;
+
+                if (e.key === 'ArrowRight' && col < COLS[COLS.length-1].charCodeAt(0)) nextCellId = String.fromCharCode(col + 1) + row;
+                else if (e.key === 'ArrowLeft' && col > COLS[0].charCodeAt(0)) nextCellId = String.fromCharCode(col - 1) + row;
+                else if (e.key === 'ArrowDown' && row < ROWS) nextCellId = String.fromCharCode(col) + (row + 1);
+                else if (e.key === 'ArrowUp' && row > 1) nextCellId = String.fromCharCode(col) + (row - 1);
+
+                if (nextCellId) {
+                    e.preventDefault();
+                    selectCell(nextCellId);
+                }
+            }
+        });
+    });
+    </script>
+</body>
+</html>
