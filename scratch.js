@@ -200,7 +200,7 @@ const slides13_16_HTML = `
                 </h2>
                 
                 <!-- Game Rules Bar -->
-                <div class="grid grid-cols-3 gap-2 mb-3">
+                <div class="grid grid-cols-4 gap-1.5 mb-3">
                     <div id="s16-rule-r1" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
                         <div class="text-slate-400 font-bold">Range 1</div>
                         <div id="s16-r1-count" class="text-emerald-400 font-bold font-mono">4 cells ✅</div>
@@ -208,13 +208,18 @@ const slides13_16_HTML = `
                     </div>
                     <div id="s16-rule-r2" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
                         <div class="text-slate-400 font-bold">Range 2</div>
-                        <div id="s16-r2-count" class="text-rose-400 font-bold font-mono">4 cells ✅</div>
+                        <div id="s16-r2-count" class="text-cyan-400 font-bold font-mono">4 cells ✅</div>
                         <div class="text-[10px] text-slate-500">Min 4 cells</div>
                     </div>
                     <div id="s16-rule-total" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
                         <div class="text-slate-400 font-bold">Combined</div>
                         <div id="s16-tot-count" class="text-cyan-400 font-bold font-mono">8 / 20 ✅</div>
                         <div class="text-[10px] text-slate-500">Max 20 cells</div>
+                    </div>
+                    <div id="s16-rule-overlap" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-400 font-bold">No Overlap</div>
+                        <div id="s16-overlap-status" class="text-emerald-400 font-bold font-mono">None ✅</div>
+                        <div class="text-[10px] text-slate-500">1 use / cell</div>
                     </div>
                 </div>
 
@@ -226,9 +231,9 @@ const slides13_16_HTML = `
                             <span class="text-xs font-bold uppercase text-emerald-400 flex items-center gap-1.5">
                                 <i class="fa-solid fa-keyboard"></i> 1. Type Range 1
                             </span>
-                            <span id="s16-score-sum" class="text-xs font-bold font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">+140 pts (9 cells)</span>
+                            <span id="s16-score-sum" class="text-xs font-bold font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">-60 pts (4 cells)</span>
                         </div>
-                        <input type="text" id="s16-input-pos" value="C3:E5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center tracking-wider" placeholder="e.g. C3:E5">
+                        <input type="text" id="s16-input-pos" value="A1:B2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center tracking-wider" placeholder="e.g. A1:B2">
                     </div>
 
                     <!-- Range 2 -->
@@ -237,9 +242,9 @@ const slides13_16_HTML = `
                             <span class="text-xs font-bold uppercase text-cyan-400 flex items-center gap-1.5">
                                 <i class="fa-solid fa-keyboard"></i> 2. Type Range 2
                             </span>
-                            <span id="s16-deduct-sum" class="text-xs font-bold font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">-10 pts (6 cells)</span>
+                            <span id="s16-deduct-sum" class="text-xs font-bold font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">-40 pts (4 cells)</span>
                         </div>
-                        <input type="text" id="s16-input-neg" value="G7:I8" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-cyan-400 font-bold focus:outline-none focus:border-cyan-400 uppercase text-center tracking-wider" placeholder="e.g. G7:I8">
+                        <input type="text" id="s16-input-neg" value="I9:J10" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-cyan-400 font-bold focus:outline-none focus:border-cyan-400 uppercase text-center tracking-wider" placeholder="e.g. I9:J10">
                     </div>
                 </div>
 
@@ -247,12 +252,12 @@ const slides13_16_HTML = `
                 <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-3 flex justify-between items-center shadow-md mb-3">
                     <div>
                         <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Net Score Formula:</div>
-                        <div id="s16-formula-preview" class="text-xs font-mono text-cyan-300 font-bold">=(SUM(C3:E5) + SUM(G7:I8)) / 100</div>
+                        <div id="s16-formula-preview" class="text-xs font-mono text-cyan-300 font-bold">=(SUM(A1:B2) + SUM(I9:J10)) / 100</div>
                         <div id="s16-rule-warning" class="text-[11px] text-rose-400 font-bold mt-0.5 hidden">⚠️ Rule violated!</div>
                     </div>
                     <div class="text-right">
                         <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Net Score:</div>
-                        <div id="s16-net-score" class="text-2xl font-extrabold text-amber-400 font-mono">+1.3</div>
+                        <div id="s16-net-score" class="text-2xl font-extrabold text-amber-400 font-mono">-1.0</div>
                     </div>
                 </div>
 
@@ -701,8 +706,13 @@ const slides13_16_FUNCTIONS = `
                 [  -50,  -60,  -70,  -80,  -70,  -50,  -40,  -30,  -30,  -50 ]  // Row 10
             ];
 
-            var s16PosRange = { minCol: 2, maxCol: 4, minRow: 3, maxRow: 5 }; // C3:E5 (9 cells: +140 pts)
-            var s16NegRange = { minCol: 6, maxCol: 8, minRow: 7, maxRow: 8 }; // G7:I8 (6 cells: -10 pts)
+            var s16PosRange = { minCol: 0, maxCol: 1, minRow: 1, maxRow: 2 }; // A1:B2 (4 cells: -60 pts)
+            var s16NegRange = { minCol: 8, maxCol: 9, minRow: 9, maxRow: 10 }; // I9:J10 (4 cells: -40 pts)
+
+            function checkS16Overlap(r1, r2) {
+                if (!r1 || !r2) return false;
+                return !(r1.maxCol < r2.minCol || r1.minCol > r2.maxCol || r1.maxRow < r2.minRow || r1.minRow > r2.maxRow);
+            }
 
             function parseS16RangeStr(str) {
                 if (!str) return null;
@@ -852,15 +862,18 @@ const slides13_16_FUNCTIONS = `
                 var rawSum = posSum + negSum;
                 var net = Number((rawSum / 100).toFixed(2));
 
+                var isOverlapping = checkS16Overlap(s16PosRange, s16NegRange);
+
                 // Rule Validations
                 var r1Valid = r1Count >= 4;
                 var r2Valid = r2Count >= 4;
                 var totValid = totCount <= 20 && totCount > 0;
-                var isAllValid = r1Valid && r2Valid && totValid;
+                var isAllValid = r1Valid && r2Valid && totValid && !isOverlapping;
 
                 var r1CountEl = document.getElementById('s16-r1-count');
                 var r2CountEl = document.getElementById('s16-r2-count');
                 var totCountEl = document.getElementById('s16-tot-count');
+                var overlapStatusEl = document.getElementById('s16-overlap-status');
 
                 if (r1CountEl) {
                     r1CountEl.textContent = r1Count + ' cells ' + (r1Valid ? '✅' : '❌ (min 4)');
@@ -873,6 +886,10 @@ const slides13_16_FUNCTIONS = `
                 if (totCountEl) {
                     totCountEl.textContent = totCount + ' / 20 ' + (totValid ? '✅' : '❌ (max 20)');
                     totCountEl.className = 'font-bold font-mono ' + (totValid ? 'text-cyan-400' : 'text-rose-400');
+                }
+                if (overlapStatusEl) {
+                    overlapStatusEl.textContent = !isOverlapping ? 'None ✅' : 'Overlap ❌';
+                    overlapStatusEl.className = 'font-bold font-mono ' + (!isOverlapping ? 'text-emerald-400' : 'text-rose-400');
                 }
 
                 var scoreSumEl = document.getElementById('s16-score-sum');
@@ -894,7 +911,9 @@ const slides13_16_FUNCTIONS = `
                 if (warningEl) {
                     if (!isAllValid) {
                         warningEl.classList.remove('hidden');
-                        if (!r1Valid || !r2Valid) {
+                        if (isOverlapping) {
+                            warningEl.textContent = '⚠️ Rule: Ranges cannot overlap! Each cell can only be selected once.';
+                        } else if (!r1Valid || !r2Valid) {
                             warningEl.textContent = '⚠️ Rule: Each range must have at least 4 cells!';
                         } else if (!totValid) {
                             warningEl.textContent = '⚠️ Rule: Combined ranges cannot exceed 20 cells!';
@@ -916,7 +935,11 @@ const slides13_16_FUNCTIONS = `
 
                 if (statusEl) {
                     if (!isAllValid) {
-                        statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> <span class="text-rose-400">Rules not met: Min 4 cells per range, Max 20 cells combined!</span>';
+                        if (isOverlapping) {
+                            statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> <span class="text-rose-400">Ranges cannot overlap! Each cell can only be selected once.</span>';
+                        } else {
+                            statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> <span class="text-rose-400">Rules not met: Min 4 cells per range, Max 20 cells combined!</span>';
+                        }
                     } else if (net >= 1.0) {
                         statusEl.innerHTML = '<i class="fa-solid fa-trophy text-amber-400"></i> <span class="text-emerald-400">High Score! Excellent combination strategy!</span>';
                     } else {
@@ -929,8 +952,13 @@ const slides13_16_FUNCTIONS = `
                 var r1Count = getRangeCellCount(s16PosRange);
                 var r2Count = getRangeCellCount(s16NegRange);
                 var totCount = r1Count + r2Count;
+                var isOverlapping = checkS16Overlap(s16PosRange, s16NegRange);
+                if (isOverlapping) {
+                    alert("Ranges cannot overlap! Each cell can only be selected once.");
+                    return;
+                }
                 if (r1Count < 4 || r2Count < 4 || totCount > 20) {
-                    alert("Please satisfy all rules before submitting: Min 4 cells per range, Max 20 combined!");
+                    alert("Please satisfy all rules before submitting: Min 4 cells per range, Max 20 combined, No overlap!");
                     return;
                 }
                 var posSum = calcS16RangeSum(s16PosRange);
