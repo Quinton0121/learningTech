@@ -19,6 +19,7 @@ async function main() {
     });
 
     const passwordHash = await bcrypt.hash('12345678', 10);
+    const tenYearsFuture = new Date(Date.now() + 3650 * 24 * 60 * 60 * 1000);
 
     if (!quinton) {
         quinton = await prisma.user.create({
@@ -29,7 +30,7 @@ async function main() {
                 role: 'ADMIN',
                 authType: 'EMAIL',
                 passwordHash: passwordHash,
-                trialExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+                trialExpiresAt: tenYearsFuture
             }
         });
         console.log("Created Quinton user on M9");
@@ -37,8 +38,10 @@ async function main() {
         quinton = await prisma.user.update({
             where: { id: quinton.id },
             data: {
+                email: 'quinton0121@gmail.com',
                 role: 'ADMIN',
-                passwordHash: passwordHash
+                passwordHash: passwordHash,
+                trialExpiresAt: tenYearsFuture
             }
         });
         console.log("Updated Quinton user on M9:", quinton.id, quinton.email);
