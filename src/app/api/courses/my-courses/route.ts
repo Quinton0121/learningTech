@@ -13,7 +13,10 @@ export async function GET(request: Request) {
     const decoded: any = jwt.verify(token, JWT_SECRET);
     
     const enrollments = await prisma.enrollment.findMany({
-      where: { userId: decoded.userId },
+      where: { 
+        userId: decoded.userId,
+        status: 'APPROVED'
+      },
       include: { 
         course: {
           include: { educator: { select: { id: true, name: true, email: true } } }

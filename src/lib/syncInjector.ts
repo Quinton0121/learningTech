@@ -630,6 +630,14 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
           const res = await fetch('/api/courses/sync-state?slide=' + activeIdx + courseIdParam, {
             headers: { 'Authorization': 'Bearer ' + token }
           });
+          if (res.status === 401 || res.status === 403) {
+            const errData = await res.json().catch(() => ({}));
+            if (errData.removed || res.status === 403 || res.status === 401) {
+              localStorage.removeItem('token');
+              window.location.href = '/';
+              return;
+            }
+          }
           if (!res.ok) return;
           const data = await res.json();
 

@@ -36,18 +36,18 @@ export async function GET(request: Request) {
         enrollment = await prisma.enrollment.findFirst({ where: { userId: user.id, status: 'APPROVED' }, include: { course: true } });
       }
 
-      if (enrollment) {
-        course = enrollment.course;
-        await prisma.enrollment.update({
-          where: { id: enrollment.id },
-          data: { 
-            lastSeenAt: new Date(), 
-            currentSlide: clientSlide !== null ? clientSlide : enrollment.currentSlide 
-          }
-        });
-      } else if (courseId) {
-        course = await prisma.course.findFirst({ where: { id: courseId } });
+      if (!enrollment) {
+        return NextResponse.json({ error: 'Not enrolled or access removed', removed: true }, { status: 403 });
       }
+
+      course = enrollment.course;
+      await prisma.enrollment.update({
+        where: { id: enrollment.id },
+        data: { 
+          lastSeenAt: new Date(), 
+          currentSlide: clientSlide !== null ? clientSlide : enrollment.currentSlide 
+        }
+      });
     }
     
     if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });

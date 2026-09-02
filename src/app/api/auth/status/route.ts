@@ -22,10 +22,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ active: true, slide: 0 }); // Manual logins don't get auto-logged out
     }
 
-    // Check if the user has any active enrollments
+    // Check if the user has any active approved enrollments
     const activeEnrollment = await prisma.enrollment.findFirst({
       where: { 
         userId: decoded.userId,
+        status: 'APPROVED',
         course: { isActive: true }
       }
     });

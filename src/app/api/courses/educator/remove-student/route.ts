@@ -33,7 +33,13 @@ export async function POST(request: Request) {
       }
     });
 
-    return NextResponse.json({ success: true, message: 'Student removed from class.' }, { status: 200 });
+    // Invalidate student's session token to immediately log them out
+    await prisma.user.update({
+      where: { id: studentId },
+      data: { sessionToken: null }
+    });
+
+    return NextResponse.json({ success: true, message: 'Student removed from class and logged out.' }, { status: 200 });
 
   } catch (error) {
     console.error(error);

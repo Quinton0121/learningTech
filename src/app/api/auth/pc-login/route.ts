@@ -14,10 +14,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing pcId' }, { status: 400 });
     }
 
-    // Find any ACTIVE course that has an enrollment mapped to this pcId
+    // Find any ACTIVE course that has an APPROVED enrollment mapped to this pcId
     const activeEnrollment = await prisma.enrollment.findFirst({
       where: {
         pcId: pcId,
+        status: 'APPROVED',
         course: {
           isActive: true
         }

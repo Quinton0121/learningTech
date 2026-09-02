@@ -41,14 +41,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Course not found or unauthorized' }, { status: 404 });
     }
 
-    const text = await file.text();
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    let text = await file.text();
+    // Remove UTF-8 BOM if present
+    if (text.charCodeAt(0) === 0xFEFF) {
+      text = text.slice(1);
+    }
+    const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
     
     if (lines.length < 2) {
       return NextResponse.json({ error: 'CSV is empty or missing data rows' }, { status: 400 });
     }
 
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/[\s_-]/g, ''));
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/[\s_"-]/g, ''));
     
     const required = ['name', 'studentid', 'email', 'password', 'pcid'];
     for (const reqCol of required) {
@@ -64,18 +68,20 @@ export async function POST(req: Request) {
     const pcIdIdx = headers.indexOf('pcid');
 
     let successCount = 0;
+    let newUsersCount = 0;
+    let updatedUsersCount = 0;
 
     for (let i = 1; i < lines.length; i++) {
-      const cols = lines[i].split(',').map(c => c.trim());
-      if (cols.length < headers.length) continue;
+      const rawCols = lines[i].split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
+      if (rawCols.length < headers.length) continue;
 
-      const name = cols[nameIdx];
-      const studentId = cols[studentIdIdx];
-      const email = cols[emailIdx] || null;
-      const password = cols[passwordIdx];
-      const pcId = cols[pcIdIdx] || null;
+      const name = rawCols[nameIdx];
+      const studentId = rawCols[studentIdIdx];
+      const email = rawCols[emailIdx] || null;
+      const password = rawCols[passwordIdx];
+      const pcId = rawCols[pcIdIdx] || null;
 
-      if (!studentId || !password) continue;
+      if (!studentId && !email) continue;
 
       let user = null;
       if (email) {
@@ -86,13 +92,13 @@ export async function POST(req: Request) {
       }
 
       if (!user) {
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = password ? await bcrypt.hash(password, 10) : await bcrypt.hash('12345678', 10);
         const trialExpiresAt = new Date();
-        trialExpiresAt.setDate(trialExpiresAt.getDate() + 30);
+        trialExpiresAt.setDate(trialExpiresAt.getDate() + 365);
         
         user = await prisma.user.create({
           data: {
-            name,
+            name: name || studentId,
             studentId,
             email,
             passwordHash,
@@ -102,8 +108,27 @@ export async function POST(req: Request) {
             trialExpiresAt
           }
         });
+        newUsersCount++;
+      } else {
+        // User already exists: update any modified details from the CSV
+        const updateData: any = {};
+        if (name && user.name !== name) updateData.name = name;
+        if (studentId && user.studentId !== studentId) updateData.studentId = studentId;
+        if (email && user.email !== email) updateData.email = email;
+        if (password) {
+          updateData.passwordHash = await bcrypt.hash(password, 10);
+        }
+
+        if (Object.keys(updateData).length > 0) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: updateData
+          });
+          updatedUsersCount++;
+        }
       }
 
+      // Upsert enrollment: re-approve and update pcId
       await prisma.enrollment.upsert({
         where: {
           userId_courseId: {
@@ -112,7 +137,8 @@ export async function POST(req: Request) {
           }
         },
         update: {
-          pcId: pcId
+          pcId: pcId,
+          status: 'APPROVED' // Re-approve if student was previously removed
         },
         create: {
           userId: user.id,
@@ -125,9 +151,16 @@ export async function POST(req: Request) {
       successCount++;
     }
 
-    return NextResponse.json({ message: `Successfully registered ${successCount} students and assigned PCs.` });
+    return NextResponse.json({ 
+      success: true,
+      message: `Successfully synced ${successCount} students (${newUsersCount} new, ${updatedUsersCount} updated).`,
+      count: successCount,
+      newUsers: newUsersCount,
+      updatedUsers: updatedUsersCount
+    });
   } catch (error: any) {
     console.error(error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
+
