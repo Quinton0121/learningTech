@@ -1968,17 +1968,17 @@
 
             const MAZE_SIZE = 11;
             const mazeGrid = [
-                [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-                [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-                [0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0],
-                [0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0],
-                [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-                [0, 1, 1, 2, 1, 0, 1, 1, 1, 1, 0],
-                [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-                [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]
+                [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+                [1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+                [0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+                [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                [0, 1, 0, 1, 1, 1, 2, 1, 0, 1, 1],
+                [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+                [1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0],
+                [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+                [0, 1, 1, 1, 0, 1, 0, 1, 1, 2, 1],
+                [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0]
             ];
 
             let playerPos = { x: 0, y: 0, z: 0 };
@@ -2108,7 +2108,13 @@
                 if (btnZ) btnZ.className = (isGameGrabbed && gameAxisLock === 'Z') ? 'bg-blue-600 text-white px-2 py-0.5 rounded border border-blue-400 font-bold ring-2 ring-blue-400' : 'bg-blue-950/70 hover:bg-blue-900 text-blue-300 px-2 py-0.5 rounded border border-blue-800 font-bold transition-colors';
 
                 if (posDisp) {
-                    posDisp.textContent = `(${playerPos.x}, ${playerPos.y}) | Z: ${playerPos.z > 0 ? '1.5m (Flying)' : '0.0m (Ground)'}`;
+                    if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z > 0) {
+                        posDisp.innerHTML = `<span class="text-emerald-400 font-bold animate-pulse">🌟 On Portal! Press G+Z to land (Z=0m) to extract!</span>`;
+                    } else if (playerPos.z > 0) {
+                        posDisp.textContent = `(${playerPos.x}, ${playerPos.y}) | Z: 1.5m (Flying - Lasers Bypassed)`;
+                    } else {
+                        posDisp.textContent = `(${playerPos.x}, ${playerPos.y}) | Z: 0.0m (Ground)`;
+                    }
                 }
             }
 
@@ -2274,6 +2280,9 @@
                     }
                     updateMazeUI();
                     renderMaze();
+                    if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z === 0) {
+                        triggerVictory();
+                    }
                 }
             };
 
