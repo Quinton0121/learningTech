@@ -270,6 +270,25 @@ export default function EducatorDashboard() {
     }
   };
 
+  const handleDelete = async (courseId: string, studentId: string, studentName?: string) => {
+    if (!confirm(`Are you sure you want to permanently delete ${studentName || 'this student'} and all their records without trace? This cannot be undone.`)) return;
+    const res = await fetch('/api/courses/educator/delete-student', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ courseId, studentId })
+    });
+    
+    if (res.ok) {
+      fetchCourses(token);
+    } else {
+      const data = await res.json();
+      alert("Error: " + data.error);
+    }
+  };
+
   const handleApprove = async (courseId: string, studentId: string, action: 'APPROVE' | 'REJECT') => {
     const res = await fetch('/api/courses/educator/approve-student', {
       method: 'POST',
@@ -823,19 +842,22 @@ export default function EducatorDashboard() {
                                     )}
                                   </td>
                                   <td style={{ padding: '12px 8px' }}>
-                                    {e.status === 'PENDING' && (
-                                      <div style={{ display: 'flex', gap: '8px' }}>
-                                        <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: '#10b981', border: 'none', color: '#fff', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Approve</button>
-                                        <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'REJECT'); }} style={{ background: 'transparent', border: '1px solid #ff8a8a', color: '#ff8a8a', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Reject</button>
-                                      </div>
-                                    )}
-                                    {e.status === 'APPROVED' && (
-                                      <button onClick={(event) => { event.preventDefault(); handleRemove(course.id, e.user.id); }} style={{ background: 'transparent', border: 'none', color: '#ff8a8a', cursor: 'pointer', fontSize: '0.85rem' }}>Remove</button>
-                                    )}
-                                    {e.status === 'REMOVED' && (
-                                      <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Restore</button>
-                                    )}
-                                  </td>
+                                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                       {e.status === 'PENDING' && (
+                                         <>
+                                           <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: '#10b981', border: 'none', color: '#fff', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Approve</button>
+                                           <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'REJECT'); }} style={{ background: 'transparent', border: '1px solid #ff8a8a', color: '#ff8a8a', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Reject</button>
+                                         </>
+                                       )}
+                                       {e.status === 'APPROVED' && (
+                                         <button onClick={(event) => { event.preventDefault(); handleRemove(course.id, e.user.id); }} style={{ background: 'transparent', border: '1px solid #fbbf24', color: '#fbbf24', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Remove</button>
+                                       )}
+                                       {e.status === 'REMOVED' && (
+                                         <button onClick={(event) => { event.preventDefault(); handleApprove(course.id, e.user.id, 'APPROVE'); }} style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Restore</button>
+                                       )}
+                                       <button onClick={(event) => { event.preventDefault(); handleDelete(course.id, e.user.id, e.user?.name); }} title="Permanently delete without trace" style={{ background: '#dc2626', border: 'none', color: '#fff', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>Delete</button>
+                                     </div>
+                                   </td>
                                 </tr>
                               );
                             })}
