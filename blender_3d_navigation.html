@@ -872,7 +872,7 @@
     </div>
 
     <!-- Slide 9: The Maze Challenge Game -->
-    <div class="slide-container" id="slide-9">
+    <div class="slide-container" id="slide-9" data-slide="8" data-badge="GAME: HOTKEY MAZE" data-title="Navigate the Maze">
         <div class="flex flex-col md:flex-row items-center gap-6 max-w-6xl w-full h-[82vh]">
             <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
                 <div>
@@ -881,30 +881,33 @@
                     </div>
                     <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">Navigate the Maze</h2>
                     <p class="text-gray-300 text-xs leading-relaxed mb-3">
-                        Use Blender translation hotkeys to guide the cube to the glowing green portal.
+                        Use Blender modal hotkeys to guide the cube from (0,0) to the emerald extraction portal at (10,10).
                     </p>
 
                     <!-- Hotkey Instructions & Controls -->
                     <div class="space-y-1.5 text-xs mb-3 font-mono">
-                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                        <div id="maze-step-select" class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center cursor-pointer transition-colors" onclick="gameTriggerHotKey('SELECT')">
                             <span class="text-blender-orange font-bold">1. Select Cube:</span>
-                            <span class="text-zinc-300">Click the box</span>
+                            <span id="maze-badge-select" class="text-amber-300 text-[11px] px-1.5 py-0.5 rounded bg-amber-950/80 border border-amber-800">Selected</span>
                         </div>
-                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                        <div id="maze-step-grab" class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center cursor-pointer transition-colors" onclick="gameTriggerHotKey('G')">
                             <span class="text-blender-orange font-bold">2. Press <kbd>G</kbd>:</span>
-                            <span class="text-zinc-300">Enters Grab Mode</span>
+                            <span id="maze-badge-grab" class="text-zinc-300 text-[11px] px-1.5 py-0.5 rounded bg-zinc-700">Grab Mode</span>
                         </div>
-                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                        <div id="maze-step-axis" class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
                             <span class="text-blender-orange font-bold">3. Lock Axis:</span>
                             <div class="flex gap-1">
-                                <button onclick="gameTriggerHotKey('X')" class="bg-red-900/60 hover:bg-red-800 text-red-300 px-1.5 py-0.5 rounded border border-red-700">X</button>
-                                <button onclick="gameTriggerHotKey('Y')" class="bg-green-900/60 hover:bg-green-800 text-green-300 px-1.5 py-0.5 rounded border border-green-700">Y</button>
-                                <button onclick="gameTriggerHotKey('Z')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 px-1.5 py-0.5 rounded border border-blue-700">Z (Fly)</button>
+                                <button id="maze-btn-x" onclick="gameTriggerHotKey('X')" class="bg-red-950/70 hover:bg-red-900 text-red-300 px-2 py-0.5 rounded border border-red-800 font-bold transition-colors">X</button>
+                                <button id="maze-btn-y" onclick="gameTriggerHotKey('Y')" class="bg-green-950/70 hover:bg-green-900 text-green-300 px-2 py-0.5 rounded border border-green-800 font-bold transition-colors">Y</button>
+                                <button id="maze-btn-z" onclick="gameTriggerHotKey('Z')" class="bg-blue-950/70 hover:bg-blue-900 text-blue-300 px-2 py-0.5 rounded border border-blue-800 font-bold transition-colors">Z (Fly)</button>
                             </div>
                         </div>
-                        <div class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
-                            <span class="text-blender-orange font-bold">4. Confirm / Cancel:</span>
-                            <span><kbd>L-Click</kbd> / <kbd>R-Click</kbd></span>
+                        <div id="maze-step-confirm" class="p-2 rounded bg-zinc-800/80 border border-zinc-700 flex justify-between items-center">
+                            <span class="text-blender-orange font-bold">4. Action:</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="gameConfirmMove(true)" class="bg-emerald-950/70 hover:bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800 font-bold transition-colors">Confirm (L-Click)</button>
+                                <button onclick="gameConfirmMove(false)" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded border border-zinc-600 font-bold transition-colors">Cancel (R-Click)</button>
+                            </div>
                         </div>
                     </div>
 
@@ -917,7 +920,7 @@
                     </button>
                 </div>
 
-                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800">
+                <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 mt-2">
                     <div class="flex justify-between text-xs font-mono">
                         <span class="text-zinc-500">Position:</span>
                         <span id="maze-pos-display" class="text-amber-400 font-bold">(0, 0) | Z: 0.0m</span>
@@ -926,12 +929,12 @@
             </div>
 
             <!-- 2D Top-Orthographic Maze Canvas -->
-            <div class="flex-1 w-full h-full min-h-[360px] relative">
-                <div class="viewport-frame w-full h-full relative flex items-center justify-center bg-zinc-950 p-2">
-                    <canvas id="maze-canvas" class="max-w-full max-h-full aspect-square rounded-lg"></canvas>
+            <div class="flex-1 w-full h-full min-h-[360px] relative flex items-center justify-center">
+                <div class="viewport-frame w-full h-full relative flex items-center justify-center bg-zinc-950 p-3" id="slide9-canvas-container">
+                    <canvas id="maze-canvas" class="rounded-xl shadow-2xl block"></canvas>
                     
                     <!-- Victory Overlay -->
-                    <div id="maze-victory-card" class="absolute inset-0 bg-zinc-950/85 backdrop-blur-md rounded-xl flex flex-col items-center justify-center hidden z-30 animate-fade-in p-6 text-center">
+                    <div id="maze-victory-card" class="absolute inset-0 bg-zinc-950/90 backdrop-blur-md rounded-xl flex flex-col items-center justify-center hidden z-30 animate-fade-in p-6 text-center">
                         <div class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-3xl text-emerald-400 mb-3 shadow-[0_0_30px_rgba(16,185,129,0.5)]">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
@@ -1980,64 +1983,189 @@
 
             let playerPos = { x: 0, y: 0, z: 0 };
             let startDragPos = { x: 0, y: 0, z: 0 };
-            let isGameSelected = false;
+            let isGameSelected = true;
             let isGameGrabbed = false;
             let gameAxisLock = null;
 
-            const mazeCanvas = document.getElementById('maze-canvas');
+            let mazeCanvas = null;
             let mazeCtx = null;
+            let mazeListenersAttached = false;
 
             function initMazeCanvas() {
                 const canvas = document.getElementById('maze-canvas');
                 if (!canvas) return;
                 mazeCanvas = canvas;
                 mazeCtx = mazeCanvas.getContext('2d');
-                const container = canvas.parentElement;
-                let size = 440;
-                if (container && container.clientWidth) {
-                    size = Math.min(440, container.clientWidth - 32, container.clientHeight - 32);
+
+                const container = canvas.parentElement || document.getElementById('slide9-canvas-container');
+                let size = 460;
+                if (container) {
+                    const rect = container.getBoundingClientRect();
+                    const w = rect.width || container.clientWidth || 0;
+                    const h = rect.height || container.clientHeight || 0;
+                    if (w > 60 && h > 60) {
+                        size = Math.min(w - 28, h - 28, 540);
+                    }
                 }
-                if (size < 200) size = 440;
-                mazeCanvas.width = size;
-                mazeCanvas.height = size;
+                if (size < 280) {
+                    size = Math.min(Math.max(window.innerWidth * 0.45, 280), 480);
+                }
+
+                const dpr = window.devicePixelRatio || 1;
+                mazeCanvas.width = Math.round(size * dpr);
+                mazeCanvas.height = Math.round(size * dpr);
+                mazeCanvas.style.width = `${Math.round(size)}px`;
+                mazeCanvas.style.height = `${Math.round(size)}px`;
+
+                attachMazeListeners();
+                updateMazeUI();
                 renderMaze();
+            }
+
+            function attachMazeListeners() {
+                if (!mazeCanvas || mazeListenersAttached) return;
+                mazeListenersAttached = true;
+
+                mazeCanvas.addEventListener('click', (e) => {
+                    const rect = mazeCanvas.getBoundingClientRect();
+                    const clickX = Math.floor((e.clientX - rect.left) / (rect.width / MAZE_SIZE));
+                    const clickY = Math.floor((e.clientY - rect.top) / (rect.height / MAZE_SIZE));
+
+                    if (isGameGrabbed) {
+                        gameConfirmMove(true);
+                    } else {
+                        if (clickX === playerPos.x && clickY === playerPos.y) {
+                            isGameSelected = !isGameSelected;
+                        } else {
+                            isGameSelected = true;
+                        }
+                        updateMazeUI();
+                        renderMaze();
+                    }
+                });
+
+                mazeCanvas.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    if (isGameGrabbed) {
+                        gameConfirmMove(false);
+                    }
+                });
+
+                mazeCanvas.addEventListener('mousemove', (e) => {
+                    if (!isGameGrabbed || !gameAxisLock || gameAxisLock === 'Z') return;
+                    const rect = mazeCanvas.getBoundingClientRect();
+                    const targetCol = Math.floor((e.clientX - rect.left) / (rect.width / MAZE_SIZE));
+                    const targetRow = Math.floor((e.clientY - rect.top) / (rect.height / MAZE_SIZE));
+
+                    if (gameAxisLock === 'X' && targetCol >= 0 && targetCol < MAZE_SIZE) {
+                        const dir = targetCol > playerPos.x ? 1 : -1;
+                        let nextX = playerPos.x;
+                        for (let x = playerPos.x + dir; dir > 0 ? x <= targetCol : x >= targetCol; x += dir) {
+                            const tile = mazeGrid[playerPos.y][x];
+                            if (tile === 1 || (tile === 2 && playerPos.z === 0)) break;
+                            nextX = x;
+                        }
+                        playerPos.x = nextX;
+                    } else if (gameAxisLock === 'Y' && targetRow >= 0 && targetRow < MAZE_SIZE) {
+                        const dir = targetRow > playerPos.y ? 1 : -1;
+                        let nextY = playerPos.y;
+                        for (let y = playerPos.y + dir; dir > 0 ? y <= targetRow : y >= targetRow; y += dir) {
+                            const tile = mazeGrid[y][playerPos.x];
+                            if (tile === 1 || (tile === 2 && playerPos.z === 0)) break;
+                            nextY = y;
+                        }
+                        playerPos.y = nextY;
+                    }
+
+                    updateMazeUI();
+                    renderMaze();
+
+                    if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z === 0) {
+                        triggerVictory();
+                    }
+                });
+            }
+
+            function updateMazeUI() {
+                const badgeSel = document.getElementById('maze-badge-select');
+                const badgeGrab = document.getElementById('maze-badge-grab');
+                const btnX = document.getElementById('maze-btn-x');
+                const btnY = document.getElementById('maze-btn-y');
+                const btnZ = document.getElementById('maze-btn-z');
+                const posDisp = document.getElementById('maze-pos-display');
+
+                if (badgeSel) {
+                    badgeSel.textContent = isGameSelected ? 'Selected' : 'Unselected';
+                    badgeSel.className = isGameSelected ? 'text-amber-300 text-[11px] px-1.5 py-0.5 rounded bg-amber-950/80 border border-amber-800' : 'text-zinc-400 text-[11px] px-1.5 py-0.5 rounded bg-zinc-700';
+                }
+                if (badgeGrab) {
+                    badgeGrab.textContent = isGameGrabbed ? (gameAxisLock ? `Grab: [${gameAxisLock}]` : 'Grab Active') : 'Idle';
+                    badgeGrab.className = isGameGrabbed ? 'text-amber-300 text-[11px] px-1.5 py-0.5 rounded bg-amber-950/80 border border-amber-800 font-bold animate-pulse' : 'text-zinc-400 text-[11px] px-1.5 py-0.5 rounded bg-zinc-700';
+                }
+
+                if (btnX) btnX.className = (isGameGrabbed && gameAxisLock === 'X') ? 'bg-red-600 text-white px-2 py-0.5 rounded border border-red-400 font-bold ring-2 ring-red-400' : 'bg-red-950/70 hover:bg-red-900 text-red-300 px-2 py-0.5 rounded border border-red-800 font-bold transition-colors';
+                if (btnY) btnY.className = (isGameGrabbed && gameAxisLock === 'Y') ? 'bg-green-600 text-white px-2 py-0.5 rounded border border-green-400 font-bold ring-2 ring-green-400' : 'bg-green-950/70 hover:bg-green-900 text-green-300 px-2 py-0.5 rounded border border-green-800 font-bold transition-colors';
+                if (btnZ) btnZ.className = (isGameGrabbed && gameAxisLock === 'Z') ? 'bg-blue-600 text-white px-2 py-0.5 rounded border border-blue-400 font-bold ring-2 ring-blue-400' : 'bg-blue-950/70 hover:bg-blue-900 text-blue-300 px-2 py-0.5 rounded border border-blue-800 font-bold transition-colors';
+
+                if (posDisp) {
+                    posDisp.textContent = `(${playerPos.x}, ${playerPos.y}) | Z: ${playerPos.z > 0 ? '1.5m (Flying)' : '0.0m (Ground)'}`;
+                }
             }
 
             function renderMaze() {
                 if (!mazeCtx || !mazeCanvas) return;
-                const cellSize = mazeCanvas.width / MAZE_SIZE;
+                const dpr = window.devicePixelRatio || 1;
+                const width = mazeCanvas.width;
+                const height = mazeCanvas.height;
+                const cellSize = width / MAZE_SIZE;
 
-                mazeCtx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+                mazeCtx.clearRect(0, 0, width, height);
 
-                mazeCtx.fillStyle = '#18181b';
-                mazeCtx.fillRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+                // Tech background
+                mazeCtx.fillStyle = '#0b0f19';
+                mazeCtx.fillRect(0, 0, width, height);
 
+                // Grid & Cells
                 for (let r = 0; r < MAZE_SIZE; r++) {
                     for (let c = 0; c < MAZE_SIZE; c++) {
                         const x = c * cellSize;
                         const y = r * cellSize;
 
                         if (mazeGrid[r][c] === 1) {
-                            mazeCtx.fillStyle = '#27272a';
-                            mazeCtx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
-                            mazeCtx.strokeStyle = '#3f3f46';
-                            mazeCtx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
-                        } else if (mazeGrid[r][c] === 2) {
-                            mazeCtx.fillStyle = '#450a0a';
-                            mazeCtx.fillRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
-                            mazeCtx.strokeStyle = '#ef4444';
-                            mazeCtx.lineWidth = 2;
-                            mazeCtx.strokeRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+                            // Wall (3D Slate Beveled Block)
+                            mazeCtx.fillStyle = '#1e293b';
+                            mazeCtx.fillRect(x + 1 * dpr, y + 1 * dpr, cellSize - 2 * dpr, cellSize - 2 * dpr);
                             
+                            // Top bevel highlight
+                            mazeCtx.fillStyle = '#334155';
+                            mazeCtx.fillRect(x + 2 * dpr, y + 2 * dpr, cellSize - 4 * dpr, 4 * dpr);
+
+                            mazeCtx.strokeStyle = '#475569';
+                            mazeCtx.lineWidth = 1 * dpr;
+                            mazeCtx.strokeRect(x + 1 * dpr, y + 1 * dpr, cellSize - 2 * dpr, cellSize - 2 * dpr);
+                        } else if (mazeGrid[r][c] === 2) {
+                            // Laser Barrier (Hazard Gate)
+                            mazeCtx.fillStyle = '#450a0a';
+                            mazeCtx.fillRect(x + 2 * dpr, y + 2 * dpr, cellSize - 4 * dpr, cellSize - 4 * dpr);
+                            
+                            // Laser line
+                            mazeCtx.strokeStyle = '#ef4444';
+                            mazeCtx.lineWidth = 3 * dpr;
                             mazeCtx.beginPath();
-                            mazeCtx.moveTo(x + 4, y + cellSize / 2);
-                            mazeCtx.lineTo(x + cellSize - 4, y + cellSize / 2);
+                            mazeCtx.moveTo(x + 3 * dpr, y + cellSize / 2);
+                            mazeCtx.lineTo(x + cellSize - 3 * dpr, y + cellSize / 2);
                             mazeCtx.stroke();
+
+                            // Hazard border
+                            mazeCtx.strokeStyle = '#f87171';
+                            mazeCtx.lineWidth = 1 * dpr;
+                            mazeCtx.strokeRect(x + 2 * dpr, y + 2 * dpr, cellSize - 4 * dpr, cellSize - 4 * dpr);
                         } else {
-                            mazeCtx.fillStyle = '#09090b';
+                            // Floor
+                            mazeCtx.fillStyle = '#0f172a';
                             mazeCtx.fillRect(x, y, cellSize, cellSize);
-                            mazeCtx.strokeStyle = '#27272a';
-                            mazeCtx.lineWidth = 0.5;
+                            mazeCtx.strokeStyle = '#1e293b';
+                            mazeCtx.lineWidth = 0.5 * dpr;
                             mazeCtx.strokeRect(x, y, cellSize, cellSize);
                         }
                     }
@@ -2046,137 +2174,108 @@
                 // Goal Portal at (10, 10)
                 const goalX = 10 * cellSize;
                 const goalY = 10 * cellSize;
-                mazeCtx.fillStyle = 'rgba(16, 185, 129, 0.25)';
-                mazeCtx.fillRect(goalX + 2, goalY + 2, cellSize - 4, cellSize - 4);
+                mazeCtx.fillStyle = 'rgba(16, 185, 129, 0.35)';
+                mazeCtx.fillRect(goalX + 2 * dpr, goalY + 2 * dpr, cellSize - 4 * dpr, cellSize - 4 * dpr);
                 mazeCtx.strokeStyle = '#10b981';
-                mazeCtx.lineWidth = 2;
-                mazeCtx.strokeRect(goalX + 2, goalY + 2, cellSize - 4, cellSize - 4);
+                mazeCtx.lineWidth = 2.5 * dpr;
+                mazeCtx.strokeRect(goalX + 2 * dpr, goalY + 2 * dpr, cellSize - 4 * dpr, cellSize - 4 * dpr);
+                
+                // Goal Portal Pulse / Inner Circle
+                mazeCtx.fillStyle = '#34d399';
+                mazeCtx.beginPath();
+                mazeCtx.arc(goalX + cellSize / 2, goalY + cellSize / 2, cellSize * 0.22, 0, Math.PI * 2);
+                mazeCtx.fill();
 
+                // Axis Laser Lines if Grabbed
                 if (isGameGrabbed && gameAxisLock) {
                     const cx = playerPos.x * cellSize + cellSize / 2;
                     const cy = playerPos.y * cellSize + cellSize / 2;
-                    mazeCtx.lineWidth = 2;
+                    mazeCtx.lineWidth = 2 * dpr;
 
                     if (gameAxisLock === 'X') {
                         mazeCtx.strokeStyle = '#ef4444';
                         mazeCtx.beginPath();
                         mazeCtx.moveTo(0, cy);
-                        mazeCtx.lineTo(mazeCanvas.width, cy);
+                        mazeCtx.lineTo(width, cy);
                         mazeCtx.stroke();
                     } else if (gameAxisLock === 'Y') {
                         mazeCtx.strokeStyle = '#22c55e';
                         mazeCtx.beginPath();
                         mazeCtx.moveTo(cx, 0);
-                        mazeCtx.lineTo(cx, mazeCanvas.height);
+                        mazeCtx.lineTo(cx, height);
                         mazeCtx.stroke();
                     } else if (gameAxisLock === 'Z') {
                         mazeCtx.strokeStyle = '#3b82f6';
                         mazeCtx.beginPath();
-                        mazeCtx.arc(cx, cy, cellSize * 0.8, 0, Math.PI * 2);
+                        mazeCtx.arc(cx, cy, cellSize * 0.85, 0, Math.PI * 2);
                         mazeCtx.stroke();
                     }
                 }
 
-                const px = playerPos.x * cellSize + 4;
-                const py = playerPos.y * cellSize + 4 - (playerPos.z * 10);
-                const pSize = cellSize - 8;
-
+                // Player Shadow if flying
+                const pSize = cellSize - 8 * dpr;
                 if (playerPos.z > 0) {
-                    mazeCtx.fillStyle = 'rgba(0,0,0,0.6)';
-                    mazeCtx.fillRect(playerPos.x * cellSize + 6, playerPos.y * cellSize + 6, pSize, pSize);
+                    mazeCtx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                    mazeCtx.fillRect(playerPos.x * cellSize + 6 * dpr, playerPos.y * cellSize + 6 * dpr, pSize, pSize);
                 }
 
-                if (isGameSelected) {
-                    mazeCtx.fillStyle = isGameGrabbed ? '#fbbf24' : '#ea7600';
+                // Player Cube Position
+                const px = playerPos.x * cellSize + 4 * dpr;
+                const py = playerPos.y * cellSize + 4 * dpr - (playerPos.z > 0 ? cellSize * 0.35 : 0);
+
+                if (isGameGrabbed) {
+                    mazeCtx.fillStyle = '#fbbf24';
                     mazeCtx.strokeStyle = '#ffffff';
-                    mazeCtx.lineWidth = 2;
+                    mazeCtx.lineWidth = 2.5 * dpr;
+                } else if (isGameSelected) {
+                    mazeCtx.fillStyle = '#ea7600';
+                    mazeCtx.strokeStyle = '#fde047';
+                    mazeCtx.lineWidth = 2 * dpr;
                 } else {
-                    mazeCtx.fillStyle = '#52525b';
-                    mazeCtx.strokeStyle = '#71717a';
-                    mazeCtx.lineWidth = 1;
+                    mazeCtx.fillStyle = '#ea7600';
+                    mazeCtx.strokeStyle = '#d4d4d8';
+                    mazeCtx.lineWidth = 1 * dpr;
                 }
+
                 mazeCtx.fillRect(px, py, pSize, pSize);
                 mazeCtx.strokeRect(px, py, pSize, pSize);
 
-                const hud = document.getElementById('maze-pos-display');
-                if (hud) {
-                    hud.textContent = `(${playerPos.x}, ${playerPos.y}) | Z: ${playerPos.z ? '1.5m (Fly)' : '0.0m (Ground)'}`;
+                // Altitude Badge on Cube if Flying
+                if (playerPos.z > 0) {
+                    mazeCtx.fillStyle = '#38bdf8';
+                    mazeCtx.font = `bold ${Math.max(9, Math.round(9 * dpr))}px monospace`;
+                    mazeCtx.textAlign = 'center';
+                    mazeCtx.fillText('Z: 1.5m', px + pSize / 2, py - 4 * dpr);
                 }
             }
 
-            mazeCanvas?.addEventListener('click', (e) => {
-                const rect = mazeCanvas.getBoundingClientRect();
-                const clickX = Math.floor((e.clientX - rect.left) / (rect.width / MAZE_SIZE));
-                const clickY = Math.floor((e.clientY - rect.top) / (rect.height / MAZE_SIZE));
-
-                if (isGameGrabbed) {
-                    gameConfirmMove(true);
-                } else {
-                    if (clickX === playerPos.x && clickY === playerPos.y) {
-                        isGameSelected = true;
-                    } else {
-                        isGameSelected = false;
-                    }
-                    renderMaze();
-                }
-            });
-
-            mazeCanvas?.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                if (isGameGrabbed) {
-                    gameConfirmMove(false);
-                }
-            });
-
             window.gameTriggerHotKey = function(key) {
-                if (!isGameSelected) return;
-
+                if (key === 'SELECT') {
+                    isGameSelected = !isGameSelected;
+                    updateMazeUI();
+                    renderMaze();
+                    return;
+                }
                 if (key === 'G') {
+                    isGameSelected = true;
                     isGameGrabbed = true;
                     gameAxisLock = null;
                     startDragPos = { ...playerPos };
+                    updateMazeUI();
                     renderMaze();
-                } else if (isGameGrabbed && (key === 'X' || key === 'Y' || key === 'Z')) {
+                    return;
+                }
+                if (!isGameSelected) return;
+
+                if (isGameGrabbed && (key === 'X' || key === 'Y' || key === 'Z')) {
                     gameAxisLock = key;
                     if (key === 'Z') {
                         playerPos.z = playerPos.z > 0 ? 0 : 1.5;
                     }
+                    updateMazeUI();
                     renderMaze();
                 }
             };
-
-            mazeCanvas?.addEventListener('mousemove', (e) => {
-                if (!isGameGrabbed || !gameAxisLock || gameAxisLock === 'Z') return;
-                const rect = mazeCanvas.getBoundingClientRect();
-                const targetCol = Math.floor((e.clientX - rect.left) / (rect.width / MAZE_SIZE));
-                const targetRow = Math.floor((e.clientY - rect.top) / (rect.height / MAZE_SIZE));
-
-                if (gameAxisLock === 'X' && targetCol >= 0 && targetCol < MAZE_SIZE) {
-                    const dir = targetCol > playerPos.x ? 1 : -1;
-                    let nextX = playerPos.x;
-                    for (let x = playerPos.x + dir; dir > 0 ? x <= targetCol : x >= targetCol; x += dir) {
-                        const tile = mazeGrid[playerPos.y][x];
-                        if (tile === 1 || (tile === 2 && playerPos.z === 0)) break;
-                        nextX = x;
-                    }
-                    playerPos.x = nextX;
-                } else if (gameAxisLock === 'Y' && targetRow >= 0 && targetRow < MAZE_SIZE) {
-                    const dir = targetRow > playerPos.y ? 1 : -1;
-                    let nextY = playerPos.y;
-                    for (let y = playerPos.y + dir; dir > 0 ? y <= targetRow : y >= targetRow; y += dir) {
-                        const tile = mazeGrid[y][playerPos.x];
-                        if (tile === 1 || (tile === 2 && playerPos.z === 0)) break;
-                        nextY = y;
-                    }
-                    playerPos.y = nextY;
-                }
-
-                renderMaze();
-
-                if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z === 0) {
-                    triggerVictory();
-                }
-            });
 
             window.gameConfirmMove = function(confirm) {
                 if (!isGameGrabbed) return;
@@ -2185,6 +2284,7 @@
                 }
                 isGameGrabbed = false;
                 gameAxisLock = null;
+                updateMazeUI();
                 renderMaze();
                 if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z === 0) {
                     triggerVictory();
@@ -2194,21 +2294,30 @@
             function triggerVictory() {
                 const card = document.getElementById('maze-victory-card');
                 if (card) card.classList.remove('hidden');
-                confetti({
-                    particleCount: 80,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
+                if (typeof confetti === 'function') {
+                    try {
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                    } catch(e) {}
+                }
             }
 
             window.resetMazeGame = function() {
                 playerPos = { x: 0, y: 0, z: 0 };
-                isGameSelected = false;
+                isGameSelected = true;
                 isGameGrabbed = false;
                 gameAxisLock = null;
                 const card = document.getElementById('maze-victory-card');
                 if (card) card.classList.add('hidden');
+                updateMazeUI();
                 renderMaze();
+            };
+
+            function onSlide9Resize() {
+                initMazeCanvas();
             };
 
             let initSlide10Done = false;
@@ -3032,11 +3141,59 @@
                 // Slide 9 Shortcuts (Maze Game)
                 if (currentSlideIndex === 8) {
                     if (e.key === 'g' || e.key === 'G') gameTriggerHotKey('G');
-                    if (e.key === 'x' || e.key === 'X') gameTriggerHotKey('X');
-                    if (e.key === 'y' || e.key === 'Y') gameTriggerHotKey('Y');
-                    if (e.key === 'z' || e.key === 'Z') gameTriggerHotKey('Z');
-                    if (e.key === 'Enter') gameConfirmMove(true);
-                    if (e.key === 'Escape') gameConfirmMove(false);
+                    else if (e.key === 'x' || e.key === 'X') gameTriggerHotKey('X');
+                    else if (e.key === 'y' || e.key === 'Y') gameTriggerHotKey('Y');
+                    else if (e.key === 'z' || e.key === 'Z') gameTriggerHotKey('Z');
+                    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); gameConfirmMove(true); }
+                    else if (e.key === 'Escape') { e.preventDefault(); gameConfirmMove(false); }
+                    else if (e.key === 'r' || e.key === 'R') { if (e.altKey) { e.preventDefault(); resetMazeGame(); } }
+                    else if (isGameGrabbed) {
+                        let dx = 0, dy = 0;
+                        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dx = 1;
+                        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dx = -1;
+                        if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dy = 1;
+                        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dy = -1;
+
+                        if (dx !== 0 || dy !== 0) {
+                            e.preventDefault();
+                            if (gameAxisLock === 'X' && dx !== 0) {
+                                const nx = playerPos.x + dx;
+                                if (nx >= 0 && nx < MAZE_SIZE) {
+                                    const tile = mazeGrid[playerPos.y][nx];
+                                    if (tile !== 1 && !(tile === 2 && playerPos.z === 0)) {
+                                        playerPos.x = nx;
+                                        updateMazeUI();
+                                        renderMaze();
+                                    }
+                                }
+                            } else if (gameAxisLock === 'Y' && dy !== 0) {
+                                const ny = playerPos.y + dy;
+                                if (ny >= 0 && ny < MAZE_SIZE) {
+                                    const tile = mazeGrid[ny][playerPos.x];
+                                    if (tile !== 1 && !(tile === 2 && playerPos.z === 0)) {
+                                        playerPos.y = ny;
+                                        updateMazeUI();
+                                        renderMaze();
+                                    }
+                                }
+                            } else if (!gameAxisLock) {
+                                const nx = playerPos.x + dx;
+                                const ny = playerPos.y + dy;
+                                if (nx >= 0 && nx < MAZE_SIZE && ny >= 0 && ny < MAZE_SIZE) {
+                                    const tile = mazeGrid[ny][nx];
+                                    if (tile !== 1 && !(tile === 2 && playerPos.z === 0)) {
+                                        playerPos.x = nx;
+                                        playerPos.y = ny;
+                                        updateMazeUI();
+                                        renderMaze();
+                                    }
+                                }
+                            }
+                            if (playerPos.x === 10 && playerPos.y === 10 && playerPos.z === 0) {
+                                triggerVictory();
+                            }
+                        }
+                    }
                 }
 
                 // Slide 10 Shortcuts (Rotate Tool)
@@ -3125,6 +3282,7 @@
                 onSlide6Resize();
                 onSlide7Resize();
                 onSlide8Resize();
+                onSlide9Resize();
                 onSlide10Resize();
                 onSlide11Resize();
                 onSlide12Resize();
