@@ -39,7 +39,8 @@ export async function POST(request: Request) {
         isPublic: false,
         priceTokens: originalCourse.priceTokens,
         studentQuota: originalCourse.studentQuota, // Actually irrelevant since we use the shared pool, but keep for fallback
-        sharedQuotaGroupId: rootQuotaId
+        sharedQuotaGroupId: rootQuotaId,
+        htmlContent: originalCourse.htmlContent
       }
     });
 

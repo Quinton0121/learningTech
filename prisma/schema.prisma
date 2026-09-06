@@ -26,7 +26,7 @@ model User {
   name             String?
   
   // Student Specific
-  studentId        String?  @unique
+  studentId        String?
   mustChangePassword Boolean @default(false)
   
   // Trial Logic
@@ -47,6 +47,7 @@ model User {
 
   @@index([role])
   @@index([createdAt])
+  @@index([studentId])
 }
 
 model Course {

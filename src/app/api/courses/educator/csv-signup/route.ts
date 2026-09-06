@@ -83,24 +83,43 @@ export async function POST(req: Request) {
 
       if (!studentId && !email) continue;
 
-      let user = null;
-      if (email) {
-        user = await prisma.user.findUnique({ where: { email } });
-      }
-      if (!user && studentId) {
-        user = await prisma.user.findUnique({ where: { studentId } });
-      }
+      // Check if this student is already enrolled in THIS course
+      const existingEnrollment = await prisma.enrollment.findFirst({
+        where: {
+          courseId: courseId,
+          OR: [
+            ...(studentId ? [{ user: { studentId } }] : []),
+            ...(email ? [{ user: { email } }] : []),
+            ...(pcId ? [{ pcId }] : [])
+          ]
+        },
+        include: { user: true }
+      });
+
+      let user = existingEnrollment?.user || null;
 
       if (!user) {
         const passwordHash = password ? await bcrypt.hash(password, 10) : await bcrypt.hash('12345678', 10);
         const trialExpiresAt = new Date();
         trialExpiresAt.setDate(trialExpiresAt.getDate() + 365);
-        
+
+        // Ensure email is globally unique if provided, or generate course-isolated email
+        let finalEmail = email;
+        if (finalEmail) {
+          const emailExists = await prisma.user.findUnique({ where: { email: finalEmail } });
+          if (emailExists) {
+            const [localPart, domain] = finalEmail.includes('@') ? finalEmail.split('@') : [finalEmail, 'learningtech.local'];
+            finalEmail = `${localPart}_${courseId.slice(-6)}@${domain}`;
+          }
+        } else {
+          finalEmail = `student_${studentId || pcId || Date.now()}_${courseId.slice(-6)}@learningtech.local`;
+        }
+
         user = await prisma.user.create({
           data: {
-            name: name || studentId,
+            name: name || studentId || pcId,
             studentId,
-            email,
+            email: finalEmail,
             passwordHash,
             role: 'LEARNER',
             authType: 'EMAIL',
@@ -109,12 +128,20 @@ export async function POST(req: Request) {
           }
         });
         newUsersCount++;
+
+        await prisma.enrollment.create({
+          data: {
+            userId: user.id,
+            courseId: courseId,
+            pcId: pcId,
+            status: 'APPROVED'
+          }
+        });
       } else {
-        // User already exists: update any modified details from the CSV
+        // User already exists in THIS course: update details without touching other courses
         const updateData: any = {};
         if (name && user.name !== name) updateData.name = name;
         if (studentId && user.studentId !== studentId) updateData.studentId = studentId;
-        if (email && user.email !== email) updateData.email = email;
         if (password) {
           updateData.passwordHash = await bcrypt.hash(password, 10);
         }
@@ -126,27 +153,17 @@ export async function POST(req: Request) {
           });
           updatedUsersCount++;
         }
-      }
 
-      // Upsert enrollment: re-approve and update pcId
-      await prisma.enrollment.upsert({
-        where: {
-          userId_courseId: {
-            userId: user.id,
-            courseId: courseId
-          }
-        },
-        update: {
-          pcId: pcId,
-          status: 'APPROVED' // Re-approve if student was previously removed
-        },
-        create: {
-          userId: user.id,
-          courseId: courseId,
-          pcId: pcId,
-          status: 'APPROVED'
+        if (existingEnrollment) {
+          await prisma.enrollment.update({
+            where: { id: existingEnrollment.id },
+            data: {
+              pcId: pcId || existingEnrollment.pcId,
+              status: 'APPROVED'
+            }
+          });
         }
-      });
+      }
 
       successCount++;
     }
