@@ -72,6 +72,10 @@ check_m9_course_html.js
 *.zip
 *.tmp
 /courses/
+!courses/blender/**
+!courses/excel/**
+!courses/iot/**
 public/courses/
 public/pending_courses/
 *.html
+!courses/**/*.html

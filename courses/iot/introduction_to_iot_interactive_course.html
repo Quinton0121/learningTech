@@ -1,0 +1,2813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internet of Things (IoT) Masterclass | Module 1</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pcbBlack: '#121417',
+                        pcbGold: '#d4af37',
+                        pcbCopper: '#c5a059',
+                        darkBezel: '#0a0d14'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c1017;
+            color: #f1f5f9;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Branding Colors */
+        .text-iot-cyan { color: #06b6d4; }
+        .bg-iot-cyan { background-color: #06b6d4; }
+        .border-iot-cyan { border-color: #06b6d4; }
+
+        .text-iot-emerald { color: #10b981; }
+        .bg-iot-emerald { background-color: #10b981; }
+        .border-iot-emerald { border-color: #10b981; }
+
+        .text-iot-violet { color: #8b5cf6; }
+        .bg-iot-violet { background-color: #8b5cf6; }
+        .border-iot-violet { border-color: #8b5cf6; }
+
+        /* Slide Transitions */
+        .slide-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translateY(20px);
+            padding: 1.5rem 2rem 5rem 2rem;
+            box-sizing: border-box;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .slide-container.previous {
+            transform: translateY(-20px);
+        }
+
+        kbd, .keyboard-key {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-bottom: 2px solid #475569;
+            color: #e2e8f0;
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.375rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        /* Fan Rotation */
+        @keyframes fan-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spinning-fast {
+            animation: fan-spin 0.4s infinite linear;
+        }
+
+        /* Animated Electron Circuit Flow */
+        @keyframes electron-dash {
+            from { stroke-dashoffset: 40; }
+            to { stroke-dashoffset: 0; }
+        }
+        .current-active {
+            stroke-dasharray: 6, 6;
+            animation: electron-dash 1s linear infinite;
+        }
+
+        canvas {
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-[#0c1017] text-slate-100 antialiased selection:bg-cyan-500 selection:text-black">
+
+    <!-- Top Progress Indicator -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-900 z-50">
+        <div id="progress-bar" class="h-full bg-iot-cyan transition-all duration-500 w-0"></div>
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50 bg-slate-900/90 backdrop-blur-md px-6 py-2.5 rounded-full border border-slate-700 shadow-2xl">
+        <button id="prev-btn" class="text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-1" title="Previous Slide (Left Arrow)">
+            <i class="fa-solid fa-chevron-left text-lg"></i>
+        </button>
+        <div class="text-slate-300 font-mono text-sm tracking-widest font-semibold flex items-center gap-1.5">
+            <span id="current-slide-num" class="text-iot-cyan text-base font-bold">1</span>
+            <span class="text-slate-600">/</span>
+            <span id="total-slide-num">10</span>
+        </div>
+        <button id="next-btn" class="text-iot-cyan hover:text-cyan-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-1" title="Next Slide (Right Arrow)">
+            <i class="fa-solid fa-chevron-right text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Slide 1: Welcome & Overview -->
+    <div class="slide-container active" id="slide-1">
+        <div class="text-center max-w-3xl">
+            <div class="w-24 h-24 bg-gradient-to-br from-cyan-900/60 to-slate-800 rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-xl border border-cyan-500/40 relative">
+                <div class="absolute inset-0 rounded-3xl bg-cyan-500/10 blur-xl"></div>
+                <i class="fa-solid fa-network-wired text-5xl text-iot-cyan relative z-10"></i>
+            </div>
+            <div class="inline-block px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-700/50 text-iot-cyan text-xs font-mono font-bold tracking-widest uppercase mb-4">
+                IoT Foundations • Topic 1
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 text-white tracking-tight">
+                The Internet of Things
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-400 mb-10 leading-relaxed font-light">
+                Bridging the physical and digital world: turning everyday objects into intelligent, data-driven systems.
+            </p>
+            <p class="text-slate-500 text-sm uppercase tracking-widest animate-pulse flex items-center justify-center gap-2">
+                <kbd><i class="fa-solid fa-arrow-right"></i></kbd> Press Right Arrow or Click Next to begin
+            </p>
+        </div>
+    </div>
+
+    <!-- Slide 2: Dumb vs Smart (The Anatomy of a "Thing") -->
+    <div class="slide-container" id="slide-2">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <!-- Left Explainer -->
+            <div class="w-full md:w-96 flex flex-col justify-between text-left h-full py-1 overflow-y-auto pr-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-iot-cyan text-xs font-bold tracking-wider mb-2">
+                        STEP 1: THE REVOLUTION
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">What Makes a "Thing" Smart?</h2>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                        A traditional appliance requires human hands to close a circuit. An IoT device introduces wireless transmission, a computing brain, and an actuator.
+                    </p>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-amber-950 border border-amber-800 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                                <i class="fa-solid fa-toggle-on text-xs"></i>
+                            </div>
+                            <div>
+                                <strong class="text-white block">Isolated (Mechanical Circuit):</strong>
+                                <span class="text-slate-400">Power is switched directly through manual contact. Without human presence, no action occurs.</span>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-iot-cyan shrink-0 mt-0.5">
+                                <i class="fa-solid fa-microchip text-xs"></i>
+                            </div>
+                            <div>
+                                <strong class="text-white block">Connected (IoT Pipeline):</strong>
+                                <span class="text-slate-400">Radio signals send telemetry to an MCU (ESP32) which computes decisions and triggers a relay.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 mt-2 text-[11px] text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400 text-base"></i>
+                    <span><strong>Key takeaway:</strong> IoT replaces manual switches with programmable logic and wireless triggers.</span>
+                </div>
+            </div>
+
+            <!-- Right Interactive Device Evolution Showcase -->
+            <div class="flex-1 w-full h-full min-h-[380px] flex items-center justify-center">
+                <div class="w-full max-w-2xl bg-slate-900/90 rounded-2xl border border-slate-800 p-5 flex flex-col items-center justify-between h-[500px]">
+                    <!-- Toggle Switch Header -->
+                    <div class="w-full flex bg-slate-950 p-1 rounded-xl border border-slate-800 mb-3">
+                        <button id="btn-mode-dumb" onclick="setDeviceDemoMode('dumb')" class="flex-1 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all bg-slate-800 text-slate-200">
+                            1. Isolated (Mechanical Circuit)
+                        </button>
+                        <button id="btn-mode-smart" onclick="setDeviceDemoMode('smart')" class="flex-1 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white">
+                            2. Connected (IoT Pipeline)
+                        </button>
+                    </div>
+
+                    <!-- View 1: Dumb Circuit Diagram -->
+                    <div id="view-dumb-circuit" class="flex-1 w-full flex flex-col items-center justify-between p-2">
+                        <div class="w-full flex justify-between items-center text-xs font-mono text-slate-400 px-2">
+                            <span>Closed-Loop Circuit Diagram</span>
+                            <span id="dumb-circuit-badge" class="px-2 py-0.5 rounded bg-red-950/80 border border-red-800 text-red-300 text-[10px] font-bold">
+                                CIRCUIT BROKEN • 0V
+                            </span>
+                        </div>
+
+                        <!-- SVG Mechanical Circuit Diagram -->
+                        <div class="w-full flex-1 flex items-center justify-center relative my-2">
+                            <svg class="w-full h-56 max-w-lg" viewBox="0 0 420 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M 70 100 L 70 40 L 220 40" stroke="#334155" stroke-width="4" stroke-linecap="round" />
+                                <path d="M 270 40 L 350 40 L 350 100" stroke="#334155" stroke-width="4" stroke-linecap="round" />
+                                <path d="M 350 100 L 350 160 L 70 160 L 70 100" stroke="#334155" stroke-width="4" stroke-linecap="round" />
+                                <path id="dumb-flow-wire" class="hidden" d="M 70 160 L 70 40 L 350 40 L 350 160 Z" stroke="#10b981" stroke-width="3" stroke-linecap="round" />
+
+                                <g transform="translate(45, 80)">
+                                    <rect x="0" y="0" width="50" height="40" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+                                    <line x1="16" y1="12" x2="34" y2="12" stroke="#ef4444" stroke-width="3" />
+                                    <line x1="25" y1="3" x2="25" y2="21" stroke="#ef4444" stroke-width="3" />
+                                    <line x1="18" y1="28" x2="32" y2="28" stroke="#60a5fa" stroke-width="3" />
+                                    <text x="25" y="55" fill="#94a3b8" font-size="10" font-family="JetBrains Mono" text-anchor="middle">12V BATTERY</text>
+                                </g>
+
+                                <g transform="translate(0, 0)">
+                                    <circle cx="220" cy="40" r="5" fill="#94a3b8" stroke="#475569" stroke-width="2" />
+                                    <circle cx="270" cy="40" r="5" fill="#94a3b8" stroke="#475569" stroke-width="2" />
+                                    <line id="dumb-switch-arm" x1="220" y1="40" x2="255" y2="15" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" class="transition-all duration-300" />
+                                    <text id="dumb-switch-label" x="245" y="70" fill="#ef4444" font-size="10" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">DISCONNECTED (OPEN)</text>
+                                </g>
+
+                                <g transform="translate(350, 100)">
+                                    <circle id="dumb-bulb-glow-halo" cx="0" cy="0" r="38" fill="#fbbf24" opacity="0" class="transition-opacity duration-300 blur-sm" />
+                                    <circle cx="0" cy="0" r="22" fill="#0f172a" stroke="#64748b" stroke-width="2" />
+                                    <path id="dumb-filament" d="M -8 6 Q 0 -12 8 6" stroke="#64748b" stroke-width="3" fill="none" class="transition-colors duration-300" />
+                                    <text x="0" y="38" fill="#94a3b8" font-size="10" font-family="JetBrains Mono" text-anchor="middle">LOAD (BULB)</text>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <!-- Button to toggle mechanical switch -->
+                        <div class="w-full flex gap-3">
+                            <button id="dumb-btn-toggle" onclick="toggleDumbSwitch()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs py-2.5 rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-hand-pointer text-amber-400"></i>
+                                <span id="dumb-btn-state-text">Close Circuit (Press Knife Switch)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- View 2: IoT Smart Pipeline Diagram -->
+                    <div id="view-smart-circuit" class="hidden flex-1 w-full flex flex-col items-center justify-between p-2">
+                        <div class="w-full flex justify-between items-center text-xs font-mono text-slate-400 px-2">
+                            <span>IoT Multi-Tier Pipeline</span>
+                            <span id="smart-pipeline-step-badge" class="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800 text-cyan-300 text-[10px] font-bold">
+                                Pipeline State: <span class="text-iot-cyan font-bold">READY FOR COMMAND</span>
+                            </span>
+                        </div>
+
+                        <!-- SVG IoT 2-Tier Architecture Diagram -->
+                        <div class="w-full flex-1 flex items-center justify-center relative my-2">
+                            <svg class="w-full h-56 max-w-xl" viewBox="0 0 460 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g transform="translate(15, 60)">
+                                    <rect x="0" y="0" width="46" height="74" rx="8" fill="#0f172a" stroke="#06b6d4" stroke-width="2" />
+                                    <rect x="4" y="6" width="38" height="54" rx="4" fill="#164e63" />
+                                    <circle cx="23" cy="67" r="3" fill="#06b6d4" />
+                                    <text x="23" y="36" fill="#e0f2fe" font-size="9" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">APP</text>
+                                    <text x="23" y="92" fill="#94a3b8" font-size="9" font-family="JetBrains Mono" text-anchor="middle">Phone (MQTT)</text>
+                                </g>
+
+                                <g transform="translate(70, 95)">
+                                    <path id="smart-radio-beam" d="M 5 0 Q 30 -15 55 0 T 105 0" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4,4" fill="none" class="opacity-30" />
+                                    <circle id="smart-packet-dot" cx="15" cy="0" r="5" fill="#38bdf8" class="hidden shadow-lg" />
+                                    <text x="55" y="-12" fill="#38bdf8" font-size="9" font-family="JetBrains Mono" text-anchor="middle">Wi-Fi (2.4GHz)</text>
+                                </g>
+
+                                <g transform="translate(185, 55)">
+                                    <rect id="mcu-chip-body" x="0" y="0" width="70" height="85" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+                                    <line x1="-6" y1="20" x2="0" y2="20" stroke="#64748b" stroke-width="2" />
+                                    <line x1="-6" y1="35" x2="0" y2="35" stroke="#64748b" stroke-width="2" />
+                                    <line x1="-6" y1="50" x2="0" y2="50" stroke="#64748b" stroke-width="2" />
+                                    <line x1="-6" y1="65" x2="0" y2="65" stroke="#64748b" stroke-width="2" />
+
+                                    <line x1="70" y1="20" x2="76" y2="20" stroke="#64748b" stroke-width="2" />
+                                    <line x1="70" y1="42" x2="76" y2="42" stroke="#10b981" stroke-width="3" />
+                                    <line x1="70" y1="65" x2="76" y2="65" stroke="#64748b" stroke-width="2" />
+
+                                    <rect x="12" y="10" width="46" height="30" rx="3" fill="#064e3b" />
+                                    <text x="35" y="28" fill="#a7f3d0" font-size="10" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">ESP32</text>
+                                    <text id="mcu-state-text" x="35" y="60" fill="#cbd5e1" font-size="8" font-family="JetBrains Mono" text-anchor="middle">CPU: IDLE</text>
+                                    <text x="35" y="102" fill="#94a3b8" font-size="9" font-family="JetBrains Mono" text-anchor="middle">Microcontroller</text>
+                                </g>
+
+                                <path id="mcu-gpio-wire" d="M 261 97 L 295 97" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+
+                                <g transform="translate(295, 70)">
+                                    <rect x="0" y="0" width="60" height="55" rx="6" fill="#1e1b4b" stroke="#818cf8" stroke-width="2" />
+                                    <circle cx="15" cy="27" r="4" fill="#a5b4fc" />
+                                    <circle cx="50" cy="27" r="4" fill="#a5b4fc" />
+                                    <line id="relay-contact-arm" x1="15" y1="27" x2="48" y2="12" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" class="transition-all duration-300" />
+                                    <text x="30" y="47" fill="#818cf8" font-size="8" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">RELAY</text>
+                                    <text id="relay-state-label" x="30" y="15" fill="#ef4444" font-size="8" font-family="JetBrains Mono" font-weight="bold" text-anchor="middle">OPEN</text>
+                                    <text x="30" y="70" fill="#94a3b8" font-size="9" font-family="JetBrains Mono" text-anchor="middle">Actuator</text>
+                                </g>
+
+                                <path d="M 355 97 L 390 97" stroke="#334155" stroke-width="4" stroke-linecap="round" />
+                                <path id="smart-current-flow" class="hidden" d="M 261 97 L 430 97" stroke="#10b981" stroke-width="3" stroke-linecap="round" />
+
+                                <g transform="translate(420, 97)">
+                                    <circle id="smart-bulb-halo" cx="0" cy="0" r="35" fill="#10b981" opacity="0" class="transition-opacity duration-300 blur-sm" />
+                                    <circle cx="0" cy="0" r="20" fill="#0f172a" stroke="#64748b" stroke-width="2" />
+                                    <path id="smart-filament" d="M -7 5 Q 0 -10 7 5" stroke="#64748b" stroke-width="3" fill="none" class="transition-colors duration-300" />
+                                    <text x="0" y="36" fill="#94a3b8" font-size="9" font-family="JetBrains Mono" text-anchor="middle">Smart Bulb</text>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <div class="w-full flex gap-3">
+                            <button id="btn-smart-send-cmd" onclick="triggerSmartIoTSequence()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-mono font-bold text-xs py-2.5 rounded-xl transition-all shadow-lg shadow-cyan-950 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> Send Remote Command ("Turn ON")
+                            </button>
+                            <button onclick="resetSmartIoTSequence()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs px-4 py-2.5 rounded-xl border border-slate-700 transition-colors">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live Telemetry Stream Box -->
+                    <div id="demo-telemetry-box" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-[11px] text-slate-400">
+                        <div class="flex justify-between border-b border-slate-800 pb-1 mb-1 text-[10px] text-slate-500 uppercase">
+                            <span>Device Telemetry / Bus Status</span>
+                            <span id="demo-stream-status" class="text-slate-500">MANUAL CIRCUIT</span>
+                        </div>
+                        <div id="demo-stream-payload" class="text-slate-400">
+                            Manual Switch: OPEN | Circuit Voltage: 0V | Current: 0.00A
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Core Definition (Coursera & Zero Human Intervention) -->
+    <div class="slide-container" id="slide-definition">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <!-- Left Panel: Coursera Quote & Deep Dive -->
+            <div class="w-full md:w-96 flex flex-col justify-between text-left h-full py-1 overflow-y-auto pr-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-700/60 text-iot-cyan text-xs font-mono font-bold tracking-wider mb-2">
+                        STEP 2: THE DEFINITION
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3 text-white">The Core Definition</h2>
+
+                    <!-- Hero Coursera Quote Card -->
+                    <div class="relative p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border-2 border-cyan-500/40 shadow-xl mb-3">
+                        <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-blue-600 border border-blue-400 text-[10px] font-bold text-white tracking-widest uppercase">
+                            Coursera
+                        </div>
+                        <i class="fa-solid fa-quote-left text-cyan-500/30 text-3xl absolute top-3 left-3 -z-0"></i>
+                        <p class="relative z-10 text-slate-200 text-xs md:text-sm font-medium leading-relaxed italic mb-2 pt-1 pl-2">
+                            "The Internet of Things, or IoT, is a network of physical devices that can transfer data to one another <span class="text-cyan-300 font-bold not-italic underline decoration-cyan-500 decoration-2">without human intervention</span>."
+                        </p>
+                        <span class="block text-right text-[11px] font-mono text-cyan-400 font-semibold">— Coursera IoT Specialization</span>
+                    </div>
+
+                    <!-- 3 Fundamental Pillars Breakdown -->
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start gap-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-iot-cyan shrink-0 mt-0.5 text-xs">
+                                <i class="fa-solid fa-cube"></i>
+                            </div>
+                            <div>
+                                <strong class="text-white block text-[11px]">1. Physical Devices:</strong>
+                                <span class="text-slate-400 text-[11px]">Everyday objects embedded with sensors, compute, and radio chips.</span>
+                            </div>
+                        </div>
+
+                        <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start gap-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-950 border border-emerald-800 flex items-center justify-center text-iot-emerald shrink-0 mt-0.5 text-xs">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <div>
+                                <strong class="text-white block text-[11px]">2. Transfer Data:</strong>
+                                <span class="text-slate-400 text-[11px]">Continuous telemetry streaming via lightweight protocols (MQTT, BLE, LoRa).</span>
+                            </div>
+                        </div>
+
+                        <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start gap-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-violet-950 border border-violet-800 flex items-center justify-center text-iot-violet shrink-0 mt-0.5 text-xs">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div>
+                                <strong class="text-white block text-[11px]">3. Without Human Intervention:</strong>
+                                <span class="text-slate-400 text-[11px]">Machine-to-Machine (M2M) autonomy where systems act instantaneously on their own.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 mt-2 text-[11px] text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-amber-400 text-sm"></i>
+                    <span><strong>Takeaway:</strong> If a human has to push a button every time, it's just a remote control—not true IoT.</span>
+                </div>
+            </div>
+
+            <!-- Right Panel: Interactive "Human-in-the-Loop vs Autonomous M2M" Lab -->
+            <div class="flex-1 w-full h-full min-h-[380px] flex items-center justify-center">
+                <div class="w-full max-w-2xl bg-slate-900/90 rounded-2xl border border-slate-800 p-5 flex flex-col justify-between h-[510px]">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">Test "Human Intervention" Difference</span>
+                            <span id="autonomy-status-badge" class="px-2.5 py-0.5 rounded bg-amber-950/80 border border-amber-700 text-amber-300 text-[10px] font-bold">
+                                REQUIRES HUMAN
+                            </span>
+                        </div>
+
+                        <div class="w-full flex bg-slate-950 p-1 rounded-xl border border-slate-800 mb-3">
+                            <button id="btn-autonomy-manual" onclick="setAutonomyMode('manual')" class="flex-1 px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all bg-slate-800 text-slate-200">
+                                1. Traditional (Human in Loop)
+                            </button>
+                            <button id="btn-autonomy-m2m" onclick="setAutonomyMode('m2m')" class="flex-1 px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white">
+                                2. True IoT (Zero Human M2M)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Flow Diagram -->
+                    <div class="flex-1 w-full bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 flex flex-col justify-between relative overflow-hidden my-1">
+                        <div class="flex justify-between items-center text-[11px] font-mono text-slate-500 border-b border-slate-800 pb-1.5">
+                            <span>Scenario: Greenhouse Frost Alert (0°C)</span>
+                            <span id="autonomy-m2m-tag" class="text-slate-400 text-[10px] uppercase">Ready to test</span>
+                        </div>
+
+                        <!-- 3-Node Visual Pipeline -->
+                        <div class="grid grid-cols-3 gap-3 items-center my-auto">
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl bg-slate-900 border border-slate-800">
+                                <div class="w-12 h-12 rounded-xl bg-cyan-950/80 border border-cyan-700 flex items-center justify-center text-iot-cyan text-xl mb-2">
+                                    <i class="fa-solid fa-snowflake"></i>
+                                </div>
+                                <strong class="text-xs text-white">Frost Sensor</strong>
+                                <span class="text-[10px] font-mono text-cyan-400 font-bold mt-0.5">Detects 0°C</span>
+                            </div>
+
+                            <div id="autonomy-middle-node" class="flex flex-col items-center text-center p-3 rounded-xl bg-amber-950/30 border border-amber-800 transition-all duration-300">
+                                <div id="autonomy-middle-icon" class="w-12 h-12 rounded-xl bg-amber-900/40 border border-amber-600 flex items-center justify-center text-amber-400 text-xl mb-2">
+                                    <i class="fa-solid fa-person-walking"></i>
+                                </div>
+                                <strong id="autonomy-middle-title" class="text-xs text-white">Human Worker</strong>
+                                <span id="autonomy-middle-sub" class="text-[10px] font-mono text-amber-400">Must check & turn dial</span>
+                            </div>
+
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl bg-slate-900 border border-slate-800">
+                                <div id="autonomy-heater-icon" class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-500 text-xl mb-2 transition-all">
+                                    <i class="fa-solid fa-fire"></i>
+                                </div>
+                                <strong class="text-xs text-white">Greenhouse Heater</strong>
+                                <span id="autonomy-heater-state" class="text-[10px] font-mono text-slate-500 uppercase">STANDBY (OFF)</span>
+                            </div>
+                        </div>
+
+                        <!-- Telemetry Stats Comparison Bar -->
+                        <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800 text-[11px] font-mono">
+                            <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                                <span class="text-slate-500 block text-[10px] uppercase">Reaction Latency:</span>
+                                <span id="autonomy-latency" class="font-bold text-amber-400 text-sm">~45 minutes (Delayed)</span>
+                            </div>
+                            <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                                <span class="text-slate-500 block text-[10px] uppercase">Human Friction:</span>
+                                <span id="autonomy-intervention" class="font-bold text-red-400 text-sm">100% Required</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 mt-2">
+                        <button id="btn-trigger-autonomy" onclick="triggerAutonomyDemo()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-mono font-bold text-xs py-2.5 rounded-xl transition-all shadow-lg shadow-cyan-950 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Simulate 0°C Frost Detection Event
+                        </button>
+                        <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 text-[10px] font-mono text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-iot-cyan"></i>
+                            <span id="autonomy-log-text" class="truncate">Select mode above and click simulate to test response time.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: The Sense-Decide-Act Loop -->
+    <div class="slide-container" id="slide-3">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-iot-emerald text-xs font-bold tracking-wider mb-2">
+                        STEP 3: THE ENGINE
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The Feedback Loop</h2>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                        Every autonomous IoT installation operates on a continuous 3-stage loop:
+                    </p>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <div class="text-iot-cyan font-bold mb-0.5 flex items-center gap-1.5">
+                                <i class="fa-solid fa-thermometer-half"></i> 1. Sense (Sensor)
+                            </div>
+                            <span class="text-slate-400">Reads analog environment (temperature, light, moisture) into electrical digits.</span>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <div class="text-amber-400 font-bold mb-0.5 flex items-center gap-1.5">
+                                <i class="fa-solid fa-brain"></i> 2. Decide (Compute)
+                            </div>
+                            <span class="text-slate-400">Edge controller or Cloud rule engine checks: <code class="text-amber-300">if (temp > 30°C)</code>.</span>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <div class="text-iot-emerald font-bold mb-0.5 flex items-center gap-1.5">
+                                <i class="fa-solid fa-fan"></i> 3. Act (Actuator)
+                            </div>
+                            <span class="text-slate-400">Motor, relay, valve, or LED turns digital decisions back into physical action.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 text-xs font-mono">
+                    <span class="text-slate-500 text-[10px] uppercase block mb-1">Live Logic State:</span>
+                    <div id="loop-logic-badge" class="text-iot-cyan font-bold">MONITORING (NORMAL)</div>
+                </div>
+            </div>
+
+            <!-- Right Interactive Temperature & Cooling Fan Sandbox -->
+            <div class="flex-1 w-full h-full min-h-[380px] flex items-center justify-center">
+                <div class="w-full max-w-xl bg-slate-900/90 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between h-[480px]">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">Industrial Thermal Chamber</span>
+                        <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">Loop Active</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center my-auto text-center">
+                        <div class="flex flex-col items-center p-3 rounded-xl bg-slate-950 border border-slate-800">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-800 flex items-center justify-center text-iot-cyan mb-2">
+                                <i class="fa-solid fa-temperature-arrow-up text-xl"></i>
+                            </div>
+                            <span class="text-xs text-slate-400 font-mono">DHT22 Sensor</span>
+                            <span id="loop-temp-display" class="text-xl font-bold font-mono text-white mt-1">24.0°C</span>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-arrow-right text-slate-600 text-lg"></i>
+                            <span class="text-[10px] font-mono text-slate-500 mt-1">MQTT Telemetry</span>
+                        </div>
+
+                        <div class="flex flex-col items-center p-3 rounded-xl bg-slate-950 border border-slate-800">
+                            <div id="fan-icon-container" class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-500 mb-2">
+                                <i id="fan-blade" class="fa-solid fa-fan text-2xl"></i>
+                            </div>
+                            <span class="text-xs text-slate-400 font-mono">Actuator (Relay)</span>
+                            <span id="fan-status-display" class="text-xs font-bold font-mono text-slate-500 mt-1 uppercase">OFF</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between text-xs font-mono">
+                            <label for="temp-slider" class="text-slate-300">Simulate Ambient Heat:</label>
+                            <span class="text-iot-cyan font-bold">Threshold: &gt; 35°C</span>
+                        </div>
+                        <input type="range" id="temp-slider" min="15" max="60" value="24" step="1" oninput="handleTempChange(this.value)" class="w-full accent-cyan-500 cursor-pointer">
+                        <div class="flex justify-between text-[10px] font-mono text-slate-500">
+                            <span>15°C (Cool)</span>
+                            <span>35°C (Trigger Point)</span>
+                            <span>60°C (Critical)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: The 4-Layer IoT Architecture -->
+    <div class="slide-container" id="slide-4">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-iot-violet text-xs font-bold tracking-wider mb-2">
+                        STEP 4: SYSTEM DESIGN
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The 4-Layer Architecture</h2>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                        IoT systems are multi-tiered stacks. Click any layer on the diagram to see how data flows from edge to user:
+                    </p>
+
+                    <div id="layer-info-card" class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+                        <div id="layer-info-title" class="font-bold text-iot-cyan text-sm mb-1">1. Perception Layer</div>
+                        <p id="layer-info-desc" class="text-slate-400 leading-relaxed text-[11px]">
+                            The physical edge sensors and actuators interacting directly with environment variables.
+                        </p>
+                        <div class="mt-2.5 pt-2 border-t border-slate-800 text-[10px] text-slate-500 font-mono">
+                            <span class="text-slate-400 font-semibold">Examples:</span> <span id="layer-info-examples">PT100, Accelerometers, Solenoids, Cameras</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+                    <i class="fa-solid fa-diagram-project mr-1 text-iot-violet"></i> Every layer has its own hardware, protocols, and latency considerations.
+                </div>
+            </div>
+
+            <!-- Interactive Architecture Stack -->
+            <div class="flex-1 w-full h-full min-h-[380px] flex items-center justify-center">
+                <div class="w-full max-w-xl flex flex-col gap-3">
+                    <div id="layer-card-4" onclick="selectLayer(4)" class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-violet-500 cursor-pointer transition-all flex items-center justify-between group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-violet-950/60 border border-violet-800 flex items-center justify-center text-iot-violet">
+                                <i class="fa-solid fa-chart-line text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white group-hover:text-violet-400 transition-colors">4. Application Layer</h3>
+                                <span class="text-xs text-slate-500">Dashboards, analytics, AI automation, smart phones</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded">Cloud / Web</span>
+                    </div>
+
+                    <div id="layer-card-3" onclick="selectLayer(3)" class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500 cursor-pointer transition-all flex items-center justify-between group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-cyan-950/60 border border-cyan-800 flex items-center justify-center text-iot-cyan">
+                                <i class="fa-solid fa-server text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">3. Processing (Middleware) Layer</h3>
+                                <span class="text-xs text-slate-500">MQTT brokers, time-series DBs, event dispatchers</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded">Broker / Edge</span>
+                    </div>
+
+                    <div id="layer-card-2" onclick="selectLayer(2)" class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500 cursor-pointer transition-all flex items-center justify-between group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-800 flex items-center justify-center text-iot-emerald">
+                                <i class="fa-solid fa-tower-broadcast text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">2. Network (Transport) Layer</h3>
+                                <span class="text-xs text-slate-500">Wireless transmission, gateways, routing</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded">Wi-Fi / LoRa / BLE</span>
+                    </div>
+
+                    <div id="layer-card-1" onclick="selectLayer(1)" class="p-4 rounded-xl bg-slate-900/90 border-2 border-cyan-500/80 cursor-pointer transition-all flex items-center justify-between group shadow-lg shadow-cyan-950/30">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-cyan-950 border border-cyan-700 flex items-center justify-center text-iot-cyan">
+                                <i class="fa-solid fa-microchip text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">1. Perception (Physical) Layer</h3>
+                                <span class="text-xs text-slate-400">Sensors measuring reality & actuators moving mechanisms</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-1 rounded border border-cyan-800">Hardware</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Wireless Connectivity & Protocols Matrix -->
+    <div class="slide-container" id="slide-5">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-iot-cyan text-xs font-bold tracking-wider mb-2">
+                        STEP 5: CONNECTIVITY
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">How IoT Speaks</h2>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                        There is no "one protocol to rule them all". Engineers select radios based on the <strong>range vs. power vs. bandwidth</strong> triangle.
+                    </p>
+
+                    <div class="space-y-1.5 text-xs font-mono">
+                        <button onclick="selectProtocol('ble')" id="btn-proto-ble" class="w-full p-2.5 rounded-lg text-left bg-slate-800 border border-cyan-500/80 text-white font-bold transition-all">
+                            BLE (Bluetooth Low Energy)
+                        </button>
+                        <button onclick="selectProtocol('wifi')" id="btn-proto-wifi" class="w-full p-2.5 rounded-lg text-left bg-slate-900 border border-slate-800 text-slate-300 transition-all hover:border-slate-700">
+                            Wi-Fi (802.11 b/g/n)
+                        </button>
+                        <button onclick="selectProtocol('lora')" id="btn-proto-lora" class="w-full p-2.5 rounded-lg text-left bg-slate-900 border border-slate-800 text-slate-300 transition-all hover:border-slate-700">
+                            LoRaWAN (Sub-GHz)
+                        </button>
+                        <button onclick="selectProtocol('cellular')" id="btn-proto-cellular" class="w-full p-2.5 rounded-lg text-left bg-slate-900 border border-slate-800 text-slate-300 transition-all hover:border-slate-700">
+                            Cellular NB-IoT / LTE-M
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-slate-500 text-[10px] font-mono uppercase block mb-1">Golden Rule:</span>
+                    <p class="text-slate-300 text-[11px]">Long Range + High Bandwidth = Huge Battery Drain.</p>
+                </div>
+            </div>
+
+            <!-- Right Visual Protocol Radar & Breakdown Card -->
+            <div class="flex-1 w-full h-full min-h-[380px] flex items-center justify-center">
+                <div class="w-full max-w-xl bg-slate-900/90 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between h-[480px]">
+                    <div>
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <i id="proto-icon" class="fa-brands fa-bluetooth text-2xl text-iot-cyan"></i>
+                                <h3 id="proto-name" class="text-lg font-bold text-white">Bluetooth Low Energy (BLE)</h3>
+                            </div>
+                            <span id="proto-tag" class="text-xs font-mono bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-800">Short Range • Ultra Low Power</span>
+                        </div>
+
+                        <div class="space-y-4 text-xs font-mono my-6">
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Signal Range:</span>
+                                    <span id="proto-range-text" class="text-white">~10 to 30 meters</span>
+                                </div>
+                                <div class="h-2 w-full bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="proto-range-bar" class="h-full bg-iot-cyan transition-all duration-500 w-[20%]"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Data Bandwidth:</span>
+                                    <span id="proto-bandwidth-text" class="text-white">Moderate (~1 - 2 Mbps)</span>
+                                </div>
+                                <div class="h-2 w-full bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="proto-bandwidth-bar" class="h-full bg-iot-emerald transition-all duration-500 w-[45%]"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Battery Efficiency:</span>
+                                    <span id="proto-power-text" class="text-white">Months to Years on Coin Cell</span>
+                                </div>
+                                <div class="h-2 w-full bg-slate-950 rounded-full overflow-hidden">
+                                    <div id="proto-power-bar" class="h-full bg-amber-400 transition-all duration-500 w-[95%]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs">
+                        <strong class="text-slate-300 block mb-1 font-mono uppercase text-[10px]">Best Suited For:</strong>
+                        <p id="proto-usecase" class="text-slate-400 text-xs leading-relaxed">
+                            Wearable fitness trackers, smart beacons, medical monitors, and peripheral sensor tags syncing with a nearby smartphone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Live Telemetry & MQTT Pipeline Simulator -->
+    <div class="slide-container" id="slide-6">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-iot-emerald text-xs font-bold tracking-wider mb-2">
+                        STEP 6: DATA PIPELINE
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">The Packet Journey</h2>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                        IoT devices serialize sensor readings into lightweight formats (like JSON) and transmit them over publish/subscribe protocols like <strong>MQTT</strong>.
+                    </p>
+
+                    <div class="space-y-2 mb-3">
+                        <button onclick="publishSensorPacket()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold font-mono py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-950">
+                            <i class="fa-solid fa-paper-plane"></i> Publish Telemetry (<kbd>Space</kbd>)
+                        </button>
+                        <button onclick="toggleAutoTelemetry()" id="btn-auto-telemetry" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono py-1.5 rounded-lg text-xs border border-slate-700 transition-colors">
+                            Auto-Stream: OFF
+                        </button>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 font-mono text-[10px] space-y-1">
+                        <div class="flex justify-between text-slate-400">
+                            <span>Protocol:</span>
+                            <span class="text-iot-cyan font-bold">MQTT v3.1.1</span>
+                        </div>
+                        <div class="flex justify-between text-slate-400">
+                            <span>Topic:</span>
+                            <span class="text-amber-400">factory/zone_1/temp</span>
+                        </div>
+                        <div class="flex justify-between text-slate-400">
+                            <span>QoS Level:</span>
+                            <span class="text-slate-300">1 (At least once)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs font-mono">
+                    <span class="text-slate-500 text-[10px] uppercase block mb-0.5">Packets Sent:</span>
+                    <span id="packet-counter" class="text-lg font-bold text-iot-emerald">0</span>
+                </div>
+            </div>
+
+            <!-- Right Live Packet Visualizer Canvas & JSON Box -->
+            <div class="flex-1 w-full h-full min-h-[380px] flex flex-col justify-between">
+                <div class="w-full h-[230px] bg-slate-900/90 rounded-2xl border border-slate-800 p-4 relative overflow-hidden flex items-center justify-between">
+                    <div class="flex flex-col items-center z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-950 border border-cyan-700 flex items-center justify-center text-iot-cyan shadow-lg shadow-cyan-950">
+                            <i class="fa-solid fa-microchip text-2xl"></i>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-slate-300 mt-2">Edge Node</span>
+                        <span class="text-[10px] font-mono text-slate-500">Publisher</span>
+                    </div>
+
+                    <div class="flex-1 h-1 bg-slate-800 mx-4 relative">
+                        <div id="packet-flyer" class="hidden absolute -top-2.5 w-6 h-6 rounded-full bg-cyan-400 border-2 border-white shadow-[0_0_15px_#06b6d4] flex items-center justify-center text-[10px] text-slate-950 font-bold">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-950 border border-emerald-700 flex items-center justify-center text-iot-emerald shadow-lg shadow-emerald-950">
+                            <i class="fa-solid fa-server text-2xl"></i>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-slate-300 mt-2">MQTT Broker</span>
+                        <span class="text-[10px] font-mono text-slate-500">Message Queue</span>
+                    </div>
+
+                    <div class="flex-1 h-1 bg-slate-800 mx-4"></div>
+
+                    <div class="flex flex-col items-center z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-violet-950 border border-violet-700 flex items-center justify-center text-iot-violet shadow-lg shadow-violet-950">
+                            <i class="fa-solid fa-desktop text-2xl"></i>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-slate-300 mt-2">Subscriber</span>
+                        <span class="text-[10px] font-mono text-slate-500">Cloud Web UI</span>
+                    </div>
+                </div>
+
+                <div class="w-full h-[180px] bg-slate-950 rounded-2xl border border-slate-800 p-4 font-mono text-xs overflow-hidden flex flex-col">
+                    <div class="flex justify-between border-b border-slate-800 pb-2 mb-2 text-[11px] text-slate-400">
+                        <span class="text-iot-cyan font-bold"><i class="fa-solid fa-terminal mr-1"></i> Live MQTT Payload Viewer</span>
+                        <span id="payload-timestamp" class="text-slate-500">Awaiting packet...</span>
+                    </div>
+                    <pre id="payload-code" class="text-emerald-400 text-xs overflow-y-auto flex-1 leading-relaxed">
+// Click "Publish Telemetry" to simulate transmission
+{
+  "device_name": "Sensor_ESP32_01",
+  "status": "IDLE"
+}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Interactive Automation Lab (The Smart Greenhouse) -->
+    <div class="slide-container" id="slide-7">
+        <div class="flex flex-col md:flex-row items-center gap-8 max-w-6xl w-full h-[82vh]">
+            <div class="w-full md:w-80 flex flex-col justify-between text-left h-full py-1">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-iot-cyan text-xs font-bold tracking-wider mb-2">
+                        CHALLENGE LAB
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">Smart Greenhouse</h2>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                        Connect the proper sensor-to-actuator rules to stabilize the greenhouse ecosystem.
+                    </p>
+
+                    <div class="space-y-2 text-xs font-mono">
+                        <div id="mission-item-moisture" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400">
+                            <span class="font-bold block text-white mb-0.5">1. Soil Moisture Target:</span>
+                            Maintain moisture between <span class="text-iot-cyan font-bold">40% - 70%</span>. Turn on Water Pump if dry.
+                        </div>
+
+                        <div id="mission-item-temp" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400">
+                            <span class="font-bold block text-white mb-0.5">2. Temperature Target:</span>
+                            Keep temp below <span class="text-amber-400 font-bold">32°C</span>. Open roof vents if overheating.
+                        </div>
+                    </div>
+
+                    <button onclick="resetGreenhouseLab()" class="w-full mt-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono py-1.5 rounded-lg text-xs border border-slate-700 transition-colors flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Ecosystem
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs font-mono">
+                    <span class="text-slate-500 text-[10px] uppercase block mb-1">System Health:</span>
+                    <div id="gh-health-badge" class="text-amber-400 font-bold">STABILIZING ENVIRONMENT</div>
+                </div>
+            </div>
+
+            <!-- Right Greenhouse Ecosystem Simulator -->
+            <div class="flex-1 w-full h-full min-h-[380px] relative">
+                <div class="w-full h-full bg-slate-900/90 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between items-center text-xs font-mono mb-2">
+                                <span class="text-slate-400"><i class="fa-solid fa-droplet text-iot-cyan mr-1"></i> Soil Moisture</span>
+                                <span id="gh-moisture-val" class="font-bold text-iot-cyan">30% (Low)</span>
+                            </div>
+                            <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
+                                <div id="gh-moisture-bar" class="h-full bg-iot-cyan transition-all duration-500 w-[30%]"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between items-center text-xs font-mono mb-2">
+                                <span class="text-slate-400"><i class="fa-solid fa-temperature-high text-amber-400 mr-1"></i> Temperature</span>
+                                <span id="gh-temp-val" class="font-bold text-amber-400">36°C (Hot)</span>
+                            </div>
+                            <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
+                                <div id="gh-temp-bar" class="h-full bg-amber-400 transition-all duration-500 w-[72%]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center my-auto">
+                        <div class="w-24 h-24 rounded-full bg-slate-950 border-2 border-slate-800 flex items-center justify-center shadow-inner relative">
+                            <i id="gh-plant-icon" class="fa-solid fa-seedling text-5xl text-amber-500 transition-all duration-500"></i>
+                        </div>
+                        <span id="gh-plant-status" class="text-xs font-mono text-amber-400 font-bold mt-2">Plant Stressed (Needs Water & Cool Air)</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800 font-mono text-xs">
+                        <button onclick="toggleActuator('pump')" id="btn-actuator-pump" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-between transition-all">
+                            <span><i class="fa-solid fa-faucet-drip mr-2 text-iot-cyan"></i>Water Pump</span>
+                            <span id="badge-pump" class="px-2 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">OFF</span>
+                        </button>
+
+                        <button onclick="toggleActuator('vent')" id="btn-actuator-vent" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-between transition-all">
+                            <span><i class="fa-solid fa-wind mr-2 text-violet-400"></i>Vent Fan</span>
+                            <span id="badge-vent" class="px-2 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">OFF</span>
+                        </button>
+                    </div>
+
+                    <div id="gh-success-overlay" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center hidden p-6 text-center">
+                        <div class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-3xl text-iot-emerald mb-3 shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-1">Ecosystem Optimized!</h3>
+                        <p class="text-xs text-slate-400 max-w-sm mb-4">You calibrated the sense-decide-act loop. Moisture is replenished and temperature has returned to safe operational bounds.</p>
+                        <button onclick="resetGreenhouseLab()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold font-mono px-5 py-2 rounded-xl text-xs transition-transform transform hover:scale-105">
+                            Run Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Quick Knowledge Check -->
+    <div class="slide-container" id="slide-8">
+        <div class="flex flex-col items-center max-w-3xl w-full text-center">
+            <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-iot-cyan text-xs font-mono font-bold tracking-widest uppercase mb-3">
+                SUMMARY & KNOWLEDGE CHECK
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Test Your IoT Intuition</h2>
+            <p class="text-sm text-slate-400 mb-8 max-w-xl">
+                Select the correct answer to complete Module 1.
+            </p>
+
+            <div class="w-full bg-slate-900/90 rounded-2xl border border-slate-800 p-6 text-left">
+                <div class="text-xs font-mono text-iot-cyan font-bold uppercase mb-1">Question 1 of 1:</div>
+                <h3 class="text-base font-semibold text-white mb-4">
+                    Which communication protocol is best suited for agricultural sensors located 5 kilometers away in remote fields that only transmit moisture readings twice a day on a 5-year battery?
+                </h3>
+
+                <div class="space-y-2.5 text-xs font-mono">
+                    <button onclick="submitQuizAnswer(false, this)" class="quiz-opt w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700 transition-all flex items-center justify-between">
+                        <span>A) Wi-Fi (802.11ac)</span>
+                        <i class="fa-regular fa-circle text-slate-600"></i>
+                    </button>
+
+                    <button onclick="submitQuizAnswer(false, this)" class="quiz-opt w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700 transition-all flex items-center justify-between">
+                        <span>B) Bluetooth Low Energy (BLE)</span>
+                        <i class="fa-regular fa-circle text-slate-600"></i>
+                    </button>
+
+                    <button onclick="submitQuizAnswer(true, this)" class="quiz-opt w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700 transition-all flex items-center justify-between">
+                        <span>C) LoRaWAN (Long Range Wide Area Network)</span>
+                        <i class="fa-regular fa-circle text-slate-600"></i>
+                    </button>
+
+                    <button onclick="submitQuizAnswer(false, this)" class="quiz-opt w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700 transition-all flex items-center justify-between">
+                        <span>D) Standard Ethernet RJ45</span>
+                        <i class="fa-regular fa-circle text-slate-600"></i>
+                    </button>
+                </div>
+
+                <div id="quiz-feedback" class="mt-4 p-3 rounded-xl hidden text-xs font-mono"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: DFRobot micro:IoT Board Hardware Guide -->
+    <div class="slide-container" id="slide-10">
+        <div class="max-w-7xl w-full h-[84vh] flex flex-col justify-between py-1">
+            <!-- Header Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 font-bold text-base shadow-inner">
+                        🤖
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-sm md:text-base font-bold text-white tracking-wide">DFRobot micro:IoT Board</h2>
+                            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold uppercase">Hardware Pinout</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">Interactive Canvas Map, Sensor Bus & GPIO Reference</p>
+                    </div>
+                </div>
+
+                <!-- Simulation Action Controls -->
+                <div class="flex items-center gap-1.5 flex-wrap text-xs">
+                    <button id="sim-flame-btn" onclick="toggleFlameSim()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition flex items-center gap-1">
+                        <span>🔥</span> <span id="sim-flame-text">Simulate Flame</span>
+                    </button>
+
+                    <button id="sim-buzzer-btn" onclick="toggleBuzzerSwitch()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition flex items-center gap-1">
+                        <span>🔊</span> <span id="sim-buzzer-text">Buzzer: ON</span>
+                    </button>
+
+                    <button id="sim-pwr-btn" onclick="togglePowerSwitch()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1">
+                        <span>⚡</span> <span id="pwr-btn-text">Power: ON</span>
+                    </button>
+
+                    <button onclick="resetBoardState()" class="px-2 py-1 rounded-lg text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2-Column Responsive Workspace -->
+            <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 pt-2 overflow-hidden min-h-0">
+                <!-- Left Column: Canvas Board -->
+                <div class="lg:col-span-7 flex flex-col justify-between h-full min-h-0">
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex-1 flex flex-col min-h-0 relative overflow-hidden shadow-xl">
+                        <!-- Canvas Controls Header -->
+                        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800 text-xs shrink-0">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="font-mono uppercase tracking-wider font-semibold text-slate-300 text-[10px]">Live Board View</span>
+                            </div>
+                            <div class="flex items-center gap-2 font-mono text-[11px] text-slate-400">
+                                <span>Filter:</span>
+                                <select id="category-filter" onchange="filterCategory(this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-slate-200 text-xs focus:outline-none focus:border-amber-400">
+                                    <option value="all">All Components</option>
+                                    <option value="pins">GPIO & I2C Hub</option>
+                                    <option value="display">OLED & Crown RGBs</option>
+                                    <option value="actuators">Buzzer, Motor & Servos</option>
+                                    <option value="power">Power, Battery & USB</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Container -->
+                        <div id="canvas-wrapper" class="relative w-full flex-1 flex items-center justify-center bg-neutral-950/80 rounded-lg border border-slate-800 overflow-hidden cursor-crosshair min-h-[260px]">
+                            <canvas id="boardCanvas" class="w-full h-full block"></canvas>
+                            <div id="canvas-tooltip" class="absolute pointer-events-none opacity-0 transition-opacity duration-150 bg-slate-900/95 border border-amber-400/80 shadow-2xl px-2.5 py-1 rounded-lg text-xs font-mono text-amber-300 z-30 whitespace-nowrap">
+                                Tooltip
+                            </div>
+                        </div>
+
+                        <!-- Live Status Bar -->
+                        <div class="mt-2 pt-1.5 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 font-mono shrink-0">
+                            <span>💡 Tap or click any labeled pin or component to inspect</span>
+                            <span id="canvas-status" class="text-amber-400 font-semibold">Hovering: None</span>
+                        </div>
+                    </div>
+
+                    <!-- Wiring Standard Legend -->
+                    <div class="bg-slate-900/70 border border-slate-800 rounded-lg p-2 mt-2 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono shrink-0">
+                        <span class="text-slate-300 font-bold">Wiring Standard:</span>
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-950 border border-slate-600 inline-block"></span> Black = GND</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Red = 3.3V / VCC</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Green = Signal / GPIO</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> Blue = I2C Bus</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Component & Pin Inspector -->
+                <div class="lg:col-span-5 flex flex-col h-full min-h-0">
+                    <div id="inspector-card" class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-2xl flex-1 flex flex-col justify-between overflow-y-auto pr-1">
+                        <div>
+                            <!-- Title & Badges -->
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <div>
+                                    <span id="insp-tag" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                        Triple I2C Bus Hub (4x3)
+                                    </span>
+                                    <h3 id="insp-title" class="text-lg font-black text-white mt-1 leading-tight">I2C Interface (4 Rows x 3 Columns)</h3>
+                                </div>
+                                <span id="insp-voltage" class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-400/10 text-amber-400 border border-amber-400/20 font-semibold whitespace-nowrap">
+                                    3.3V Power & Logic
+                                </span>
+                            </div>
+
+                            <!-- Description -->
+                            <p id="insp-desc" class="text-xs text-slate-300 leading-relaxed mb-2.5 whitespace-pre-line">
+The board provides a 3-column I2C expansion port labeled "I2C" arranged in 4 rows:
+• Row 1 (Top): SDA (Serial Data Line -> micro:bit Pin 20)
+• Row 2: SCL (Serial Clock Line -> micro:bit Pin 19)
+• Row 3: GND (System Ground / 0V)
+• Row 4 (Bottom): 3V3 (3.3V DC Power Rail)
+
+All 3 columns are wired in parallel to the exact same I2C bus. Connect up to 3 I2C modules simultaneously without external breadboards.
+                            </p>
+
+                            <!-- Specifications Table -->
+                            <div class="bg-slate-950 rounded-lg border border-slate-800 overflow-hidden mb-2.5 text-[11px]">
+                                <div class="px-2.5 py-1 bg-slate-900/90 border-b border-slate-800 text-[10px] font-mono uppercase text-slate-400 font-semibold flex justify-between">
+                                    <span>Hardware Parameters</span>
+                                    <span id="insp-id-badge" class="text-amber-400">ID: I2C_PORT</span>
+                                </div>
+                                <div class="p-2 space-y-1.5">
+                                    <div class="flex justify-between items-center border-b border-slate-900 pb-1">
+                                        <span class="text-slate-400">micro:bit Mapping</span>
+                                        <span id="insp-mapping" class="font-mono font-bold text-slate-200">SDA = P20 | SCL = P19</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b border-slate-900 pb-1">
+                                        <span class="text-slate-400">Functionality</span>
+                                        <span id="insp-functions" class="font-semibold text-emerald-400 truncate max-w-[200px]">Daisy-chain up to 3 I2C sensors in parallel</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b border-slate-900 pb-1">
+                                        <span class="text-slate-400">Onboard Conflicts</span>
+                                        <span id="insp-conflict" class="font-semibold text-slate-300 truncate max-w-[200px]">Shares bus with OLED (0x3C)</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-400">Peripherals</span>
+                                        <span id="insp-devices" class="font-semibold text-slate-200 truncate max-w-[200px]">OLED, BME280, SHT30, RTC</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Code Snippet -->
+                            <div class="bg-slate-950 rounded-lg border border-slate-800 p-2 mb-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-semibold">MakeCode Python Snippet</span>
+                                    <button onclick="copySnippet()" class="text-amber-400 hover:text-amber-300 text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">
+                                        Copy
+                                    </button>
+                                </div>
+                                <pre class="text-[10px] font-mono text-emerald-400 bg-slate-900 p-2 rounded border border-slate-800 overflow-x-auto whitespace-pre leading-relaxed"><code id="insp-code"># I2C communication is handled automatically in MakeCode:
+# micro:bit Pin 19 = SCL, Pin 20 = SDA
+OLED.init(128, 64)
+OLED.write_string("I2C Multi-Hub")</code></pre>
+                            </div>
+                        </div>
+
+                        <!-- Quick Jump Buttons -->
+                        <div class="pt-2 border-t border-slate-800 shrink-0">
+                            <span class="text-[10px] font-mono text-slate-400 block mb-1.5 font-semibold">Quick Jump to Board Parts:</span>
+                            <div class="flex flex-wrap gap-1 text-[10px] font-mono">
+                                <button onclick="selectPart('I2C_PORT')" class="px-1.5 py-0.5 rounded bg-blue-950 border border-blue-600 text-blue-300 font-bold">I2C (4x3)</button>
+                                <button onclick="selectPart('GPIO_CLUSTER')" class="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold">All GPIO</button>
+                                <button onclick="selectPart('GPIO_P0')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">P0</button>
+                                <button onclick="selectPart('GPIO_P1')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">P1</button>
+                                <button onclick="selectPart('GPIO_P2')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">P2</button>
+                                <button onclick="selectPart('BUZZER_SW')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">Buzzer Sw</button>
+                                <button onclick="selectPart('OLED')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">OLED</button>
+                                <button onclick="selectPart('MOTOR')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">Motor M1</button>
+                                <button onclick="selectPart('SERVO_6PIN')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">Servo S1/S2</button>
+                                <button onclick="selectPart('RGB_CROWN')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">RGB (P15)</button>
+                                <button onclick="selectPart('MB_SLOT')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">micro:bit</button>
+                                <button onclick="selectPart('BATT_JST')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">Battery</button>
+                                <button onclick="selectPart('USB_CHG')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">USB 5V</button>
+                                <button onclick="selectPart('PWR_SW')" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">Power Sw</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide-container');
+            const totalSlides = slides.length;
+            let currentSlideIndex = 0;
+
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const currentNumSpan = document.getElementById('current-slide-num');
+            const totalNumSpan = document.getElementById('total-slide-num');
+            const progressBar = document.getElementById('progress-bar');
+
+            totalNumSpan.textContent = totalSlides;
+
+            window.updateUI = function() {
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'previous');
+                    if (index === currentSlideIndex) {
+                        slide.classList.add('active');
+                    } else if (index < currentSlideIndex) {
+                        slide.classList.add('previous');
+                    }
+                });
+
+                prevBtn.disabled = currentSlideIndex === 0;
+                nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+                currentNumSpan.textContent = currentSlideIndex + 1;
+                progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
+
+                // Resize Slide 10 canvas on entry
+                if (currentSlideIndex === 9) {
+                    setTimeout(resizeBoardCanvas, 60);
+                }
+            };
+
+            window.nextSlide = function() {
+                if (currentSlideIndex < totalSlides - 1) {
+                    currentSlideIndex++;
+                    updateUI();
+                }
+            };
+
+            window.prevSlide = function() {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    updateUI();
+                }
+            };
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            let dumbSwitchClosed = false;
+            let smartSequenceRunning = false;
+
+            window.setDeviceDemoMode = function(mode) {
+                const btnDumb = document.getElementById('btn-mode-dumb');
+                const btnSmart = document.getElementById('btn-mode-smart');
+                const viewDumb = document.getElementById('view-dumb-circuit');
+                const viewSmart = document.getElementById('view-smart-circuit');
+                const statusSpan = document.getElementById('demo-stream-status');
+                const payloadSpan = document.getElementById('demo-stream-payload');
+
+                if (mode === 'smart') {
+                    if (btnSmart) btnSmart.className = 'flex-1 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all bg-iot-cyan text-slate-950 shadow-lg shadow-cyan-950';
+                    if (btnDumb) btnDumb.className = 'flex-1 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white';
+                    if (viewDumb) viewDumb.classList.add('hidden');
+                    if (viewSmart) viewSmart.classList.remove('hidden');
+                    if (statusSpan) {
+                        statusSpan.textContent = 'DIGITAL IOT PIPELINE';
+                        statusSpan.className = 'text-iot-cyan font-bold';
+                    }
+                    if (payloadSpan) {
+                        payloadSpan.innerHTML = 'Awaiting remote telemetry packet &rarr; MCU listening on port 1883';
+                    }
+                } else {
+                    if (btnDumb) btnDumb.className = 'flex-1 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all bg-slate-800 text-slate-200';
+                    if (btnSmart) btnSmart.className = 'flex-1 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white';
+                    if (viewDumb) viewDumb.classList.remove('hidden');
+                    if (viewSmart) viewSmart.classList.add('hidden');
+                    if (statusSpan) {
+                        statusSpan.textContent = 'MANUAL CIRCUIT';
+                        statusSpan.className = 'text-slate-500';
+                    }
+                    renderDumbCircuitUI();
+                }
+            };
+
+            window.toggleDumbSwitch = function() {
+                dumbSwitchClosed = !dumbSwitchClosed;
+                renderDumbCircuitUI();
+            };
+
+            window.toggleBulbPower = function() {
+                window.toggleDumbSwitch();
+            };
+
+            function renderDumbCircuitUI() {
+                const arm = document.getElementById('dumb-switch-arm');
+                const label = document.getElementById('dumb-switch-label');
+                const flowWire = document.getElementById('dumb-flow-wire');
+                const badge = document.getElementById('dumb-circuit-badge');
+                const btnText = document.getElementById('dumb-btn-state-text');
+                const halo = document.getElementById('dumb-bulb-glow-halo');
+                const filament = document.getElementById('dumb-filament');
+                const payloadSpan = document.getElementById('demo-stream-payload');
+
+                if (dumbSwitchClosed) {
+                    if (arm) { arm.setAttribute('x2', '270'); arm.setAttribute('y2', '40'); arm.setAttribute('stroke', '#10b981'); }
+                    if (label) { label.textContent = 'CONNECTED (CLOSED)'; label.setAttribute('fill', '#10b981'); }
+                    if (flowWire) { flowWire.classList.remove('hidden'); flowWire.classList.add('current-active'); }
+                    if (badge) {
+                        badge.className = 'px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-700 text-emerald-300 text-[10px] font-bold';
+                        badge.textContent = 'CIRCUIT COMPLETE • 12V FLOWING';
+                    }
+                    if (btnText) btnText.textContent = 'Break Circuit (Open Knife Switch)';
+                    if (halo) halo.setAttribute('opacity', '0.75');
+                    if (filament) filament.setAttribute('stroke', '#fbbf24');
+                    if (payloadSpan) {
+                        payloadSpan.innerHTML = '<span class="text-emerald-400 font-bold">CIRCUIT CLOSED:</span> Switch = ON | Continuous Current: 1.0A | Bulb: 100% Lumens';
+                    }
+                } else {
+                    if (arm) { arm.setAttribute('x2', '255'); arm.setAttribute('y2', '15'); arm.setAttribute('stroke', '#e2e8f0'); }
+                    if (label) { label.textContent = 'DISCONNECTED (OPEN)'; label.setAttribute('fill', '#ef4444'); }
+                    if (flowWire) { flowWire.classList.add('hidden'); flowWire.classList.remove('current-active'); }
+                    if (badge) {
+                        badge.className = 'px-2 py-0.5 rounded bg-red-950/80 border border-red-800 text-red-300 text-[10px] font-bold';
+                        badge.textContent = 'CIRCUIT BROKEN • 0V';
+                    }
+                    if (btnText) btnText.textContent = 'Close Circuit (Press Knife Switch)';
+                    if (halo) halo.setAttribute('opacity', '0');
+                    if (filament) filament.setAttribute('stroke', '#64748b');
+                    if (payloadSpan) {
+                        payloadSpan.innerHTML = 'Manual Switch: OPEN | Circuit Voltage: 0V | Current: 0.00A';
+                    }
+                }
+            }
+
+            window.triggerSmartIoTSequence = function() {
+                if (smartSequenceRunning) return;
+                smartSequenceRunning = true;
+
+                const btn = document.getElementById('btn-smart-send-cmd');
+                if (btn) { btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed'); }
+
+                const beam = document.getElementById('smart-radio-beam');
+                const packet = document.getElementById('smart-packet-dot');
+                const mcuBody = document.getElementById('mcu-chip-body');
+                const mcuText = document.getElementById('mcu-state-text');
+                const mcuWire = document.getElementById('mcu-gpio-wire');
+                const relayArm = document.getElementById('relay-contact-arm');
+                const relayLabel = document.getElementById('relay-state-label');
+                const smartCurrent = document.getElementById('smart-current-flow');
+                const bulbHalo = document.getElementById('smart-bulb-halo');
+                const filament = document.getElementById('smart-filament');
+                const badge = document.getElementById('smart-pipeline-step-badge');
+                const payloadSpan = document.getElementById('demo-stream-payload');
+
+                if (badge) badge.innerHTML = 'Step 1: <span class="text-cyan-400 font-bold">Transmitting Wi-Fi Packet...</span>';
+                if (beam) { beam.classList.remove('opacity-30'); beam.classList.add('opacity-100', 'current-active'); }
+                if (packet) packet.classList.remove('hidden');
+
+                let packetProgress = 75;
+                const animPacket = setInterval(() => {
+                    packetProgress += 5;
+                    if (packet) packet.setAttribute('cx', packetProgress);
+                    if (packetProgress >= 175) {
+                        clearInterval(animPacket);
+                        if (packet) packet.classList.add('hidden');
+                        if (beam) { beam.classList.remove('current-active'); beam.classList.add('opacity-30'); }
+
+                        if (badge) badge.innerHTML = 'Step 2: <span class="text-emerald-400 font-bold">ESP32 Computing Decision...</span>';
+                        if (mcuBody) { mcuBody.setAttribute('stroke', '#06b6d4'); mcuBody.setAttribute('fill', '#082f49'); }
+                        if (mcuText) { mcuText.textContent = 'CPU: PARSING JSON'; mcuText.setAttribute('fill', '#38bdf8'); }
+                        if (payloadSpan) { payloadSpan.innerHTML = '<span class="text-iot-cyan">MQTT RX:</span> {"topic":"home/bulb_01/cmd","action":"ON","relay":1}'; }
+
+                        setTimeout(() => {
+                            if (badge) badge.innerHTML = 'Step 3: <span class="text-purple-400 font-bold">GPIO 12 HIGH &rarr; Energizing Relay Coil</span>';
+                            if (mcuWire) { mcuWire.setAttribute('stroke', '#10b981'); mcuWire.setAttribute('stroke-width', '4'); }
+                            if (mcuText) { mcuText.textContent = 'GPIO 12: HIGH (3.3V)'; mcuText.setAttribute('fill', '#10b981'); }
+
+                            setTimeout(() => {
+                                if (badge) badge.innerHTML = 'Step 4: <span class="text-emerald-400 font-bold">Relay Contacts Closed &rarr; Bulb ON!</span>';
+                                if (relayArm) { relayArm.setAttribute('x2', '55'); relayArm.setAttribute('y2', '27'); relayArm.setAttribute('stroke', '#10b981'); }
+                                if (relayLabel) { relayLabel.textContent = 'CLOSED'; relayLabel.setAttribute('fill', '#10b981'); }
+
+                                if (smartCurrent) { smartCurrent.classList.remove('hidden'); smartCurrent.classList.add('current-active'); }
+                                if (bulbHalo) bulbHalo.setAttribute('opacity', '0.85');
+                                if (filament) filament.setAttribute('stroke', '#10b981');
+                                if (payloadSpan) {
+                                    payloadSpan.innerHTML = '<span class="text-emerald-400 font-bold">SYSTEM ACTIVE:</span> Remote App &rarr; ESP32 MCU &rarr; Relay Closed &rarr; 120V Circuit Complete!';
+                                }
+
+                                if (btn) { btn.disabled = false; btn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                                smartSequenceRunning = false;
+                            }, 600);
+                        }, 600);
+                    }
+                }, 20);
+            };
+
+            window.simulateCloudAutomation = function() {
+                window.triggerSmartIoTSequence();
+            };
+
+            window.resetSmartIoTSequence = function() {
+                smartSequenceRunning = false;
+                const btn = document.getElementById('btn-smart-send-cmd');
+                if (btn) { btn.disabled = false; btn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+
+                const beam = document.getElementById('smart-radio-beam');
+                if (beam) beam.className = 'opacity-30';
+                const packet = document.getElementById('smart-packet-dot');
+                if (packet) packet.classList.add('hidden');
+
+                const mcuBody = document.getElementById('mcu-chip-body');
+                if (mcuBody) { mcuBody.setAttribute('stroke', '#10b981'); mcuBody.setAttribute('fill', '#0f172a'); }
+                const mcuText = document.getElementById('mcu-state-text');
+                if (mcuText) { mcuText.textContent = 'CPU: IDLE'; mcuText.setAttribute('fill', '#cbd5e1'); }
+                const mcuWire = document.getElementById('mcu-gpio-wire');
+                if (mcuWire) { mcuWire.setAttribute('stroke', '#334155'); mcuWire.setAttribute('stroke-width', '3'); }
+
+                const relayArm = document.getElementById('relay-contact-arm');
+                if (relayArm) { relayArm.setAttribute('x2', '48'); relayArm.setAttribute('y2', '12'); relayArm.setAttribute('stroke', '#e2e8f0'); }
+                const relayLabel = document.getElementById('relay-state-label');
+                if (relayLabel) { relayLabel.textContent = 'OPEN'; relayLabel.setAttribute('fill', '#ef4444'); }
+
+                const smartCurrent = document.getElementById('smart-current-flow');
+                if (smartCurrent) { smartCurrent.classList.add('hidden'); smartCurrent.classList.remove('current-active'); }
+
+                const bulbHalo = document.getElementById('smart-bulb-halo');
+                if (bulbHalo) bulbHalo.setAttribute('opacity', '0');
+                const filament = document.getElementById('smart-filament');
+                if (filament) filament.setAttribute('stroke', '#64748b');
+
+                const badge = document.getElementById('smart-pipeline-step-badge');
+                if (badge) badge.innerHTML = 'Pipeline State: <span class="text-iot-cyan font-bold">READY FOR COMMAND</span>';
+                const payloadSpan = document.getElementById('demo-stream-payload');
+                if (payloadSpan) payloadSpan.innerHTML = 'Awaiting remote telemetry packet &rarr; MCU listening on port 1883';
+            };
+
+            let currentAutonomyMode = 'manual';
+            let autonomySimRunning = false;
+
+            window.setAutonomyMode = function(mode) {
+                if (autonomySimRunning) return;
+                currentAutonomyMode = mode;
+
+                const btnManual = document.getElementById('btn-autonomy-manual');
+                const btnM2M = document.getElementById('btn-autonomy-m2m');
+                const badge = document.getElementById('autonomy-status-badge');
+                const middleNode = document.getElementById('autonomy-middle-node');
+                const middleIcon = document.getElementById('autonomy-middle-icon');
+                const middleTitle = document.getElementById('autonomy-middle-title');
+                const middleSub = document.getElementById('autonomy-middle-sub');
+                const latency = document.getElementById('autonomy-latency');
+                const intervention = document.getElementById('autonomy-intervention');
+                const log = document.getElementById('autonomy-log-text');
+                const heaterIcon = document.getElementById('autonomy-heater-icon');
+                const heaterState = document.getElementById('autonomy-heater-state');
+
+                heaterIcon.className = 'w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-500 text-xl mb-2 transition-all';
+                heaterState.textContent = 'STANDBY (OFF)';
+                heaterState.className = 'text-[10px] font-mono text-slate-500 uppercase';
+
+                if (mode === 'm2m') {
+                    btnM2M.className = 'flex-1 px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all bg-iot-cyan text-slate-950 shadow-lg shadow-cyan-950';
+                    btnManual.className = 'flex-1 px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white';
+                    badge.className = 'px-2.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-700 text-emerald-300 text-[10px] font-bold';
+                    badge.textContent = 'ZERO HUMAN INTERVENTION (M2M)';
+
+                    middleNode.className = 'flex flex-col items-center text-center p-3 rounded-xl bg-cyan-950/30 border border-cyan-700 transition-all duration-300';
+                    middleIcon.className = 'w-12 h-12 rounded-xl bg-cyan-900/40 border border-cyan-500 flex items-center justify-center text-iot-cyan text-xl mb-2';
+                    middleIcon.innerHTML = '<i class="fa-solid fa-network-wired"></i>';
+                    middleTitle.textContent = 'M2M Wireless Bus';
+                    middleSub.textContent = 'Direct MQTT broker link';
+                    middleSub.className = 'text-[10px] font-mono text-iot-cyan';
+
+                    latency.textContent = '14 milliseconds (Instant)';
+                    latency.className = 'font-bold text-iot-emerald text-sm';
+                    intervention.textContent = '0% (Completely Autonomous)';
+                    intervention.className = 'font-bold text-iot-emerald text-sm';
+
+                    log.textContent = 'IoT Mode Active: Telemetry packets transfer directly from device to device.';
+                } else {
+                    btnManual.className = 'flex-1 px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all bg-slate-800 text-slate-200';
+                    btnM2M.className = 'flex-1 px-3 py-2 rounded-lg text-xs font-mono font-bold transition-all text-slate-400 hover:text-white';
+                    badge.className = 'px-2.5 py-0.5 rounded bg-amber-950/80 border border-amber-700 text-amber-300 text-[10px] font-bold';
+                    badge.textContent = 'REQUIRES HUMAN';
+
+                    middleNode.className = 'flex flex-col items-center text-center p-3 rounded-xl bg-amber-950/30 border border-amber-800 transition-all duration-300';
+                    middleIcon.className = 'w-12 h-12 rounded-xl bg-amber-900/40 border border-amber-600 flex items-center justify-center text-amber-400 text-xl mb-2';
+                    middleIcon.innerHTML = '<i class="fa-solid fa-person-walking"></i>';
+                    middleTitle.textContent = 'Human Worker';
+                    middleSub.textContent = 'Must check & turn dial';
+                    middleSub.className = 'text-[10px] font-mono text-amber-400';
+
+                    latency.textContent = '~45 minutes (Delayed)';
+                    latency.className = 'font-bold text-amber-400 text-sm';
+                    intervention.textContent = '100% Required';
+                    intervention.className = 'font-bold text-red-400 text-sm';
+
+                    log.textContent = 'Manual Mode: Sensor reading sits unused until a human physically inspects it.';
+                }
+            };
+
+            window.triggerAutonomyDemo = function() {
+                if (autonomySimRunning) return;
+                autonomySimRunning = true;
+
+                const btn = document.getElementById('btn-trigger-autonomy');
+                const log = document.getElementById('autonomy-log-text');
+                const tag = document.getElementById('autonomy-m2m-tag');
+                const heaterIcon = document.getElementById('autonomy-heater-icon');
+                const heaterState = document.getElementById('autonomy-heater-state');
+                const middleNode = document.getElementById('autonomy-middle-node');
+
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                if (currentAutonomyMode === 'm2m') {
+                    tag.textContent = 'PACKET TRANSMITTING';
+                    tag.className = 'text-iot-cyan text-[10px] uppercase font-bold animate-pulse';
+                    log.innerHTML = '<span class="text-iot-cyan">M2M Flow:</span> Sensor detects 0°C &rarr; Emits MQTT payload over radio bus...';
+                    middleNode.classList.add('border-cyan-400', 'shadow-[0_0_20px_rgba(6,182,212,0.4)]');
+
+                    setTimeout(() => {
+                        log.innerHTML = '<span class="text-emerald-400">Autonomy Active:</span> Packet processed by heater relay. No human touched anything!';
+                        heaterIcon.className = 'w-12 h-12 rounded-xl bg-amber-950/70 border-2 border-amber-500 flex items-center justify-center text-amber-400 text-2xl mb-2 shadow-[0_0_25px_rgba(245,158,11,0.6)] animate-pulse';
+                        heaterState.textContent = 'HEATING ENGAGED (24°C)';
+                        heaterState.className = 'text-[10px] font-mono text-emerald-400 font-bold uppercase';
+                        tag.textContent = 'M2M COMPLETE (14ms)';
+                        tag.className = 'text-emerald-400 text-[10px] uppercase font-bold';
+
+                        confetti({ particleCount: 50, spread: 55, origin: { y: 0.6 } });
+
+                        setTimeout(() => {
+                            middleNode.classList.remove('border-cyan-400', 'shadow-[0_0_20px_rgba(6,182,212,0.4)]');
+                            btn.disabled = false;
+                            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            autonomySimRunning = false;
+                        }, 1200);
+                    }, 650);
+                } else {
+                    tag.textContent = 'WAITING FOR HUMAN';
+                    tag.className = 'text-amber-400 text-[10px] uppercase font-bold animate-pulse';
+                    log.innerHTML = '<span class="text-amber-400">Manual Delay:</span> Temperature dropped to 0°C. Nobody is in the greenhouse...';
+                    middleNode.classList.add('border-amber-400', 'shadow-[0_0_20px_rgba(245,158,11,0.3)]');
+
+                    setTimeout(() => {
+                        log.innerHTML = '<span class="text-amber-300">Human Dispatched:</span> Worker finally notices thermometer 45 mins later and turns knob.';
+                        heaterIcon.className = 'w-12 h-12 rounded-xl bg-amber-950/70 border border-amber-600 flex items-center justify-center text-amber-400 text-xl mb-2';
+                        heaterState.textContent = 'HEATER TURNED ON (MANUAL)';
+                        heaterState.className = 'text-[10px] font-mono text-amber-300 uppercase';
+                        tag.textContent = 'COMPLETED (SLOW)';
+                        tag.className = 'text-slate-400 text-[10px] uppercase';
+
+                        setTimeout(() => {
+                            middleNode.classList.remove('border-amber-400', 'shadow-[0_0_20px_rgba(245,158,11,0.3)]');
+                            btn.disabled = false;
+                            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            autonomySimRunning = false;
+                        }, 1400);
+                    }, 1400);
+                }
+            };
+
+            window.handleTempChange = function(temp) {
+                const tempDisplay = document.getElementById('loop-temp-display');
+                const badge = document.getElementById('loop-logic-badge');
+                const fanStatus = document.getElementById('fan-status-display');
+                const fanBlade = document.getElementById('fan-blade');
+                const fanContainer = document.getElementById('fan-icon-container');
+
+                tempDisplay.textContent = `${temp}.0°C`;
+
+                if (temp > 35) {
+                    badge.textContent = 'ACTUATOR TRIGGERED: EXTREME HEAT';
+                    badge.className = 'text-red-400 font-bold';
+                    fanStatus.textContent = 'RUNNING (HIGH SPEED)';
+                    fanStatus.className = 'text-xs font-bold font-mono text-emerald-400 mt-1 uppercase';
+                    fanBlade.className = 'fa-solid fa-fan text-2xl text-iot-emerald spinning-fast';
+                    fanContainer.className = 'w-12 h-12 rounded-xl bg-emerald-950/60 border border-emerald-600 flex items-center justify-center text-iot-emerald mb-2 shadow-lg shadow-emerald-950';
+                } else {
+                    badge.textContent = 'MONITORING (NORMAL)';
+                    badge.className = 'text-iot-cyan font-bold';
+                    fanStatus.textContent = 'OFF';
+                    fanStatus.className = 'text-xs font-bold font-mono text-slate-500 mt-1 uppercase';
+                    fanBlade.className = 'fa-solid fa-fan text-2xl text-slate-500';
+                    fanContainer.className = 'w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-500 mb-2';
+                }
+            };
+
+            const layerData = {
+                1: {
+                    title: "1. Perception (Physical) Layer",
+                    desc: "The edge hardware directly in contact with reality. Converts physical properties (light, heat, pressure) to electrical signals, or drives actuators.",
+                    examples: "Thermocouples, Piezoelectric sensors, Servos, Relays, ESP32 ADC pins",
+                    color: "border-cyan-500/80"
+                },
+                2: {
+                    title: "2. Network (Transport) Layer",
+                    desc: "Transfers telemetry from edge devices to local gateways or base stations over wireless or wired links.",
+                    examples: "Wi-Fi (802.11), BLE, Zigbee mesh, LoRaWAN, Cellular NB-IoT, Ethernet",
+                    color: "border-emerald-500/80"
+                },
+                3: {
+                    title: "3. Processing (Middleware) Layer",
+                    desc: "Brokers, queues, and event dispatchers that store, authenticate, and filter streams before business logic ingestion.",
+                    examples: "MQTT Brokers (EMQX, Mosquitto), Kafka, AWS IoT Core, InfluxDB time-series",
+                    color: "border-cyan-500/80"
+                },
+                4: {
+                    title: "4. Application Layer",
+                    desc: "The user-facing software delivering value. Powers visual monitoring dashboards, predictive AI models, and automated ERP alerts.",
+                    examples: "Grafana dashboards, Home Assistant, Smartphone native apps, SCADA systems",
+                    color: "border-violet-500/80"
+                }
+            };
+
+            window.selectLayer = function(layerNum) {
+                const info = layerData[layerNum];
+                document.getElementById('layer-info-title').textContent = info.title;
+                document.getElementById('layer-info-desc').textContent = info.desc;
+                document.getElementById('layer-info-examples').textContent = info.examples;
+
+                for (let i = 1; i <= 4; i++) {
+                    const card = document.getElementById(`layer-card-${i}`);
+                    if (i === layerNum) {
+                        card.className = `p-4 rounded-xl bg-slate-900/90 border-2 ${info.color} cursor-pointer transition-all flex items-center justify-between group shadow-lg`;
+                    } else {
+                        card.className = `p-4 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 cursor-pointer transition-all flex items-center justify-between group`;
+                    }
+                }
+            };
+
+            const protocolData = {
+                ble: {
+                    name: "Bluetooth Low Energy (BLE)",
+                    icon: "fa-brands fa-bluetooth text-iot-cyan",
+                    tag: "Short Range • Ultra Low Power",
+                    rangeText: "~10 to 30 meters",
+                    rangeWidth: "20%",
+                    bandwidthText: "Moderate (~1 - 2 Mbps)",
+                    bandwidthWidth: "45%",
+                    powerText: "Months to Years on Coin Cell",
+                    powerWidth: "95%",
+                    usecase: "Wearable fitness trackers, smart beacons, medical monitors, and peripheral sensor tags syncing with a nearby smartphone."
+                },
+                wifi: {
+                    name: "Wi-Fi (802.11 b/g/n)",
+                    icon: "fa-solid fa-wifi text-emerald-400",
+                    tag: "High Speed • Mains Powered",
+                    rangeText: "~50 to 100 meters",
+                    rangeWidth: "35%",
+                    bandwidthText: "High (54 to 300+ Mbps)",
+                    bandwidthWidth: "90%",
+                    powerText: "Hours/Days (Requires wall power or large LiPo)",
+                    powerWidth: "25%",
+                    usecase: "Security cameras, smart home hubs, streaming audio devices where high data throughput is required and wall power is accessible."
+                },
+                lora: {
+                    name: "LoRaWAN (Long Range)",
+                    icon: "fa-solid fa-tower-broadcast text-amber-400",
+                    tag: "Ultra Long Range • Low Data",
+                    rangeText: "~5 to 15 kilometers",
+                    rangeWidth: "98%",
+                    bandwidthText: "Tiny (~0.3 to 50 kbps packets)",
+                    bandwidthWidth: "10%",
+                    powerText: "5 to 10+ Years on Single Battery",
+                    powerWidth: "95%",
+                    usecase: "Smart agriculture, water reservoir monitoring, flood warning buoys, and smart city utility meter readings in rural terrain."
+                },
+                cellular: {
+                    name: "Cellular NB-IoT / LTE-M",
+                    icon: "fa-solid fa-signal text-violet-400",
+                    tag: "Global Coverage • Telecom Backed",
+                    rangeText: "Anywhere with cellular tower coverage",
+                    rangeWidth: "85%",
+                    bandwidthText: "Low to Medium (~64 - 250 kbps)",
+                    bandwidthWidth: "35%",
+                    powerText: "Years (Power Saving Mode enabled)",
+                    powerWidth: "75%",
+                    usecase: "Fleet vehicle telematics, global asset shipping container trackers, and distributed electrical grid monitors."
+                }
+            };
+
+            window.selectProtocol = function(protoKey) {
+                const p = protocolData[protoKey];
+                const keys = ['ble', 'wifi', 'lora', 'cellular'];
+
+                keys.forEach(k => {
+                    const btn = document.getElementById(`btn-proto-${k}`);
+                    if (k === protoKey) {
+                        btn.className = 'w-full p-2.5 rounded-lg text-left bg-slate-800 border border-cyan-500/80 text-white font-bold transition-all';
+                    } else {
+                        btn.className = 'w-full p-2.5 rounded-lg text-left bg-slate-900 border border-slate-800 text-slate-300 transition-all hover:border-slate-700';
+                    }
+                });
+
+                document.getElementById('proto-name').textContent = p.name;
+                document.getElementById('proto-icon').className = p.icon + ' text-2xl';
+                document.getElementById('proto-tag').textContent = p.tag;
+                document.getElementById('proto-range-text').textContent = p.rangeText;
+                document.getElementById('proto-range-bar').style.width = p.rangeWidth;
+                document.getElementById('proto-bandwidth-text').textContent = p.bandwidthText;
+                document.getElementById('proto-bandwidth-bar').style.width = p.bandwidthWidth;
+                document.getElementById('proto-power-text').textContent = p.powerText;
+                document.getElementById('proto-power-bar').style.width = p.powerWidth;
+                document.getElementById('proto-usecase').textContent = p.usecase;
+            };
+
+            let packetCount = 0;
+            let autoTelemetryInterval = null;
+
+            window.publishSensorPacket = function() {
+                packetCount++;
+                document.getElementById('packet-counter').textContent = packetCount;
+
+                const flyer = document.getElementById('packet-flyer');
+                flyer.classList.remove('hidden');
+                flyer.style.left = '0%';
+
+                let progress = 0;
+                const anim = setInterval(() => {
+                    progress += 4;
+                    flyer.style.left = `${progress}%`;
+                    if (progress >= 100) {
+                        clearInterval(anim);
+                        flyer.classList.add('hidden');
+                    }
+                }, 20);
+
+                const sampleTemps = [21.4, 22.8, 23.1, 24.5, 23.9, 25.2];
+                const temp = sampleTemps[Math.floor(Math.random() * sampleTemps.length)];
+                const humidity = (45 + Math.random() * 10).toFixed(1);
+
+                const payload = {
+                    topic: "factory/zone_1/temp",
+                    client_id: "ESP32_SENSOR_A1",
+                    timestamp: new Date().toISOString(),
+                    payload: {
+                        temperature_c: temp,
+                        humidity_pct: parseFloat(humidity),
+                        battery_v: 3.28,
+                        packet_id: packetCount
+                    }
+                };
+
+                document.getElementById('payload-timestamp').textContent = `Received: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('payload-code').textContent = JSON.stringify(payload, null, 2);
+            };
+
+            window.toggleAutoTelemetry = function() {
+                const btn = document.getElementById('btn-auto-telemetry');
+                if (autoTelemetryInterval) {
+                    clearInterval(autoTelemetryInterval);
+                    autoTelemetryInterval = null;
+                    btn.textContent = 'Auto-Stream: OFF';
+                    btn.className = 'w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono py-1.5 rounded-lg text-xs border border-slate-700 transition-colors';
+                } else {
+                    publishSensorPacket();
+                    autoTelemetryInterval = setInterval(publishSensorPacket, 1400);
+                    btn.textContent = 'Auto-Stream: ON (1.4s)';
+                    btn.className = 'w-full bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 font-mono py-1.5 rounded-lg text-xs border border-emerald-700 transition-colors font-bold';
+                }
+            };
+
+            let ghMoisture = 30;
+            let ghTemp = 36;
+            let pumpOn = false;
+            let ventOn = false;
+            let ghLoopTimer = null;
+
+            function startGreenhouseLoop() {
+                if (ghLoopTimer) clearInterval(ghLoopTimer);
+                ghLoopTimer = setInterval(() => {
+                    if (currentSlideIndex !== 7) return;
+
+                    if (pumpOn && ghMoisture < 65) ghMoisture += 4;
+                    if (!pumpOn && ghMoisture > 20) ghMoisture -= 1;
+
+                    if (ventOn && ghTemp > 24) ghTemp -= 2;
+                    if (!ventOn && ghTemp < 40) ghTemp += 1;
+
+                    renderGreenhouseState();
+                }, 800);
+            }
+
+            function renderGreenhouseState() {
+                document.getElementById('gh-moisture-val').textContent = `${ghMoisture}% ${ghMoisture < 40 ? '(Low)' : '(Optimal)'}`;
+                document.getElementById('gh-moisture-bar').style.width = `${ghMoisture}%`;
+
+                document.getElementById('gh-temp-val').textContent = `${ghTemp}°C ${ghTemp > 32 ? '(Hot)' : '(Safe)'}`;
+                document.getElementById('gh-temp-bar').style.width = `${Math.min(100, (ghTemp / 50) * 100)}%`;
+
+                const plantIcon = document.getElementById('gh-plant-icon');
+                const plantStatus = document.getElementById('gh-plant-status');
+                const healthBadge = document.getElementById('gh-health-badge');
+
+                const isMoistureGood = ghMoisture >= 40 && ghMoisture <= 75;
+                const isTempGood = ghTemp <= 32;
+
+                if (isMoistureGood && isTempGood) {
+                    plantIcon.className = 'fa-solid fa-seedling text-5xl text-emerald-400 drop-shadow-[0_0_20px_rgba(16,185,129,0.8)]';
+                    plantStatus.textContent = 'Ecosystem Thriving (Optimal Moisture & Temp)';
+                    plantStatus.className = 'text-xs font-mono text-emerald-400 font-bold mt-2';
+                    healthBadge.textContent = 'ALL METRICS STABILIZED (100%)';
+                    healthBadge.className = 'text-emerald-400 font-bold';
+
+                    const overlay = document.getElementById('gh-success-overlay');
+                    if (overlay.classList.contains('hidden')) {
+                        overlay.classList.remove('hidden');
+                        confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+                    }
+                } else {
+                    plantIcon.className = 'fa-solid fa-seedling text-5xl text-amber-500';
+                    plantStatus.textContent = 'Plant Stressed (Needs Moisture & Ventilation)';
+                    plantStatus.className = 'text-xs font-mono text-amber-400 font-bold mt-2';
+                    healthBadge.textContent = 'STABILIZING ENVIRONMENT';
+                    healthBadge.className = 'text-amber-400 font-bold';
+                }
+            }
+
+            window.toggleActuator = function(type) {
+                if (type === 'pump') {
+                    pumpOn = !pumpOn;
+                    const badge = document.getElementById('badge-pump');
+                    const btn = document.getElementById('btn-actuator-pump');
+                    badge.textContent = pumpOn ? 'RUNNING' : 'OFF';
+                    badge.className = pumpOn ? 'px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 text-[10px] font-bold' : 'px-2 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]';
+                    btn.className = pumpOn ? 'p-3 rounded-xl bg-cyan-950/40 border border-cyan-700 text-white flex items-center justify-between transition-all' : 'p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-between transition-all';
+                } else if (type === 'vent') {
+                    ventOn = !ventOn;
+                    const badge = document.getElementById('badge-vent');
+                    const btn = document.getElementById('btn-actuator-vent');
+                    badge.textContent = ventOn ? 'OPEN' : 'OFF';
+                    badge.className = ventOn ? 'px-2 py-0.5 rounded bg-violet-950 text-violet-300 border border-violet-800 text-[10px] font-bold' : 'px-2 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]';
+                    btn.className = ventOn ? 'p-3 rounded-xl bg-violet-950/40 border border-violet-700 text-white flex items-center justify-between transition-all' : 'p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-between transition-all';
+                }
+            };
+
+            window.resetGreenhouseLab = function() {
+                ghMoisture = 30;
+                ghTemp = 36;
+                pumpOn = false;
+                ventOn = false;
+                document.getElementById('badge-pump').textContent = 'OFF';
+                document.getElementById('badge-pump').className = 'px-2 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]';
+                document.getElementById('btn-actuator-pump').className = 'p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-between transition-all';
+                document.getElementById('badge-vent').textContent = 'OFF';
+                document.getElementById('badge-vent').className = 'px-2 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]';
+                document.getElementById('btn-actuator-vent').className = 'p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-between transition-all';
+                document.getElementById('gh-success-overlay').classList.add('hidden');
+                renderGreenhouseState();
+            };
+
+            window.submitQuizAnswer = function(isCorrect, btn) {
+                const buttons = document.querySelectorAll('.quiz-opt');
+                buttons.forEach(b => {
+                    b.className = 'quiz-opt w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 opacity-60';
+                });
+
+                const feedback = document.getElementById('quiz-feedback');
+                feedback.classList.remove('hidden');
+
+                if (isCorrect) {
+                    btn.className = 'quiz-opt w-full p-3 rounded-xl bg-emerald-950/60 border-2 border-emerald-500 text-white font-bold flex items-center justify-between shadow-lg shadow-emerald-950';
+                    feedback.className = 'mt-4 p-3 rounded-xl bg-emerald-950/50 border border-emerald-700 text-emerald-300 text-xs font-mono';
+                    feedback.innerHTML = '<i class="fa-solid fa-circle-check mr-1.5"></i> <strong>Correct!</strong> LoRaWAN is engineered specifically for long range (up to 15km) and low power consumption on infrequent, tiny payload transmissions.';
+                    confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+                } else {
+                    btn.className = 'quiz-opt w-full p-3 rounded-xl bg-red-950/60 border-2 border-red-500 text-red-200 font-bold flex items-center justify-between';
+                    feedback.className = 'mt-4 p-3 rounded-xl bg-red-950/50 border border-red-800 text-red-300 text-xs font-mono';
+                    feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1.5"></i> <strong>Not quite.</strong> That protocol either lacks the 5km transmission range or consumes too much power for a multi-year battery life. Try LoRaWAN!';
+                }
+            };
+
+            if (!CanvasRenderingContext2D.prototype.roundRect) {
+                CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                    if (typeof r === 'undefined') r = 0;
+                    if (typeof r === 'number') r = [r, r, r, r];
+                    const tl = r[0] || 0;
+                    const tr = r[1] || r[0] || 0;
+                    const br = r[2] || r[0] || 0;
+                    const bl = r[3] || r[1] || r[0] || 0;
+                    this.moveTo(x + tl, y);
+                    this.lineTo(x + w - tr, y);
+                    this.quadraticCurveTo(x + w, y, x + w, y + tr);
+                    this.lineTo(x + w, y + h - br);
+                    this.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+                    this.lineTo(x + bl, y + h);
+                    this.quadraticCurveTo(x, y + h, x, y + h - bl);
+                    this.lineTo(x, y + tl);
+                    this.quadraticCurveTo(x, y, x + tl, y);
+                    this.closePath();
+                    return this;
+                };
+            }
+
+            const boardCanvas = document.getElementById('boardCanvas');
+            const boardCtx = boardCanvas ? boardCanvas.getContext('2d') : null;
+            const boardTooltip = document.getElementById('canvas-tooltip');
+            const boardWrapper = document.getElementById('canvas-wrapper');
+            const boardStatusText = document.getElementById('canvas-status');
+
+            const V_W = 960;
+            const V_H = 640;
+            let boardScale = 1;
+            let boardOffsetX = 0;
+            let boardOffsetY = 0;
+
+            let simFlameActive = false;
+            let simPowerOn = true;
+            let simBuzzerSwOn = true;
+            let pulseAnim = 0;
+            let motorSpin = 0;
+            let currentFilter = 'all';
+
+            const boardParts = {
+                'GPIO_CLUSTER': {
+                    name: 'GPIO Interface Overview (P0, P1, P2, P8, P12, P13, P14, P16)',
+                    category: 'pins',
+                    badge: 'Complete 8-Pin GPIO Header Bus',
+                    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                    voltage: '3.3V Power & Logic',
+                    mapping: 'micro:bit Pads 0, 1, 2, 8, 12, 13, 14, 16',
+                    functions: 'Analog Input (P0-P2), Digital In/Out (All), PWM Servo (P1/P2), SPI (P13-P16)',
+                    conflict: 'Pin P0 is shared with onboard Buzzer (isolate with switch). Others are free.',
+                    devices: 'Gravity 3-pin sensors, Servos, Relays, LDRs, Flame Detectors',
+                    desc: 'PINOUT BREAKDOWN:\n• P0, P1, P2 = Native Analog-to-Digital Converter (ADC) pins (0-1023) AND Digital pins (0 or 1).\n• P0 = Wired to Onboard Buzzer (turn buzzer switch OFF to use as clean sensor pin).\n• P1, P2 = Completely free for Servos & Analog Sensors.\n• P8, P12, P13, P14, P16 = Pure Digital IO (0 or 1). No analog ADC.\n• WIRING: Black column = GND | Red column = 3.3V | Green column = Signal.',
+                    code: `# Reading Analog (0-1023) on P2:\nval = pins.analog_read_pin(AnalogPin.P2)\n\n# Or reading Digital (0 or 1) on P2:\ndig = pins.digital_read_pin(DigitalPin.P2)\n\n# Writing Servo Angle on P1:\npins.servo_write_pin(AnalogPin.P1, 77)`,
+                    bbox: { x: 215, y: 248, w: 46, h: 98 }
+                },
+                'GPIO_P0': {
+                    name: 'GPIO Interface: Pin P0',
+                    category: 'pins',
+                    badge: 'Analog / Digital / Buzzer Shared',
+                    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                    voltage: '3.3V Logic',
+                    mapping: 'micro:bit Pad 0',
+                    functions: 'Analog ADC (0-1023), Digital IO (0/1), Touch Ring 0, Buzzer Tone',
+                    conflict: 'Physically connected to onboard Piezo Buzzer!',
+                    devices: 'Buzzer audio, or analog/digital sensors if buzzer switch is OFF',
+                    desc: 'Pin P0 can be used for both Analog and Digital. However, it is hardwired to the onboard buzzer. If you plug a sensor here while the buzzer switch is ON, the speaker will buzz. Slide the switch next to the motor to "x" to isolate the buzzer.',
+                    code: `# Playing sound on P0:\nmusic.play_tone(Note.HIGH_C, music.beat(BeatFraction.WHOLE))\n\n# Or reading analog with buzzer switch OFF:\nval = pins.analog_read_pin(AnalogPin.P0)`,
+                    bbox: { x: 215, y: 248, w: 46, h: 23 }
+                },
+                'GPIO_P1': {
+                    name: 'GPIO Interface: Pin P1',
+                    category: 'pins',
+                    badge: 'Analog / Digital / Servo PWM',
+                    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                    voltage: '3.3V Logic',
+                    mapping: 'micro:bit Pad 1',
+                    functions: 'Analog ADC (0-1023), Digital IO (0/1), PWM Servo Driver',
+                    conflict: 'None (Completely dedicated)',
+                    devices: 'Servo motors, Potentiometers, Analog sensors, Relays',
+                    desc: 'Pin P1 has full dual capability: it can be an Analog input (0-1023), a Digital input/output (0 or 1), or a hardware PWM line to drive RC servo motors (0° to 180°). It has zero onboard hardware conflicts.',
+                    code: `# Command servo motor on P1:\npins.servo_write_pin(AnalogPin.P1, 60)\nbasic.pause(1000)\npins.servo_write_pin(AnalogPin.P1, 77)`,
+                    bbox: { x: 215, y: 271, w: 46, h: 23 }
+                },
+                'GPIO_P2': {
+                    name: 'GPIO Interface: Pin P2',
+                    category: 'pins',
+                    badge: 'Analog ADC & Digital IO (Dual Capability)',
+                    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                    voltage: '3.3V Logic',
+                    mapping: 'micro:bit Pad 2',
+                    functions: 'Analog ADC (0-1023), Digital In/Out (0 or 1), PWM',
+                    conflict: 'None (Completely dedicated & free)',
+                    devices: 'DFRobot Flame Sensor V2, Analog Light Sensors, Potentiometers',
+                    desc: 'CAN PIN 2 BE USED FOR BOTH ANALOG AND DIGITAL? YES!\n• Pin P2 is a dual-function micro:bit GPIO.\n• If you use pins.analog_read_pin(AnalogPin.P2), the 10-bit hardware ADC returns a continuous gradient number from 0 to 1023.\n• If you use pins.digital_read_pin(DigitalPin.P2), it treats signals below ~1V as 0 and above ~1V as 1.',
+                    code: `# Read continuous analog gradient (0 to 1023):\nflame_adc = pins.analog_read_pin(AnalogPin.P2)\n\n# Read binary digital state (0 or 1):\nflame_dig = pins.digital_read_pin(DigitalPin.P2)\n\nif flame_adc < 10:\n    pins.servo_write_pin(AnalogPin.P1, 60)\nelse:\n    pins.servo_write_pin(AnalogPin.P1, 77)`,
+                    bbox: { x: 215, y: 294, w: 46, h: 23 }
+                },
+                'I2C_PORT': {
+                    name: 'I2C Interface (4 Rows x 3 Columns)',
+                    category: 'pins',
+                    badge: 'Triple I2C Bus Hub (4x3)',
+                    badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+                    voltage: '3.3V Power & Logic',
+                    mapping: 'SDA = micro:bit P20 | SCL = micro:bit P19',
+                    functions: 'Daisy-chain up to 3 I2C sensors/actuators in parallel',
+                    conflict: 'Shares I2C bus with onboard 0.96" OLED display (Address 0x3C)',
+                    devices: 'OLED screens, BME280 weather sensor, SHT30, RTC, MCP23017',
+                    desc: 'The board provides a 3-column I2C expansion port labeled "I2C" arranged in 4 rows:\n• Row 1 (Top): SDA (Serial Data Line -> micro:bit Pin 20)\n• Row 2: SCL (Serial Clock Line -> micro:bit Pin 19)\n• Row 3: GND (System Ground / 0V)\n• Row 4 (Bottom): 3V3 (3.3V DC Power Rail)\n\nAll 3 columns are wired in parallel to the exact same I2C bus.',
+                    code: `# I2C communication is handled automatically in MakeCode:\n# micro:bit Pin 19 = SCL, Pin 20 = SDA\nOLED.init(128, 64)\nOLED.write_string("I2C Multi-Hub")`,
+                    bbox: { x: 210, y: 356, w: 58, h: 68 }
+                },
+                'RGB_CROWN': {
+                    name: 'RGB <left to right: 1, 2, 3> (P15)',
+                    category: 'display',
+                    badge: '3x Addressable WS2812B NeoPixels',
+                    badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+                    voltage: '3.3V Data',
+                    mapping: 'micro:bit Pin P15',
+                    functions: 'Full 24-bit TrueColor illumination, animations, alerts',
+                    conflict: 'Internal to Pin P15',
+                    devices: '3 onboard surface-mount RGB LEDs',
+                    desc: 'Located on the crown of the robot head (numbered 1, 2, 3 from left to right). Programmed using the MakeCode NeoPixel extension on Pin P15.',
+                    code: `let strip = neopixel.create(DigitalPin.P15, 3, NeoPixelMode.RGB)\nstrip.show_color(neopixel.colors(NeoPixelColors.RED))`,
+                    bbox: { x: 420, y: 95, w: 220, h: 85 }
+                },
+                'BUZZER': {
+                    name: 'Piezo Buzzer (P0)',
+                    category: 'actuators',
+                    badge: 'Acoustic Sounder',
+                    badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                    voltage: '3.3V Driven',
+                    mapping: 'micro:bit Pin P0',
+                    functions: 'Plays alarm tones, melodies, and feedback clicks',
+                    conflict: 'Tied to P0 pin header (isolate with Buzzer Switch next to motor)',
+                    devices: 'Round acoustic piezo transducer',
+                    desc: 'Located at the upper-left of the robot face (above the OLED screen). Wired to Pin P0. Use the switch next to the motor to mute or enable it.',
+                    code: `music.play_tone(Note.HIGH_C, music.beat(BeatFraction.HALF))`,
+                    bbox: { x: 315, y: 245, w: 56, h: 56 }
+                },
+                'OLED': {
+                    name: '0.96" I2C OLED Display',
+                    category: 'display',
+                    badge: 'Monochrome SSD1306 (128x64)',
+                    badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+                    voltage: '3.3V Internal',
+                    mapping: 'I2C Bus: Address 0x3C (P19 SCL / P20 SDA)',
+                    functions: 'Displays dynamic telemetry, numbers, and custom graphics',
+                    conflict: 'Shares I2C bus with external I2C sensors',
+                    devices: 'High-contrast monochrome OLED panel',
+                    desc: 'Positioned right above the motor module. Displays live telemetry, flame sensor readings, and servo angles without requiring a computer monitor.',
+                    code: `# Using OLED-SSD1306 extension:\nOLED.init(128, 64)\nOLED.write_string("Flame:")\nOLED.write_num(pins.analog_read_pin(AnalogPin.P2))`,
+                    bbox: { x: 280, y: 325, w: 125, h: 95 }
+                },
+                'BUZZER_SW': {
+                    name: 'Buzzer Switch (x P0 🕪)',
+                    category: 'actuators',
+                    badge: 'SPDT Isolation Switch',
+                    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                    voltage: 'Hardware Circuit Break',
+                    mapping: 'Pin P0 Physical Line',
+                    functions: 'Connects or disconnects the buzzer from micro:bit Pin P0',
+                    conflict: 'None',
+                    devices: 'Slide toggle switch located to the left of the motor interface',
+                    desc: 'Located directly to the left of the motor screw terminal touching the bottom edge. Slide toward the speaker icon to enable buzzer alarms; slide toward "x" to isolate Pin P0.',
+                    code: `// Physical slide switch - no code needed! Just slide with your finger.`,
+                    bbox: { x: 238, y: 445, w: 50, h: 36 }
+                },
+                'MOTOR': {
+                    name: 'Motor Interface (M1A / M1B)',
+                    category: 'actuators',
+                    badge: 'H-Bridge DC Motor Port',
+                    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                    voltage: 'Up to 5V-6V Motor Rail',
+                    mapping: 'Onboard Motor Driver IC',
+                    functions: 'Bidirectional speed & direction control for 1 DC motor',
+                    conflict: 'Requires external battery or powered USB rail for high loads',
+                    devices: 'Single green 2-pin screw terminal block (M1A / M1B)',
+                    desc: 'Single green 2-pin screw terminal situated flush with the bottom PCB edge beneath the OLED monitor. Drives a DC gearmotor bidirectionally.',
+                    code: `// With microIoT extension:\nmicroIoT.motor_run(microIoT.Motors.M1, 100)\nbasic.pause(2000)\nmicroIoT.motor_stop(microIoT.Motors.M1)`,
+                    bbox: { x: 308, y: 438, w: 60, h: 48 }
+                },
+                'SERVO_6PIN': {
+                    name: 'Servo Interface (S2 S1)',
+                    category: 'actuators',
+                    badge: '6-Pin Dual Servo Header (2x3)',
+                    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                    voltage: '3.3V / 5V Rail',
+                    mapping: 'S2 & S1 Mapped to PWM Pins',
+                    functions: 'Drives 2 RC Servos with standard 3-wire plugs (Signal, VCC, GND)',
+                    conflict: 'High-torque servos require external battery power',
+                    devices: '6-pin male header (Top: S2/S1, Row 1: S, Row 2: VCC, Row 3: GND)',
+                    desc: 'Located directly above the battery interface on the right side. Features 2 columns (S2 and S1) with 3 rows: Row 1 = Signal (S), Row 2 = VCC (Red), Row 3 = GND (Black).',
+                    code: `// Control Servo S1 on PWM Pin P1:\npins.servo_write_pin(AnalogPin.P1, 60)\nbasic.pause(1000)\npins.servo_write_pin(AnalogPin.P1, 77)`,
+                    bbox: { x: 705, y: 310, w: 60, h: 80 }
+                },
+                'MB_SLOT': {
+                    name: 'micro:bit Horizontal Edge Connector Slot',
+                    category: 'pins',
+                    badge: '40-Pin Card Edge Socket',
+                    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                    voltage: '3.3V Logic Bus',
+                    mapping: 'Full BBC micro:bit Pinout',
+                    functions: 'Inserts the BBC micro:bit horizontally into the board',
+                    conflict: 'Insert with 5x5 LED matrix facing front toward user',
+                    devices: 'BBC micro:bit V1 or V2',
+                    desc: 'Positioned lower down in the center section of the board. The micro:bit slides firmly inside, facing forward, bridging its processor to all board peripherals.',
+                    code: `// Runs MakeCode directly on the plugged micro:bit!`,
+                    bbox: { x: 425, y: 360, w: 220, h: 52 }
+                },
+                'PWR_SW': {
+                    name: 'Power Switch (ON / OFF)',
+                    category: 'power',
+                    badge: 'System Master Power Toggle',
+                    badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+                    voltage: 'Hardware Rail Switch',
+                    mapping: 'Master 3.3V / 5V Regulators',
+                    functions: 'Turns board power ON or OFF',
+                    conflict: 'If OFF, 3.3V rail outputs 0V (sensors read flat 0!)',
+                    devices: 'Metal lever slide switch',
+                    desc: 'Located on the right wing. If turned OFF while running on battery, the sensor power rail drops to 0V, causing the flame sensor to read 0 constantly.',
+                    code: `// Ensure switch is ON to power external sensors!`,
+                    bbox: { x: 695, y: 240, w: 45, h: 36 }
+                },
+                'BATT_JST': {
+                    name: 'Battery Interface (3.5 - 5.5V)',
+                    category: 'power',
+                    badge: 'JST-PH 2-Pin Port',
+                    badgeClass: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+                    voltage: '3.5V to 5.5V DC',
+                    mapping: 'External Battery Rail',
+                    functions: 'Connects external 3.7V LiPo or 3xAA battery pack',
+                    conflict: 'Polarity: labeled + and -',
+                    devices: 'White 2-pin JST connector touching the bottom-right corner edge',
+                    desc: 'Located flush against the bottom-right curved corner edge of the board, directly below the 6-pin servo interface. Used to power the board with an external battery pack.',
+                    code: `// External battery connector (3.5V to 5.5V)`,
+                    bbox: { x: 730, y: 442, w: 44, h: 36 }
+                },
+                'USB_CHG': {
+                    name: 'USB Power / Charging Interface (5V CHARGE)',
+                    category: 'power',
+                    badge: 'Micro-USB 5V Input',
+                    badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+                    voltage: '5V DC In',
+                    mapping: '5V Input Rail',
+                    functions: 'Provides 5V external power or charges connected lithium batteries',
+                    conflict: 'Power port only',
+                    devices: 'Micro-USB receptacle',
+                    desc: 'Located at the bottom edge next to the battery interface. Plug a standard 5V USB charger here to supply external power.',
+                    code: `// Plug into any standard 5V USB adapter`,
+                    bbox: { x: 660, y: 462, w: 34, h: 24 }
+                }
+            };
+
+            let selectedBoardKey = 'I2C_PORT';
+            let hoveredBoardKey = null;
+
+            function resizeBoardCanvas() {
+                if (!boardWrapper || !boardCanvas || !boardCtx) return;
+                const rect = boardWrapper.getBoundingClientRect();
+                if (!rect.width || !rect.height) return;
+                const dpr = window.devicePixelRatio || 1;
+
+                boardCanvas.width = rect.width * dpr;
+                boardCanvas.height = rect.height * dpr;
+
+                boardScale = Math.min(rect.width / V_W, rect.height / V_H);
+                boardOffsetX = (rect.width - V_W * boardScale) / 2;
+                boardOffsetY = (rect.height - V_H * boardScale) / 2;
+
+                boardCtx.resetTransform();
+                boardCtx.scale(dpr, dpr);
+                drawMicroBoard();
+            }
+
+            function drawMicroBoard() {
+                if (!boardCtx) return;
+                boardCtx.clearRect(0, 0, boardWrapper.clientWidth, boardWrapper.clientHeight);
+
+                boardCtx.save();
+                boardCtx.translate(boardOffsetX, boardOffsetY);
+                boardCtx.scale(boardScale, boardScale);
+
+                // PCB Outline
+                boardCtx.save();
+                boardCtx.fillStyle = '#141619';
+                boardCtx.strokeStyle = '#c5a059';
+                boardCtx.lineWidth = 3.5;
+                boardCtx.beginPath();
+                boardCtx.moveTo(200, 480);
+                boardCtx.bezierCurveTo(320, 500, 600, 500, 750, 480);
+                boardCtx.bezierCurveTo(800, 470, 830, 400, 810, 320);
+                boardCtx.bezierCurveTo(800, 240, 720, 210, 680, 220);
+                boardCtx.bezierCurveTo(680, 210, 640, 150, 600, 140);
+                boardCtx.bezierCurveTo(610, 110, 590, 90, 560, 115);
+                boardCtx.bezierCurveTo(550, 70, 490, 70, 480, 115);
+                boardCtx.bezierCurveTo(450, 90, 430, 110, 440, 140);
+                boardCtx.bezierCurveTo(400, 150, 360, 180, 360, 210);
+                boardCtx.bezierCurveTo(310, 180, 230, 190, 200, 240);
+                boardCtx.bezierCurveTo(150, 270, 140, 380, 170, 430);
+                boardCtx.closePath();
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                [{x: 195, y: 395}, {x: 430, y: 470}, {x: 690, y: 440}].forEach(h => {
+                    boardCtx.fillStyle = '#0a0d14';
+                    boardCtx.strokeStyle = '#c5a059';
+                    boardCtx.lineWidth = 3;
+                    boardCtx.beginPath();
+                    boardCtx.arc(h.x, h.y, 11, 0, Math.PI * 2);
+                    boardCtx.fill();
+                    boardCtx.stroke();
+                });
+                boardCtx.restore();
+
+                // Silkscreen Robot Face
+                boardCtx.save();
+                boardCtx.strokeStyle = '#c5a059';
+                boardCtx.fillStyle = '#c5a059';
+                boardCtx.lineWidth = 2;
+                boardCtx.beginPath();
+                boardCtx.arc(450, 140, 16, 0, Math.PI * 2);
+                boardCtx.arc(520, 105, 18, 0, Math.PI * 2);
+                boardCtx.arc(590, 155, 16, 0, Math.PI * 2);
+                boardCtx.stroke();
+
+                boardCtx.beginPath();
+                boardCtx.roundRect(440, 195, 160, 100, 18);
+                boardCtx.stroke();
+
+                boardCtx.beginPath();
+                boardCtx.roundRect(450, 205, 140, 60, 8);
+                boardCtx.fill();
+
+                boardCtx.fillStyle = '#141619';
+                boardCtx.beginPath();
+                boardCtx.moveTo(480, 220); boardCtx.lineTo(500, 220); boardCtx.lineTo(490, 245); boardCtx.closePath();
+                boardCtx.moveTo(560, 220); boardCtx.lineTo(540, 220); boardCtx.lineTo(550, 245); boardCtx.closePath();
+                boardCtx.fill();
+
+                boardCtx.strokeStyle = '#141619';
+                boardCtx.lineWidth = 3.5;
+                boardCtx.beginPath();
+                boardCtx.arc(520, 250, 18, 0.2, Math.PI - 0.2);
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#ffffff';
+                boardCtx.font = '900 16px sans-serif';
+                boardCtx.fillText('DFROBOT', 270, 170);
+                boardCtx.fillStyle = '#c5a059';
+                boardCtx.font = 'bold 11px monospace';
+                boardCtx.fillText('micro:IoT', 270, 185);
+                boardCtx.restore();
+
+                // Crown LEDs
+                const crownLeds = [
+                    { x: 450, y: 140, label: '1' },
+                    { x: 520, y: 105, label: '2' },
+                    { x: 590, y: 155, label: '3' }
+                ];
+                crownLeds.forEach(led => {
+                    boardCtx.fillStyle = '#222831';
+                    boardCtx.strokeStyle = '#475569';
+                    boardCtx.lineWidth = 1.5;
+                    boardCtx.fillRect(led.x - 7, led.y - 7, 14, 14);
+                    boardCtx.strokeRect(led.x - 7, led.y - 7, 14, 14);
+
+                    boardCtx.fillStyle = simPowerOn ? (simFlameActive ? '#ef4444' : '#10b981') : '#334155';
+                    boardCtx.beginPath();
+                    boardCtx.arc(led.x, led.y, 4 + (simFlameActive ? Math.sin(pulseAnim) * 1.5 : 0), 0, Math.PI * 2);
+                    boardCtx.fill();
+
+                    boardCtx.fillStyle = '#c5a059';
+                    boardCtx.font = '8px monospace';
+                    boardCtx.textAlign = 'center';
+                    boardCtx.fillText(led.label, led.x, led.y + 22);
+                });
+                boardCtx.textAlign = 'left';
+
+                // Piezo Buzzer
+                const bz = boardParts['BUZZER'].bbox;
+                const bzCx = bz.x + bz.w / 2;
+                const bzCy = bz.y + bz.h / 2;
+                boardCtx.fillStyle = '#1e242d';
+                boardCtx.strokeStyle = (simFlameActive && simBuzzerSwOn && simPowerOn) ? '#f43f5e' : '#64748b';
+                boardCtx.lineWidth = 2.5;
+                boardCtx.beginPath();
+                boardCtx.arc(bzCx, bzCy, 22, 0, Math.PI * 2);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#05070a';
+                boardCtx.beginPath();
+                boardCtx.arc(bzCx, bzCy, 6, 0, Math.PI * 2);
+                boardCtx.fill();
+
+                if (simFlameActive && simBuzzerSwOn && simPowerOn) {
+                    boardCtx.strokeStyle = '#f43f5e';
+                    boardCtx.lineWidth = 2;
+                    boardCtx.beginPath();
+                    boardCtx.arc(bzCx, bzCy, 30 + Math.sin(pulseAnim) * 4, -0.7, 0.7);
+                    boardCtx.stroke();
+                }
+
+                boardCtx.fillStyle = '#cbd5e1';
+                boardCtx.font = 'bold 9px monospace';
+                boardCtx.textAlign = 'center';
+                boardCtx.fillText('Buzzer (P0)', bzCx, bz.y - 6);
+                boardCtx.textAlign = 'left';
+
+                // OLED Screen
+                const oledB = boardParts['OLED'].bbox;
+                boardCtx.fillStyle = '#090b10';
+                boardCtx.strokeStyle = '#475569';
+                boardCtx.lineWidth = 2;
+                boardCtx.beginPath();
+                boardCtx.roundRect(oledB.x, oledB.y, oledB.w, oledB.h, 6);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#020408';
+                boardCtx.fillRect(oledB.x + 8, oledB.y + 8, oledB.w - 16, oledB.h - 16);
+
+                if (simPowerOn) {
+                    boardCtx.fillStyle = '#38bdf8';
+                    boardCtx.font = 'bold 9.5px monospace';
+                    boardCtx.fillText('0.96" OLED (0x3C)', oledB.x + 12, oledB.y + 24);
+
+                    boardCtx.fillStyle = '#e2e8f0';
+                    boardCtx.font = '9px monospace';
+                    boardCtx.fillText(simFlameActive ? 'FLAME: 2 (FIRE!)' : 'FLAME: 68 (CLEAR)', oledB.x + 12, oledB.y + 44);
+
+                    boardCtx.fillStyle = '#1e293b';
+                    boardCtx.fillRect(oledB.x + 12, oledB.y + 52, oledB.w - 24, 8);
+                    boardCtx.fillStyle = simFlameActive ? '#ef4444' : '#10b981';
+                    boardCtx.fillRect(oledB.x + 12, oledB.y + 52, simFlameActive ? 14 : 75, 8);
+
+                    boardCtx.fillStyle = '#facc15';
+                    boardCtx.font = '8.5px monospace';
+                    boardCtx.fillText(simFlameActive ? 'Servo -> 60°' : 'Servo -> 77°', oledB.x + 12, oledB.y + 74);
+                } else {
+                    boardCtx.fillStyle = '#475569';
+                    boardCtx.font = '9px monospace';
+                    boardCtx.fillText('[SCREEN OFF]', oledB.x + 24, oledB.y + 50);
+                }
+
+                // Buzzer Switch
+                const bzSw = boardParts['BUZZER_SW'].bbox;
+                boardCtx.fillStyle = '#0f172a';
+                boardCtx.strokeStyle = '#cbd5e1';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(bzSw.x, bzSw.y, bzSw.w, bzSw.h, 4);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                const knobX = simBuzzerSwOn ? (bzSw.x + bzSw.w - 20) : (bzSw.x + 3);
+                boardCtx.fillStyle = simBuzzerSwOn ? '#22c55e' : '#cbd5e1';
+                boardCtx.fillRect(knobX, bzSw.y + 4, 17, bzSw.h - 8);
+
+                boardCtx.fillStyle = '#e2e8f0';
+                boardCtx.font = 'bold 8.5px monospace';
+                boardCtx.fillText('x P0 🕪', bzSw.x + 4, bzSw.y - 6);
+
+                // Motor M1
+                const motB = boardParts['MOTOR'].bbox;
+                boardCtx.fillStyle = '#15803d';
+                boardCtx.strokeStyle = '#4ade80';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(motB.x, motB.y, motB.w, motB.h, 4);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                [motB.x + 16, motB.x + 44].forEach(sx => {
+                    boardCtx.fillStyle = '#86efac';
+                    boardCtx.beginPath();
+                    boardCtx.arc(sx, motB.y + 20, 6.5, 0, Math.PI * 2);
+                    boardCtx.fill();
+                    boardCtx.strokeStyle = '#14532d';
+                    boardCtx.lineWidth = 1.5;
+                    boardCtx.beginPath();
+                    boardCtx.moveTo(sx - 4.5, motB.y + 20); boardCtx.lineTo(sx + 4.5, motB.y + 20);
+                    boardCtx.stroke();
+                });
+
+                boardCtx.fillStyle = '#86efac';
+                boardCtx.font = 'bold 8.5px monospace';
+                boardCtx.fillText('M1A  M1B', motB.x + 8, motB.y - 6);
+
+                if (simFlameActive && simPowerOn) {
+                    motorSpin += 0.2;
+                    boardCtx.save();
+                    boardCtx.translate(motB.x + motB.w / 2, motB.y + 20);
+                    boardCtx.rotate(motorSpin);
+                    boardCtx.strokeStyle = '#facc15';
+                    boardCtx.lineWidth = 2;
+                    boardCtx.beginPath();
+                    boardCtx.arc(0, 0, 7, 0, Math.PI * 1.5);
+                    boardCtx.stroke();
+                    boardCtx.restore();
+                }
+
+                // micro:bit Edge Slot
+                const mbS = boardParts['MB_SLOT'].bbox;
+                boardCtx.fillStyle = '#0c0e12';
+                boardCtx.strokeStyle = '#c5a059';
+                boardCtx.lineWidth = 2.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(mbS.x, mbS.y, mbS.w, mbS.h, 4);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#000000';
+                boardCtx.fillRect(mbS.x + 10, mbS.y + 14, mbS.w - 20, 24);
+
+                boardCtx.strokeStyle = '#eab308';
+                boardCtx.lineWidth = 2;
+                boardCtx.beginPath();
+                for (let x = mbS.x + 15; x < mbS.x + mbS.w - 15; x += 6) {
+                    boardCtx.moveTo(x, mbS.y + 15);
+                    boardCtx.lineTo(x, mbS.y + 36);
+                }
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#cbd5e1';
+                boardCtx.font = 'bold 9px monospace';
+                boardCtx.fillText('micro:bit Card Edge Connector', mbS.x + 28, mbS.y + 47);
+
+                // Servo 6-Pin Header
+                const srvB = boardParts['SERVO_6PIN'].bbox;
+                boardCtx.fillStyle = '#1e293b';
+                boardCtx.strokeStyle = '#f59e0b';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(srvB.x, srvB.y, srvB.w, srvB.h, 4);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#f59e0b';
+                boardCtx.font = 'bold 9px monospace';
+                boardCtx.fillText('S2  S1', srvB.x + 13, srvB.y + 13);
+
+                const colX = [srvB.x + 18, srvB.x + 42];
+                const srvRows = [
+                    { y: srvB.y + 27, color: '#10b981', label: 'S' },
+                    { y: srvB.y + 47, color: '#ef4444', label: 'V' },
+                    { y: srvB.y + 67, color: '#0f172a', label: 'G' }
+                ];
+
+                srvRows.forEach(r => {
+                    boardCtx.fillStyle = '#cbd5e1';
+                    boardCtx.font = 'bold 8px monospace';
+                    boardCtx.fillText(r.label, srvB.x + 4, r.y + 3);
+
+                    colX.forEach(x => {
+                        boardCtx.fillStyle = r.color;
+                        boardCtx.strokeStyle = '#cbd5e1';
+                        boardCtx.lineWidth = 1;
+                        boardCtx.beginPath();
+                        boardCtx.arc(x, r.y, 4.5, 0, Math.PI * 2);
+                        boardCtx.fill();
+                        boardCtx.stroke();
+                    });
+                });
+
+                boardCtx.fillStyle = '#f59e0b';
+                boardCtx.font = 'bold 8px monospace';
+                boardCtx.fillText('SERVO', srvB.x + 14, srvB.y + srvB.h + 12);
+
+                // GPIO Cluster
+                const gpB = boardParts['GPIO_CLUSTER'].bbox;
+                boardCtx.strokeStyle = '#10b981';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.strokeRect(gpB.x, gpB.y, gpB.w, gpB.h);
+
+                for (let row = 0; row < 4; row++) {
+                    boardCtx.fillStyle = '#dc2626';
+                    boardCtx.beginPath(); boardCtx.arc(gpB.x + 10, gpB.y + 13 + row * 23, 3, 0, Math.PI * 2); boardCtx.fill();
+                    boardCtx.fillStyle = '#0f172a';
+                    boardCtx.beginPath(); boardCtx.arc(gpB.x + 22, gpB.y + 13 + row * 23, 3, 0, Math.PI * 2); boardCtx.fill();
+                    boardCtx.fillStyle = '#10b981';
+                    boardCtx.beginPath(); boardCtx.arc(gpB.x + 34, gpB.y + 13 + row * 23, 3, 0, Math.PI * 2); boardCtx.fill();
+                }
+
+                boardCtx.fillStyle = '#34d399';
+                boardCtx.font = '7.5px monospace';
+                boardCtx.fillText('GPIO (P0-P16)', gpB.x - 8, gpB.y - 4);
+
+                // I2C Header (4 rows x 3 cols)
+                const i2cB = boardParts['I2C_PORT'].bbox;
+                boardCtx.fillStyle = '#181e29';
+                boardCtx.strokeStyle = '#3b82f6';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(i2cB.x, i2cB.y, i2cB.w, i2cB.h, 4);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#38bdf8';
+                boardCtx.font = 'bold 9px monospace';
+                boardCtx.fillText('I2C', i2cB.x + 19, i2cB.y - 4);
+
+                const i2cRowData = [
+                    { label: 'SDA', color: '#2563eb', border: '#60a5fa' },
+                    { label: 'SCL', color: '#0284c7', border: '#38bdf8' },
+                    { label: 'GND', color: '#0f172a', border: '#64748b' },
+                    { label: '3V3', color: '#dc2626', border: '#f87171' }
+                ];
+
+                for (let r = 0; r < 4; r++) {
+                    const ry = i2cB.y + 11 + r * 15;
+                    boardCtx.fillStyle = i2cRowData[r].border;
+                    boardCtx.font = 'bold 7px monospace';
+                    boardCtx.textAlign = 'right';
+                    boardCtx.fillText(i2cRowData[r].label, i2cB.x - 3, ry + 2.5);
+
+                    for (let c = 0; c < 3; c++) {
+                        const cx = i2cB.x + 12 + c * 16;
+                        boardCtx.fillStyle = i2cRowData[r].color;
+                        boardCtx.strokeStyle = i2cRowData[r].border;
+                        boardCtx.lineWidth = 1;
+                        boardCtx.beginPath();
+                        boardCtx.arc(cx, ry, 4, 0, Math.PI * 2);
+                        boardCtx.fill();
+                        boardCtx.stroke();
+                    }
+                }
+                boardCtx.textAlign = 'left';
+
+                // Power Switch
+                const pwrB = boardParts['PWR_SW'].bbox;
+                boardCtx.fillStyle = '#0f172a';
+                boardCtx.strokeStyle = '#cbd5e1';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(pwrB.x, pwrB.y, pwrB.w, pwrB.h, 4);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                const leverY = simPowerOn ? (pwrB.y + 4) : (pwrB.y + pwrB.h - 18);
+                boardCtx.fillStyle = simPowerOn ? '#ef4444' : '#64748b';
+                boardCtx.fillRect(pwrB.x + 8, leverY, pwrB.w - 16, 14);
+
+                boardCtx.fillStyle = '#f87171';
+                boardCtx.font = 'bold 8px monospace';
+                boardCtx.fillText('POWER', pwrB.x + 8, pwrB.y - 6);
+                boardCtx.fillText(simPowerOn ? 'ON' : 'OFF', pwrB.x + 12, pwrB.y + pwrB.h + 12);
+
+                // Battery JST
+                const jstB = boardParts['BATT_JST'].bbox;
+                boardCtx.fillStyle = '#e2e8f0';
+                boardCtx.strokeStyle = '#cbd5e1';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(jstB.x, jstB.y, jstB.w, jstB.h, 4);
+                boardCtx.fill();
+                boardCtx.stroke();
+
+                boardCtx.fillStyle = '#0f172a';
+                boardCtx.fillRect(jstB.x + 7, jstB.y + 7, 10, jstB.h - 14);
+                boardCtx.fillRect(jstB.x + 27, jstB.y + 7, 10, jstB.h - 14);
+
+                boardCtx.fillStyle = '#cbd5e1';
+                boardCtx.beginPath();
+                boardCtx.arc(jstB.x + 12, jstB.y + jstB.h / 2, 2, 0, Math.PI * 2);
+                boardCtx.arc(jstB.x + 32, jstB.y + jstB.h / 2, 2, 0, Math.PI * 2);
+                boardCtx.fill();
+
+                boardCtx.fillStyle = '#cbd5e1';
+                boardCtx.font = 'bold 8px monospace';
+                boardCtx.fillText('3.5-5.5V', jstB.x - 2, jstB.y - 6);
+                boardCtx.fillStyle = '#f87171';
+                boardCtx.fillText('-', jstB.x + 10, jstB.y + 6);
+                boardCtx.fillStyle = '#4ade80';
+                boardCtx.fillText('+', jstB.x + 30, jstB.y + 6);
+
+                // USB Charging Port
+                const usbB = boardParts['USB_CHG'].bbox;
+                boardCtx.fillStyle = '#94a3b8';
+                boardCtx.strokeStyle = '#cbd5e1';
+                boardCtx.lineWidth = 1.5;
+                boardCtx.beginPath();
+                boardCtx.roundRect(usbB.x, usbB.y, usbB.w, usbB.h, 3);
+                boardCtx.fill();
+                boardCtx.stroke();
+                boardCtx.fillStyle = '#0f172a';
+                boardCtx.fillRect(usbB.x + 6, usbB.y + 6, usbB.w - 12, usbB.h - 12);
+
+                boardCtx.fillStyle = '#38bdf8';
+                boardCtx.font = '7.5px monospace';
+                boardCtx.fillText('5V CHARGE', usbB.x - 8, usbB.y - 6);
+
+                // Interactive Selection Highlights
+                if (hoveredBoardKey && boardParts[hoveredBoardKey]) {
+                    const b = boardParts[hoveredBoardKey].bbox;
+                    boardCtx.strokeStyle = 'rgba(250, 204, 21, 0.7)';
+                    boardCtx.lineWidth = 2.5;
+                    boardCtx.strokeRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8);
+                }
+
+                if (selectedBoardKey && boardParts[selectedBoardKey]) {
+                    const b = boardParts[selectedBoardKey].bbox;
+                    boardCtx.save();
+                    boardCtx.strokeStyle = '#facc15';
+                    boardCtx.lineWidth = 3;
+                    boardCtx.shadowColor = '#facc15';
+                    boardCtx.shadowBlur = 12;
+                    boardCtx.strokeRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8);
+                    boardCtx.restore();
+                }
+
+                boardCtx.restore();
+            }
+
+            function getBoardCoords(e) {
+                const rect = boardCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const px = clientX - rect.left;
+                const py = clientY - rect.top;
+
+                const vx = (px - boardOffsetX) / boardScale;
+                const vy = (py - boardOffsetY) / boardScale;
+
+                return { vx, vy, px, py };
+            }
+
+            function getBoardPartAt(vx, vy) {
+                for (const [key, part] of Object.entries(boardParts)) {
+                    if (currentFilter !== 'all' && part.category !== currentFilter) continue;
+                    const b = part.bbox;
+                    if (vx >= b.x - 4 && vx <= b.x + b.w + 4 && vy >= b.y - 4 && vy <= b.y + b.h + 4) {
+                        return key;
+                    }
+                }
+                return null;
+            }
+
+            if (boardCanvas) {
+                boardCanvas.addEventListener('mousemove', (e) => {
+                    const { vx, vy, px, py } = getBoardCoords(e);
+                    const hit = getBoardPartAt(vx, vy);
+
+                    if (hit !== hoveredBoardKey) {
+                        hoveredBoardKey = hit;
+                        drawMicroBoard();
+
+                        if (hoveredBoardKey && boardTooltip) {
+                            const p = boardParts[hoveredBoardKey];
+                            boardTooltip.textContent = p.name;
+                            boardTooltip.style.left = `${px + 12}px`;
+                            boardTooltip.style.top = `${py - 24}px`;
+                            boardTooltip.style.opacity = '1';
+                            if (boardStatusText) boardStatusText.textContent = `Hovering: ${p.name}`;
+                            boardCanvas.style.cursor = 'pointer';
+                        } else if (boardTooltip) {
+                            boardTooltip.style.opacity = '0';
+                            if (boardStatusText) boardStatusText.textContent = 'Hovering: None';
+                            boardCanvas.style.cursor = 'crosshair';
+                        }
+                    } else if (hoveredBoardKey && boardTooltip) {
+                        boardTooltip.style.left = `${px + 12}px`;
+                        boardTooltip.style.top = `${py - 24}px`;
+                    }
+                });
+
+                boardCanvas.addEventListener('mouseleave', () => {
+                    hoveredBoardKey = null;
+                    if (boardTooltip) boardTooltip.style.opacity = '0';
+                    if (boardStatusText) boardStatusText.textContent = 'Hovering: None';
+                    drawMicroBoard();
+                });
+
+                boardCanvas.addEventListener('click', (e) => {
+                    const { vx, vy } = getBoardCoords(e);
+                    const hit = getBoardPartAt(vx, vy);
+                    if (hit) selectPart(hit);
+                });
+
+                boardCanvas.addEventListener('touchstart', (e) => {
+                    const { vx, vy } = getBoardCoords(e);
+                    const hit = getBoardPartAt(vx, vy);
+                    if (hit) selectPart(hit);
+                });
+            }
+
+            window.selectPart = function(key) {
+                if (!boardParts[key]) return;
+                selectedBoardKey = key;
+                const d = boardParts[key];
+
+                const tagEl = document.getElementById('insp-tag');
+                if (tagEl) {
+                    tagEl.textContent = d.badge;
+                    tagEl.className = `px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${d.badgeClass || 'bg-slate-700 text-slate-200'}`;
+                }
+                const titleEl = document.getElementById('insp-title');
+                if (titleEl) titleEl.textContent = d.name;
+                const voltEl = document.getElementById('insp-voltage');
+                if (voltEl) voltEl.textContent = d.voltage;
+                const descEl = document.getElementById('insp-desc');
+                if (descEl) descEl.textContent = d.desc;
+                const badgeId = document.getElementById('insp-id-badge');
+                if (badgeId) badgeId.textContent = `ID: ${key}`;
+                const mapEl = document.getElementById('insp-mapping');
+                if (mapEl) mapEl.textContent = d.mapping;
+                const funcEl = document.getElementById('insp-functions');
+                if (funcEl) funcEl.textContent = d.functions;
+                const confEl = document.getElementById('insp-conflict');
+                if (confEl) confEl.textContent = d.conflict;
+                const devEl = document.getElementById('insp-devices');
+                if (devEl) devEl.textContent = d.devices;
+                const codeEl = document.getElementById('insp-code');
+                if (codeEl) codeEl.textContent = d.code;
+
+                drawMicroBoard();
+            };
+
+            window.filterCategory = function(cat) {
+                currentFilter = cat;
+                for (const [k, v] of Object.entries(boardParts)) {
+                    if (cat === 'all' || v.category === cat) {
+                        selectPart(k);
+                        break;
+                    }
+                }
+                drawMicroBoard();
+            };
+
+            window.toggleFlameSim = function() {
+                simFlameActive = !simFlameActive;
+                const btn = document.getElementById('sim-flame-btn');
+                const text = document.getElementById('sim-flame-text');
+
+                if (simFlameActive) {
+                    if (text) text.textContent = 'Fire Alert (<10)';
+                    if (btn) btn.className = 'px-2 py-1 rounded-lg text-[11px] font-semibold bg-rose-500 text-white shadow-lg transition flex items-center gap-1';
+                } else {
+                    if (text) text.textContent = 'Simulate Flame';
+                    if (btn) btn.className = 'px-2 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition flex items-center gap-1';
+                }
+                drawMicroBoard();
+            };
+
+            window.toggleBuzzerSwitch = function() {
+                simBuzzerSwOn = !simBuzzerSwOn;
+                const text = document.getElementById('sim-buzzer-text');
+                if (text) text.textContent = simBuzzerSwOn ? 'Buzzer: ON' : 'Buzzer: MUTED (x)';
+                selectPart('BUZZER_SW');
+                drawMicroBoard();
+            };
+
+            window.togglePowerSwitch = function() {
+                simPowerOn = !simPowerOn;
+                const text = document.getElementById('pwr-btn-text');
+                if (text) text.textContent = simPowerOn ? 'Power: ON' : 'Power: OFF (0V)';
+                selectPart('PWR_SW');
+                drawMicroBoard();
+            };
+
+            window.resetBoardState = function() {
+                simFlameActive = false;
+                simPowerOn = true;
+                simBuzzerSwOn = true;
+                const flameText = document.getElementById('sim-flame-text');
+                if (flameText) flameText.textContent = 'Simulate Flame';
+                const flameBtn = document.getElementById('sim-flame-btn');
+                if (flameBtn) flameBtn.className = 'px-2 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition flex items-center gap-1';
+                const bzText = document.getElementById('sim-buzzer-text');
+                if (bzText) bzText.textContent = 'Buzzer: ON';
+                const pwrText = document.getElementById('pwr-btn-text');
+                if (pwrText) pwrText.textContent = 'Power: ON';
+                const filterEl = document.getElementById('category-filter');
+                if (filterEl) filterEl.value = 'all';
+                currentFilter = 'all';
+                selectPart('I2C_PORT');
+            };
+
+            window.copySnippet = function() {
+                const codeEl = document.getElementById('insp-code');
+                if (!codeEl) return;
+                const text = codeEl.textContent;
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                if (boardStatusText) {
+                    boardStatusText.textContent = 'Snippet copied to clipboard!';
+                    setTimeout(() => { boardStatusText.textContent = 'Hovering: None'; }, 2000);
+                }
+            };
+
+            function animateMicroBoard() {
+                pulseAnim += 0.08;
+                if (boardCanvas && (boardCanvas.width === 0 || boardCanvas.height === 0)) {
+                    resizeBoardCanvas();
+                }
+                drawMicroBoard();
+                requestAnimationFrame(animateMicroBoard);
+            }
+
+            // Keyboard Navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+                if (e.key === ' ' && currentSlideIndex === 6) {
+                    e.preventDefault();
+                    publishSensorPacket();
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                resizeBoardCanvas();
+            });
+
+            startGreenhouseLoop();
+            updateUI();
+            requestAnimationFrame(animateMicroBoard);
+        });
+    </script>
+</body>
+</html>
