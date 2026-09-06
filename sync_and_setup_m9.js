@@ -123,8 +123,52 @@ async function main() {
         console.log("Upserted IoT course with full HTML content!");
     }
 
-    console.log("All courses seeded and synced successfully without overwriting titles!");
+    // 6. Automatically ensure all enrollments across different courses have independent User accounts
+    const allEnrollments = await prisma.enrollment.findMany({
+        include: { user: true }
+    });
+
+    const seenUserCourses = new Map(); // userId -> first courseId
+    for (const enroll of allEnrollments) {
+        if (!enroll.user) continue;
+        if (!seenUserCourses.has(enroll.userId)) {
+            seenUserCourses.set(enroll.userId, enroll.courseId);
+        } else {
+            // This user is attached to multiple courses! Clone a separate User for this course
+            const origUser = enroll.user;
+            const shortId = enroll.courseId.slice(-6);
+            let newEmail = origUser.email;
+            if (newEmail) {
+                const [local, domain] = newEmail.includes('@') ? newEmail.split('@') : [newEmail, 'learningtech.local'];
+                newEmail = `${local}_${shortId}@${domain}`;
+            } else {
+                newEmail = `student_${origUser.studentId || enroll.pcId || Date.now()}_${shortId}@learningtech.local`;
+            }
+
+            const clonedUser = await prisma.user.create({
+                data: {
+                    name: origUser.name,
+                    studentId: origUser.studentId,
+                    email: newEmail,
+                    passwordHash: origUser.passwordHash,
+                    role: origUser.role,
+                    authType: origUser.authType || 'EMAIL',
+                    mustChangePassword: origUser.mustChangePassword,
+                    trialExpiresAt: origUser.trialExpiresAt
+                }
+            });
+
+            await prisma.enrollment.update({
+                where: { id: enroll.id },
+                data: { userId: clonedUser.id }
+            });
+            console.log(`Successfully separated shared student "${origUser.name || origUser.id}" into course ${enroll.courseId}`);
+        }
+    }
+
+    console.log("All courses and student rosters seeded, synced, and isolated successfully!");
 }
 
 main().finally(() => prisma.$disconnect());
+
 

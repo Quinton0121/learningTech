@@ -44,6 +44,49 @@ export async function POST(request: Request) {
       }
     });
 
+    // Query all original enrollments with their users
+    const originalEnrollments = await prisma.enrollment.findMany({
+      where: { courseId: originalCourse.id },
+      include: { user: true }
+    });
+
+    for (const enroll of originalEnrollments) {
+      const origUser = enroll.user;
+      if (!origUser) continue;
+
+      // Create a cloned independent user for the new course
+      const shortId = newCourse.id.slice(-6);
+      let clonedEmail = origUser.email;
+      if (clonedEmail) {
+        const [local, domain] = clonedEmail.includes('@') ? clonedEmail.split('@') : [clonedEmail, 'learningtech.local'];
+        clonedEmail = `${local}_${shortId}@${domain}`;
+      } else {
+        clonedEmail = `student_${origUser.studentId || enroll.pcId || Date.now()}_${shortId}@learningtech.local`;
+      }
+
+      const clonedUser = await prisma.user.create({
+        data: {
+          name: origUser.name,
+          studentId: origUser.studentId,
+          email: clonedEmail,
+          passwordHash: origUser.passwordHash,
+          role: 'LEARNER',
+          authType: origUser.authType || 'EMAIL',
+          mustChangePassword: origUser.mustChangePassword,
+          trialExpiresAt: origUser.trialExpiresAt
+        }
+      });
+
+      await prisma.enrollment.create({
+        data: {
+          userId: clonedUser.id,
+          courseId: newCourse.id,
+          pcId: enroll.pcId,
+          status: 'APPROVED'
+        }
+      });
+    }
+
     return NextResponse.json({ success: true, course: newCourse }, { status: 200 });
 
   } catch (error) {

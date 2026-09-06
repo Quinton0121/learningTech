@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       include: { 
         enrollments: {
           include: {
-            user: { select: { id: true, name: true, email: true } }
+            user: { select: { id: true, name: true, email: true, studentId: true } }
           }
         } 
       }
