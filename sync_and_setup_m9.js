@@ -96,6 +96,28 @@ async function main() {
         }
     });
 
+    // 5. IoT Masterclass - Only update htmlContent, NEVER overwrite title
+    let iotHtml = '';
+    if (fs.existsSync('courses/iot/introduction_to_iot_interactive_course.html')) {
+        iotHtml = fs.readFileSync('courses/iot/introduction_to_iot_interactive_course.html', 'utf8');
+    }
+
+    await prisma.course.upsert({
+        where: { id: 'iot_intro_masterclass_01' },
+        update: {
+            htmlContent: iotHtml || undefined
+        },
+        create: {
+            id: 'iot_intro_masterclass_01',
+            title: 'Introduction to IoT | Interactive Masterclass',
+            description: 'Interactive Masterclass on Internet of Things (IoT): smart circuits, sensors, microcontrollers, cloud connectivity, and automated systems.',
+            educatorId: quinton.id,
+            htmlContent: iotHtml || '<h1>IoT Masterclass</h1>',
+            isPublic: true,
+            studentQuota: 50
+        }
+    });
+
     console.log("All courses seeded and synced successfully without overwriting titles!");
 }
 

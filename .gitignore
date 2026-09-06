@@ -41,7 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
-*.db
+*.db*
 ignored_files/
 
 # Scratch files and generated content
@@ -67,6 +67,8 @@ create_user.js
 combine_html.py
 translate.py
 test_m9_api.js
+check_m9_auth.js
+check_m9_course_html.js
 *.zip
 *.tmp
 /courses/
