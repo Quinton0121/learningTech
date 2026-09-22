@@ -1228,9 +1228,13 @@
                 <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                 Reference Anchor Mode (Cycle with <kbd class="px-1 bg-slate-100 border border-slate-300 rounded text-slate-700 font-mono">F4</kbd>)
               </label>
-              <div class="flex gap-1.5 text-[11px]">
-                <button id="preset-tax" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Tax ($B$1)</button>
-                <button id="preset-running" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Relative (A1)</button>
+              <div class="flex flex-wrap gap-1.5 text-[11px]">
+                <button id="preset-addition" class="px-2 py-0.5 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1">➕ Sum (=A1+B1)</button>
+                <button id="preset-fixed-add" class="px-2 py-0.5 rounded bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300 font-bold flex items-center gap-1">⚓ Hybrid (=A2+$B$1)</button>
+                <button id="preset-hybrid-mixed" class="px-2 py-0.5 rounded bg-sky-100 hover:bg-sky-200 text-sky-900 border border-sky-300 font-bold flex items-center gap-1">🔀 Hybrid+Mixed (=A2+B$1)</button>
+                <button id="preset-matrix-mixed" class="px-2 py-0.5 rounded bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold flex items-center gap-1">🧮 2D Matrix (=$A2+B$1)</button>
+                <button id="preset-tax" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Single ($B$1)</button>
+                <button id="preset-running" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Relative (B1)</button>
                 <button id="preset-mult-table" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Mixed (B$1)</button>
               </div>
             </div>
@@ -1326,6 +1330,9 @@
                 <marker id="arrowhead-blue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
                   <polygon points="0 0, 8 4, 0 8" fill="#2563eb" />
                 </marker>
+                <marker id="arrowhead-purple" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <polygon points="0 0, 8 4, 0 8" fill="#9333ea" />
+                </marker>
                 <marker id="arrowhead-red" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
                   <polygon points="0 0, 8 4, 0 8" fill="#dc2626" />
                 </marker>
@@ -1333,13 +1340,10 @@
                   <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.2"/>
                 </filter>
               </defs>
+              <!-- Primary reference connector -->
               <path id="connector-line" d="" fill="none" stroke="#2563eb" stroke-width="3" class="anim-dash" filter="url(#glow-shadow)"/>
-              <g id="vector-badge" class="transition-all duration-200">
-                <rect id="badge-bg" rx="6" ry="6" fill="#1e293b" x="0" y="0" width="120" height="24" filter="url(#glow-shadow)"/>
-                <text id="badge-text" x="0" y="0" fill="#ffffff" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
-                  Offset: (0, 0)
-                </text>
-              </g>
+              <!-- Secondary reference connector (Used for =A1+B1 dual references) -->
+              <path id="connector-line-2" d="" fill="none" stroke="#9333ea" stroke-width="3" class="anim-dash hidden" filter="url(#glow-shadow)"/>
             </svg>
 
             <!-- Table Structure -->
@@ -1379,8 +1383,12 @@
           <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
             <div class="flex items-center gap-4 flex-wrap">
               <span class="flex items-center gap-1.5">
-                <span class="w-3 h-3 rounded bg-blue-100 border border-blue-500"></span>
-                Referenced Target Cell
+                <span class="w-3 h-3 rounded bg-blue-100 border-2 border-blue-500"></span>
+                <span id="legend-source-1">Reference A (Blue)</span>
+              </span>
+              <span id="legend-source-2-container" class="flex items-center gap-1.5 hidden">
+                <span class="w-3 h-3 rounded bg-purple-100 border-2 border-purple-500"></span>
+                <span>Reference B (Purple)</span>
               </span>
               <span class="flex items-center gap-1.5">
                 <span class="w-3 h-3 rounded bg-emerald-100 border-2 border-emerald-600"></span>
@@ -2526,16 +2534,22 @@ document.addEventListener('DOMContentLoaded', () => {
        PAGE 1: CELL REFERENCES STATE & LOGIC
        ========================================================================= */
     const refState = {
-      formulaCell: { col: 'C', row: 2 },
+      formulaCell: { col: 'C', row: 1 },
       mode: 'relative',
-      initialFormulaCell: { col: 'C', row: 2 },
+      formulaType: 'addition', // 'single' or 'addition'
+      subType: 'sum', // 'sum', 'hybrid-abs', 'hybrid-mixed', 'matrix-mixed'
+      // For single formulas:
+      initialFormulaCell: { col: 'C', row: 1 },
       initialTargetCell: { col: 'B', row: 1 },
+      // For addition formulas:
+      term1: { col: 'A', row: 1, mode: 'relative' },
+      term2: { col: 'B', row: 1, mode: 'relative' },
       gridData: {
-        'A1': 'Item', 'B1': '100', 'C1': 'Price', 'D1': 'Tax', 'E1': 'Total',
-        'A2': 'Apples', 'B2': '10', 'C2': '', 'D2': '', 'E2': '',
-        'A3': 'Bananas', 'B3': '15', 'C3': '', 'D3': '', 'E3': '',
-        'A4': 'Cherries', 'B4': '25', 'C4': '', 'D4': '', 'E4': '',
-        'A5': 'Dates', 'B5': '40', 'C5': '', 'D5': ''
+        'A1': '10', 'B1': '15', 'C1': '20', 'D1': '25', 'E1': '30',
+        'A2': '30', 'B2': '40', 'C2': '',   'D2': '',   'E2': '',
+        'A3': '50', 'B3': '60', 'C3': '',   'D3': '',   'E3': '',
+        'A4': '70', 'B4': '80', 'C4': '',   'D4': '',   'E4': '',
+        'A5': '90', 'B5': '100','C5': '',   'D5': ''
       },
       copiedCells: new Set()
     };
@@ -2546,19 +2560,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function colToIndex(c) { return COLS.indexOf(c); }
     function indexToCol(idx) { return COLS[Math.max(0, Math.min(COLS.length - 1, idx))]; }
 
-    function resolveSourceCell(formulaCol, formulaRow, mode) {
-      const origFormColIdx = colToIndex(refState.initialFormulaCell.col);
-      const origFormRow = refState.initialFormulaCell.row;
-
-      const origTargetColIdx = colToIndex(refState.initialTargetCell.col);
-      const origTargetRow = refState.initialTargetCell.row;
-
+    function resolveReference(origFormCol, origFormRow, origTargetCol, origTargetRow, curFormCol, curFormRow, mode) {
+      const origFormColIdx = colToIndex(origFormCol);
+      const origTargetColIdx = colToIndex(origTargetCol);
       const deltaCol = origTargetColIdx - origFormColIdx;
       const deltaRow = origTargetRow - origFormRow;
 
-      const curFormColIdx = colToIndex(formulaCol);
-      const curFormRow = formulaRow;
-
+      const curFormColIdx = colToIndex(curFormCol);
       let resolvedColIdx;
       let resolvedRow;
 
@@ -2591,6 +2599,14 @@ document.addEventListener('DOMContentLoaded', () => {
         rawRow: resolvedRow,
         outOfBounds: isColOutOfBounds || isRowOutOfBounds
       };
+    }
+
+    function resolveSourceCell(formulaCol, formulaRow, mode) {
+      return resolveReference(
+        refState.initialFormulaCell.col, refState.initialFormulaCell.row,
+        refState.initialTargetCell.col, refState.initialTargetCell.row,
+        formulaCol, formulaRow, mode
+      );
     }
 
     function initializeRefTable() {
@@ -2638,14 +2654,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderRefGridState() {
-      const target = resolveSourceCell(refState.formulaCell.col, refState.formulaCell.row, refState.mode);
+      const isDual = refState.formulaType === 'addition';
       const formulaKey = `${refState.formulaCell.col}${refState.formulaCell.row}`;
-      const targetKey = `${target.col}${target.row}`;
 
+      // Calculate Target 1 and Target 2
+      let target1, target2;
+      if (isDual) {
+        target1 = resolveReference(
+          refState.initialFormulaCell.col, refState.initialFormulaCell.row,
+          refState.term1.col, refState.term1.row,
+          refState.formulaCell.col, refState.formulaCell.row,
+          refState.term1.mode
+        );
+        target2 = resolveReference(
+          refState.initialFormulaCell.col, refState.initialFormulaCell.row,
+          refState.term2.col, refState.term2.row,
+          refState.formulaCell.col, refState.formulaCell.row,
+          refState.term2.mode
+        );
+      } else {
+        target1 = resolveSourceCell(refState.formulaCell.col, refState.formulaCell.row, refState.mode);
+      }
+
+      const target1Key = `${target1.col}${target1.row}`;
+      const target2Key = isDual ? `${target2.col}${target2.row}` : null;
+
+      // Clear previous grid stylings
       document.querySelectorAll('#table-body .grid-cell').forEach(td => {
         td.classList.remove(
           'bg-emerald-100', 'border-emerald-600', 'border-2', 'z-30',
           'bg-blue-100/70', 'border-blue-500', 'source-cell-glow',
+          'bg-purple-100/70', 'border-purple-500',
           'bg-red-50', 'border-red-400'
         );
         const handle = td.querySelector('.fill-handle');
@@ -2655,15 +2694,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (badge) badge.textContent = '';
       });
 
-      updateHeaderLockVisuals(target);
-
-      const targetTd = document.querySelector(`td[data-cell="${targetKey}"]`);
-      if (targetTd && !target.outOfBounds) {
-        targetTd.classList.add('bg-blue-100/70', 'border-blue-500', 'border-2', 'source-cell-glow');
-        const badge = targetTd.querySelector('.cell-badge');
-        if (badge) badge.innerHTML = `<span class="text-blue-600 font-bold">SOURCE</span>`;
+      // Target 1 cell highlight (Blue)
+      const target1Td = document.querySelector(`td[data-cell="${target1Key}"]`);
+      if (target1Td && !target1.outOfBounds) {
+        target1Td.classList.add('bg-blue-100/70', 'border-blue-500', 'border-2', 'source-cell-glow');
+        const badge = target1Td.querySelector('.cell-badge');
+        if (badge) badge.innerHTML = `<span class="text-blue-600 font-bold">${isDual ? 'A1 Term' : 'SOURCE'}</span>`;
       }
 
+      // Target 2 cell highlight (Purple, if in dual mode)
+      let target2Td = null;
+      if (isDual && target2Key) {
+        target2Td = document.querySelector(`td[data-cell="${target2Key}"]`);
+        if (target2Td && !target2.outOfBounds) {
+          target2Td.classList.add('bg-purple-100/70', 'border-purple-500', 'border-2', 'source-cell-glow');
+          const badge = target2Td.querySelector('.cell-badge');
+          if (badge) badge.innerHTML = `<span class="text-purple-600 font-bold">B1 Term</span>`;
+        }
+      }
+
+      // Formula cell highlight
       const formulaTd = document.querySelector(`td[data-cell="${formulaKey}"]`);
       if (formulaTd) {
         formulaTd.classList.add('bg-emerald-100', 'border-emerald-600', 'border-2', 'z-20');
@@ -2677,6 +2727,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formulaTd.appendChild(handle);
       }
 
+      // Highlight ghost trace of filled cells
       refState.copiedCells.forEach(cellKey => {
         if (cellKey !== formulaKey) {
           const td = document.querySelector(`td[data-cell="${cellKey}"]`);
@@ -2684,20 +2735,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      drawVectorArrow(formulaTd, targetTd, target.outOfBounds);
-      updateFormulaBarAndInspector(target);
+      // Toggle Legend items
+      const leg2 = document.getElementById('legend-source-2-container');
+      const leg1 = document.getElementById('legend-source-1');
+      if (isDual) {
+        leg2.classList.remove('hidden');
+        leg1.textContent = 'Term 1 (Blue)';
+      } else {
+        leg2.classList.add('hidden');
+        leg1.textContent = 'Referenced Target Cell';
+      }
+
+      // Draw primary spline
+      drawSingleVector(formulaTd, target1Td, target1, 'connector-line', '#2563eb', 'url(#arrowhead-blue)');
+
+      // Draw secondary spline (if dual mode)
+      const line2 = document.getElementById('connector-line-2');
+      if (isDual && target2Td) {
+        line2.classList.remove('hidden');
+        drawSingleVector(formulaTd, target2Td, target2, 'connector-line-2', '#9333ea', 'url(#arrowhead-purple)');
+      } else {
+        line2.classList.add('hidden');
+        line2.setAttribute('d', '');
+      }
+
+      updateHeaderLockVisuals(target1, isDual ? target2 : null);
+      updateFormulaBarAndInspector(target1, target2);
     }
 
-    function drawVectorArrow(fromElem, toElem, isOutOfBounds) {
+    function drawSingleVector(fromElem, toElem, targetObj, lineId, strokeColor, markerUrl) {
       const svg = document.getElementById('arrow-svg');
-      const line = document.getElementById('connector-line');
-      const badge = document.getElementById('vector-badge');
-      const badgeBg = document.getElementById('badge-bg');
-      const badgeText = document.getElementById('badge-text');
+      const line = document.getElementById(lineId);
 
       if (!fromElem || document.getElementById('page-refs').classList.contains('hidden')) {
         line.setAttribute('d', '');
-        badge.style.display = 'none';
         return;
       }
 
@@ -2709,12 +2780,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let endX, endY;
 
-      if (toElem && !isOutOfBounds) {
+      if (toElem && !targetObj.outOfBounds) {
         const toRect = toElem.getBoundingClientRect();
         endX = (toRect.left + toRect.width / 2) - svgRect.left;
         endY = (toRect.top + toRect.height / 2) - svgRect.top;
-        line.setAttribute('marker-end', 'url(#arrowhead-blue)');
-        line.setAttribute('stroke', '#2563eb');
+        line.setAttribute('marker-end', markerUrl);
+        line.setAttribute('stroke', strokeColor);
       } else {
         endX = Math.max(10, Math.min(svgRect.width - 10, startX - 140));
         endY = Math.max(10, Math.min(svgRect.height - 10, startY - 90));
@@ -2722,52 +2793,18 @@ document.addEventListener('DOMContentLoaded', () => {
         line.setAttribute('stroke', '#dc2626');
       }
 
+      // Curve curvature: offset slightly if secondary line to prevent overlap
+      const curvature = lineId === 'connector-line-2' ? -0.22 : 0.18;
       const dx = endX - startX;
       const dy = endY - startY;
-      const cx = (startX + endX) / 2 - (dy * 0.15);
-      const cy = (startY + endY) / 2 + (dx * 0.15);
+      const cx = (startX + endX) / 2 - (dy * curvature);
+      const cy = (startY + endY) / 2 + (dx * curvature);
 
       const pathData = `M ${startX} ${startY} Q ${cx} ${cy} ${endX} ${endY}`;
       line.setAttribute('d', pathData);
-
-      badge.style.display = 'block';
-      const midX = (startX + endX) / 2;
-      const midY = (startY + endY) / 2;
-
-      let badgeLabel = "";
-      if (isOutOfBounds) {
-        badgeLabel = "#REF! Off Grid";
-        badgeBg.setAttribute('fill', '#991b1b');
-      } else if (refState.mode === 'absolute') {
-        badgeLabel = "📌 Locked Anchor";
-        badgeBg.setAttribute('fill', '#1e3a8a');
-      } else if (refState.mode === 'relative') {
-        const deltaCol = colToIndex(refState.formulaCell.col) - colToIndex(resolveSourceCell(refState.formulaCell.col, refState.formulaCell.row, refState.mode).col);
-        const deltaRow = refState.formulaCell.row - resolveSourceCell(refState.formulaCell.col, refState.formulaCell.row, refState.mode).row;
-        badgeLabel = `Δ (${deltaCol > 0 ? '←' + deltaCol : (deltaCol < 0 ? '→' + Math.abs(deltaCol) : '0')}, ${deltaRow > 0 ? '↑' + deltaRow : (deltaRow < 0 ? '↓' + Math.abs(deltaRow) : '0')})`;
-        badgeBg.setAttribute('fill', '#1e293b');
-      } else if (refState.mode === 'mixed-col') {
-        badgeLabel = "🔒 Col Locked, Row Slides";
-        badgeBg.setAttribute('fill', '#854d0e');
-      } else {
-        badgeLabel = "🔒 Row Locked, Col Slides";
-        badgeBg.setAttribute('fill', '#6b21a8');
-      }
-
-      const textWidth = Math.max(105, badgeLabel.length * 8.5 + 20);
-      badgeBg.setAttribute('width', textWidth);
-      badgeBg.setAttribute('x', midX - textWidth / 2);
-      badgeBg.setAttribute('y', midY - 14);
-
-      badgeText.setAttribute('x', midX);
-      badgeText.setAttribute('y', midY - 2);
-      badgeText.textContent = badgeLabel;
     }
 
-    function updateHeaderLockVisuals(target) {
-      const isColLocked = refState.mode === 'absolute' || refState.mode === 'mixed-col';
-      const isRowLocked = refState.mode === 'absolute' || refState.mode === 'mixed-row';
-
+    function updateHeaderLockVisuals(target1, target2) {
       document.querySelectorAll('#page-refs .col-header').forEach(th => {
         th.classList.remove('bg-amber-100', 'text-amber-900', 'font-black');
         th.querySelector('.col-lock-badge').classList.add('hidden');
@@ -2777,20 +2814,32 @@ document.addEventListener('DOMContentLoaded', () => {
         th.querySelector('.row-lock-badge').classList.add('hidden');
       });
 
-      if (isColLocked) {
-        const colHeader = document.querySelector(`.col-header[data-col="${target.col}"]`);
-        if (colHeader) {
-          colHeader.classList.add('bg-amber-100', 'text-amber-900', 'font-black');
-          colHeader.querySelector('.col-lock-badge').classList.remove('hidden');
-        }
-      }
+      const checkLock = (target, mode) => {
+        if (!target) return;
+        const isColLocked = mode === 'absolute' || mode === 'mixed-col';
+        const isRowLocked = mode === 'absolute' || mode === 'mixed-row';
 
-      if (isRowLocked) {
-        const rowHeader = document.querySelector(`.row-header[data-row="${target.row}"]`);
-        if (rowHeader) {
-          rowHeader.classList.add('bg-amber-100', 'text-amber-900', 'font-black');
-          rowHeader.querySelector('.row-lock-badge').classList.remove('hidden');
+        if (isColLocked) {
+          const colHeader = document.querySelector(`.col-header[data-col="${target.col}"]`);
+          if (colHeader) {
+            colHeader.classList.add('bg-amber-100', 'text-amber-900', 'font-black');
+            colHeader.querySelector('.col-lock-badge').classList.remove('hidden');
+          }
         }
+        if (isRowLocked) {
+          const rowHeader = document.querySelector(`.row-header[data-row="${target.row}"]`);
+          if (rowHeader) {
+            rowHeader.classList.add('bg-amber-100', 'text-amber-900', 'font-black');
+            rowHeader.querySelector('.row-lock-badge').classList.remove('hidden');
+          }
+        }
+      };
+
+      if (refState.formulaType === 'addition') {
+        checkLock(target1, refState.term1.mode);
+        checkLock(target2, refState.term2.mode);
+      } else {
+        checkLock(target1, refState.mode);
       }
     }
 
@@ -2803,74 +2852,139 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    function updateFormulaBarAndInspector(target) {
+    function updateFormulaBarAndInspector(target1, target2) {
       const formulaCellKey = `${refState.formulaCell.col}${refState.formulaCell.row}`;
-      const formulaStr = getFormulaString(target.col, target.row, refState.mode);
+      const isDual = refState.formulaType === 'addition';
+
+      const formatTerm = (col, row, mode) => {
+        switch (mode) {
+          case 'relative': return `${col}${row}`;
+          case 'absolute': return `$${col}$${row}`;
+          case 'mixed-col': return `$${col}${row}`;
+          case 'mixed-row': return `${col}$${row}`;
+        }
+      };
+
+      let fullFormula = "";
+      if (isDual) {
+        const t1Str = formatTerm(target1.col, target1.row, refState.term1.mode);
+        const t2Str = formatTerm(target2.col, target2.row, refState.term2.mode);
+        fullFormula = `=${t1Str}+${t2Str}`;
+
+        const val1 = Number(refState.gridData[`${target1.col}${target1.row}`] || 0);
+        const val2 = Number(refState.gridData[`${target2.col}${target2.row}`] || 0);
+        const total = val1 + val2;
+
+        document.getElementById('formula-bar-display').innerHTML = `
+          <span class="text-slate-400 font-bold mr-1">=</span>
+          <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold border border-blue-300">
+            ${t1Str}
+          </span>
+          <span class="text-slate-500 font-bold mx-1">+</span>
+          <span class="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-bold border border-purple-300">
+            ${t2Str}
+          </span>
+          <span class="text-emerald-700 font-bold ml-2">➔ ${total}</span>
+        `;
+        document.getElementById('source-cell-tag').innerHTML = `Terms: <strong class="text-blue-600">${t1Str}</strong> (${val1}) + <strong class="text-purple-600">${t2Str}</strong> (${val2})`;
+        document.getElementById('insp-formula-cell').textContent = formulaCellKey;
+        document.getElementById('insp-raw-formula').textContent = fullFormula;
+        document.getElementById('insp-resolved-cell').textContent = `${target1.col}${target1.row} + ${target2.col}${target2.row}`;
+        document.getElementById('insp-cell-value').textContent = `${val1} + ${val2} = ${total}`;
+
+        const badgeSummary = document.getElementById('badge-lock-summary');
+        const vectorDesc = document.getElementById('insp-vector-desc');
+        const behavDesc = document.getElementById('insp-behavior-desc');
+        const colText = document.getElementById('col-status-text');
+        const rowText = document.getElementById('row-status-text');
+
+        if (refState.subType === 'matrix-mixed') {
+          badgeSummary.textContent = "2D Matrix: Mixed Col + Mixed Row";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900 border border-amber-300";
+          vectorDesc.innerHTML = `Term 1 (<strong class="text-blue-600">${t1Str}</strong>) locks Column A. Term 2 (<strong class="text-purple-600">${t2Str}</strong>) locks Row 1!`;
+          behavDesc.innerHTML = `This is the <strong>famous spreadsheet matrix formula</strong>! As you copy across rows and columns, Column A supplies vertical row values while Row 1 supplies horizontal column values. Notice the 🔒 clamps anchored on header <strong>A</strong> and header <strong>1</strong>.`;
+          colText.innerHTML = "<span class='text-blue-700 font-bold'>$A locked</span> (slides vertically)";
+          rowText.innerHTML = "<span class='text-purple-700 font-bold'>$1 locked</span> (slides horizontally)";
+        } else if (refState.subType === 'hybrid-mixed') {
+          badgeSummary.textContent = "Hybrid + Mixed (=A2+B$1)";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-sky-100 text-sky-900 border border-sky-300";
+          vectorDesc.innerHTML = `Term 1 (<strong class="text-blue-600">${t1Str}</strong>) is fully relative. Term 2 (<strong class="text-purple-600">${t2Str}</strong>) has its row clamped to Row 1!`;
+          behavDesc.innerHTML = `Copying vertically down maintains row 1 for Term 2 (<strong class="text-purple-700">${target2.col}$1</strong>), while Term 1 steps down freely (<strong class="text-blue-700">${target1.col}${target1.row}</strong>). If you copy right, both columns advance in parallel!`;
+          colText.textContent = "Both columns float freely";
+          rowText.textContent = "Term 1 floats, Term 2 row clamped to $1";
+        } else if (refState.subType === 'hybrid-abs') {
+          badgeSummary.textContent = "Hybrid: Relative + Absolute Anchor";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-800";
+          vectorDesc.innerHTML = `Term 1 (<strong class="text-blue-600">${t1Str}</strong>) moves dynamically. Term 2 (<strong class="text-purple-600">${t2Str}</strong>) is a permanent pinned anchor!`;
+          behavDesc.innerHTML = `As you copy downward to row ${refState.formulaCell.row}, the formula evaluates as <strong class="text-emerald-700">=A${refState.formulaCell.row}+$B$1</strong>. The blue arrow travels down with your row, while the purple arrow stretches like an elastic tether back to the clamped $B$1 cell!`;
+          colText.textContent = "Mixed Structure";
+          rowText.textContent = "A dynamic, B1 clamped";
+        } else {
+          badgeSummary.textContent = "Dual Parallel Vectors (=A1+B1)";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+          vectorDesc.innerHTML = `Two parallel vector arrows: "Look <strong>2 columns left</strong> (A) and <strong>1 column left</strong> (B)".`;
+          behavDesc.innerHTML = `When you fill down to row ${refState.formulaCell.row}, both references adjust in tandem to row ${refState.formulaCell.row} (becoming <strong>=A${refState.formulaCell.row}+B${refState.formulaCell.row}</strong>), behaving like two synchronized tracks.`;
+          colText.textContent = "Relative (Slides together)";
+          rowText.textContent = "Relative (Slides together)";
+        }
+
+      } else {
+        const formulaStr = getFormulaString(target1.col, target1.row, refState.mode);
+        document.getElementById('formula-bar-display').innerHTML = `
+          <span class="text-slate-400">=</span>
+          <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold border border-blue-200">
+            ${formulaStr.replace('=', '')}
+          </span>
+          <span class="text-slate-400 font-normal ml-1">× 1.15</span>
+        `;
+        document.getElementById('source-cell-tag').innerHTML = `Target: <strong class="text-blue-600">${target1.col}${target1.row}</strong>`;
+        document.getElementById('insp-formula-cell').textContent = formulaCellKey;
+        document.getElementById('insp-raw-formula').textContent = formulaStr;
+        document.getElementById('insp-resolved-cell').textContent = `${target1.col}${target1.row}`;
+        
+        const val = refState.gridData[`${target1.col}${target1.row}`];
+        document.getElementById('insp-cell-value').textContent = val !== undefined && val !== '' ? `"${val}"` : '0 (Empty)';
+
+        const vectorDesc = document.getElementById('insp-vector-desc');
+        const behavDesc = document.getElementById('insp-behavior-desc');
+        const badgeSummary = document.getElementById('badge-lock-summary');
+        const colText = document.getElementById('col-status-text');
+        const rowText = document.getElementById('row-status-text');
+
+        if (refState.mode === 'relative') {
+          badgeSummary.textContent = "Fully Relative (B1)";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+          const dCol = colToIndex(refState.formulaCell.col) - colToIndex(target1.col);
+          const dRow = refState.formulaCell.row - target1.row;
+          vectorDesc.innerHTML = `Direction vector: <strong>${Math.abs(dCol)} col ${dCol >= 0 ? 'left' : 'right'}</strong>, <strong>${Math.abs(dRow)} row ${dRow >= 0 ? 'up' : 'down'}</strong>.`;
+          behavDesc.textContent = "Copying this cell keeps the vector arrow identical in shape and length.";
+          colText.textContent = "Relative (Slides)";
+          rowText.textContent = "Relative (Slides)";
+        } else if (refState.mode === 'absolute') {
+          badgeSummary.textContent = "Fully Absolute ($B$1)";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-800";
+          vectorDesc.innerHTML = `Pinned directly to coordinate <strong>$${refState.initialTargetCell.col}$${refState.initialTargetCell.row}</strong>.`;
+          behavDesc.textContent = "No matter where you drag or copy, this formula always pulls from this exact coordinate.";
+          colText.textContent = "Locked ($)";
+          rowText.textContent = "Locked ($)";
+        } else if (refState.mode === 'mixed-col') {
+          badgeSummary.textContent = "Mixed Reference ($B1)";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800";
+          vectorDesc.innerHTML = `Column <strong>$${refState.initialTargetCell.col}</strong> is locked. Row shifts with movement.`;
+          behavDesc.textContent = "Copying horizontally maintains column. Copying vertically shifts row numbers.";
+          colText.textContent = "Locked ($)";
+          rowText.textContent = "Relative (Slides)";
+        } else if (refState.mode === 'mixed-row') {
+          badgeSummary.textContent = "Mixed Reference (B$1)";
+          badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-800";
+          vectorDesc.innerHTML = `Row <strong>$${refState.initialTargetCell.row}</strong> is locked. Column shifts with movement.`;
+          behavDesc.textContent = "Copying vertically keeps row fixed. Copying horizontally shifts column letters.";
+          colText.textContent = "Relative (Slides)";
+          rowText.textContent = "Locked ($)";
+        }
+      }
 
       document.getElementById('active-cell-indicator').textContent = `Active Cell: ${formulaCellKey}`;
-      document.getElementById('formula-bar-display').innerHTML = `
-        <span class="text-slate-400">=</span>
-        <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold border border-blue-200">
-          ${formulaStr.replace('=', '')}
-        </span>
-        <span class="text-slate-400 font-normal ml-1">× 1.15</span>
-      `;
-
-      document.getElementById('source-cell-tag').innerHTML = `Target: <strong class="text-blue-600">${target.col}${target.row}</strong>`;
-      document.getElementById('insp-formula-cell').textContent = formulaCellKey;
-      document.getElementById('insp-raw-formula').textContent = formulaStr;
-      document.getElementById('insp-resolved-cell').textContent = `${target.col}${target.row}`;
-      
-      const val = refState.gridData[`${target.col}${target.row}`];
-      document.getElementById('insp-cell-value').textContent = val !== undefined && val !== '' ? `"${val}"` : '0 (Empty)';
-
-      const vectorDesc = document.getElementById('insp-vector-desc');
-      const behavDesc = document.getElementById('insp-behavior-desc');
-      const badgeSummary = document.getElementById('badge-lock-summary');
-      const colBox = document.getElementById('col-status-box');
-      const colText = document.getElementById('col-status-text');
-      const rowBox = document.getElementById('row-status-box');
-      const rowText = document.getElementById('row-status-text');
-
-      if (refState.mode === 'relative') {
-        badgeSummary.textContent = "Fully Relative (A1)";
-        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
-        const dCol = colToIndex(refState.formulaCell.col) - colToIndex(target.col);
-        const dRow = refState.formulaCell.row - target.row;
-        vectorDesc.innerHTML = `Direction vector: <strong>${Math.abs(dCol)} col ${dCol >= 0 ? 'left' : 'right'}</strong>, <strong>${Math.abs(dRow)} row ${dRow >= 0 ? 'up' : 'down'}</strong>.`;
-        behavDesc.textContent = "Copying this cell keeps the vector arrow identical in shape and length.";
-        colText.textContent = "Relative (Slides)";
-        colBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
-        rowText.textContent = "Relative (Slides)";
-        rowBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
-      } else if (refState.mode === 'absolute') {
-        badgeSummary.textContent = "Fully Absolute ($A$1)";
-        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-800";
-        vectorDesc.innerHTML = `Pinned directly to coordinate <strong>$${refState.initialTargetCell.col}$${refState.initialTargetCell.row}</strong>.`;
-        behavDesc.textContent = "No matter where you drag or copy, this formula always pulls from this exact coordinate.";
-        colText.textContent = "Locked ($)";
-        colBox.className = "p-2 rounded bg-blue-50 border border-blue-200 flex flex-col text-blue-900";
-        rowText.textContent = "Locked ($)";
-        rowBox.className = "p-2 rounded bg-blue-50 border border-blue-200 flex flex-col text-blue-900";
-      } else if (refState.mode === 'mixed-col') {
-        badgeSummary.textContent = "Mixed Reference ($A1)";
-        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800";
-        vectorDesc.innerHTML = `Column <strong>$${refState.initialTargetCell.col}</strong> is locked. Row shifts with movement.`;
-        behavDesc.textContent = "Copying horizontally maintains column. Copying vertically shifts row numbers.";
-        colText.textContent = "Locked ($)";
-        colBox.className = "p-2 rounded bg-amber-50 border border-amber-200 flex flex-col text-amber-900";
-        rowText.textContent = "Relative (Slides)";
-        rowBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
-      } else if (refState.mode === 'mixed-row') {
-        badgeSummary.textContent = "Mixed Reference (A$1)";
-        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-800";
-        vectorDesc.innerHTML = `Row <strong>$${refState.initialTargetCell.row}</strong> is locked. Column shifts with movement.`;
-        behavDesc.textContent = "Copying vertically keeps row fixed. Copying horizontally shifts column letters.";
-        colText.textContent = "Relative (Slides)";
-        colBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
-        rowText.textContent = "Locked ($)";
-        rowBox.className = "p-2 rounded bg-purple-50 border border-purple-200 flex flex-col text-purple-900";
-      }
     }
 
     function setActiveFormulaCell(col, row) {
@@ -3346,49 +3460,111 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupReferenceInteractions() {
+      const bindClick = (id, handler) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', handler);
+      };
+
       document.querySelectorAll('.ref-mode-btn').forEach(btn => {
-        btn.addEventListener('click', () => setReferenceMode(btn.dataset.mode));
+        btn.addEventListener('click', () => {
+          refState.formulaType = 'single';
+          setReferenceMode(btn.dataset.mode);
+        });
       });
 
-      document.getElementById('copy-down-btn').addEventListener('click', () => {
+      bindClick('copy-down-btn', () => {
         if (refState.formulaCell.row < ROWS.length) {
           setActiveFormulaCell(refState.formulaCell.col, refState.formulaCell.row + 1);
         }
       });
 
-      document.getElementById('copy-right-btn').addEventListener('click', () => {
+      bindClick('copy-right-btn', () => {
         const curIdx = colToIndex(refState.formulaCell.col);
         if (curIdx < COLS.length - 1) {
           setActiveFormulaCell(indexToCol(curIdx + 1), refState.formulaCell.row);
         }
       });
 
-      document.getElementById('reset-grid-btn').addEventListener('click', () => {
+      bindClick('reset-grid-btn', () => {
         refState.copiedCells.clear();
+        refState.formulaType = 'addition';
+        refState.formulaCell = { col: 'C', row: 1 };
+        refState.initialFormulaCell = { col: 'C', row: 1 };
+        refState.term1 = { col: 'A', row: 1, mode: 'relative' };
+        refState.term2 = { col: 'B', row: 1, mode: 'relative' };
+        setActiveFormulaCell('C', 1);
+      });
+
+      // Preset 1: Dual relative addition =A1+B1
+      bindClick('preset-addition', () => {
+        refState.copiedCells.clear();
+        refState.formulaType = 'addition';
+        refState.subType = 'sum';
+        refState.formulaCell = { col: 'C', row: 1 };
+        refState.initialFormulaCell = { col: 'C', row: 1 };
+        refState.term1 = { col: 'A', row: 1, mode: 'relative' };
+        refState.term2 = { col: 'B', row: 1, mode: 'relative' };
+        setActiveFormulaCell('C', 1);
+      });
+
+      // Preset 2: Hybrid addition =A2+$B$1 (Dynamic Item + Pinned Tax/Markup)
+      bindClick('preset-fixed-add', () => {
+        refState.copiedCells.clear();
+        refState.formulaType = 'addition';
+        refState.subType = 'hybrid-abs';
         refState.formulaCell = { col: 'C', row: 2 };
-        refState.mode = 'relative';
-        setReferenceMode('relative');
+        refState.initialFormulaCell = { col: 'C', row: 2 };
+        refState.term1 = { col: 'A', row: 2, mode: 'relative' };
+        refState.term2 = { col: 'B', row: 1, mode: 'absolute' };
         setActiveFormulaCell('C', 2);
       });
 
-      document.getElementById('preset-tax').addEventListener('click', () => {
+      // Preset 3: Hybrid + Mixed =A2+B$1 (Relative Term 1 + Mixed Row Term 2)
+      bindClick('preset-hybrid-mixed', () => {
         refState.copiedCells.clear();
+        refState.formulaType = 'addition';
+        refState.subType = 'hybrid-mixed';
+        refState.formulaCell = { col: 'C', row: 2 };
+        refState.initialFormulaCell = { col: 'C', row: 2 };
+        refState.term1 = { col: 'A', row: 2, mode: 'relative' };
+        refState.term2 = { col: 'B', row: 1, mode: 'mixed-row' };
+        setActiveFormulaCell('C', 2);
+      });
+
+      // Preset 4: 2D Matrix Dual Mixed =$A2+B$1 (Mixed Col $A2 + Mixed Row B$1)
+      bindClick('preset-matrix-mixed', () => {
+        refState.copiedCells.clear();
+        refState.formulaType = 'addition';
+        refState.subType = 'matrix-mixed';
+        refState.formulaCell = { col: 'B', row: 2 };
+        refState.initialFormulaCell = { col: 'B', row: 2 };
+        refState.term1 = { col: 'A', row: 2, mode: 'mixed-col' };
+        refState.term2 = { col: 'B', row: 1, mode: 'mixed-row' };
+        setActiveFormulaCell('B', 2);
+      });
+
+      bindClick('preset-tax', () => {
+        refState.copiedCells.clear();
+        refState.formulaType = 'single';
+        refState.subType = 'single';
         refState.initialTargetCell = { col: 'B', row: 1 };
         refState.initialFormulaCell = { col: 'C', row: 2 };
         setReferenceMode('absolute');
         setActiveFormulaCell('C', 2);
       });
 
-      document.getElementById('preset-running').addEventListener('click', () => {
+      bindClick('preset-running', () => {
         refState.copiedCells.clear();
+        refState.formulaType = 'single';
         refState.initialTargetCell = { col: 'B', row: 2 };
         refState.initialFormulaCell = { col: 'C', row: 2 };
         setReferenceMode('relative');
         setActiveFormulaCell('C', 2);
       });
 
-      document.getElementById('preset-mult-table').addEventListener('click', () => {
+      bindClick('preset-mult-table', () => {
         refState.copiedCells.clear();
+        refState.formulaType = 'single';
         refState.initialTargetCell = { col: 'B', row: 1 };
         refState.initialFormulaCell = { col: 'B', row: 2 };
         setReferenceMode('mixed-row');
@@ -3398,9 +3574,17 @@ document.addEventListener('DOMContentLoaded', () => {
       window.addEventListener('keydown', (e) => {
         if (e.key === 'F4' && typeof currentSlideIndex !== 'undefined' && currentSlideIndex === 16 && !document.getElementById('page-refs').classList.contains('hidden')) {
           e.preventDefault();
-          const modes = ['relative', 'absolute', 'mixed-row', 'mixed-col'];
-          const nextIndex = (modes.indexOf(refState.mode) + 1) % modes.length;
-          setReferenceMode(modes[nextIndex]);
+          if (refState.formulaType === 'addition') {
+            // Cycle the second term mode
+            const modes = ['relative', 'absolute', 'mixed-row', 'mixed-col'];
+            const nextIdx = (modes.indexOf(refState.term2.mode) + 1) % modes.length;
+            refState.term2.mode = modes[nextIdx];
+            renderRefGridState();
+          } else {
+            const modes = ['relative', 'absolute', 'mixed-row', 'mixed-col'];
+            const nextIndex = (modes.indexOf(refState.mode) + 1) % modes.length;
+            setReferenceMode(modes[nextIndex]);
+          }
         }
       });
     }
