@@ -50,26 +50,26 @@ export default function TokenStorePage() {
           
           <div className="glass-panel" style={{ flex: 1, minWidth: '250px', padding: '32px', textAlign: 'center', borderTop: '4px solid #94a3b8' }}>
             <h3 style={{ fontSize: '1.2rem', color: 'var(--text-muted)', marginBottom: '16px' }}>Starter Pack</h3>
-            <div style={{ fontSize: '3rem', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>100 <span style={{ fontSize: '1.2rem', color: '#94a3b8' }}>Tokens</span></div>
-            <div style={{ color: '#94a3b8', fontSize: '1.5rem', fontWeight: 600, marginBottom: '32px' }}>$50 USD</div>
+            <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>100 <span style={{ fontSize: '1.2rem', color: '#94a3b8' }}>Tokens</span></div>
+            <div style={{ color: '#64748b', fontSize: '1.5rem', fontWeight: 600, marginBottom: '32px' }}>$50 USD</div>
             <button className="btn-secondary" style={{ width: '100%', padding: '12px' }}>Buy Now</button>
           </div>
 
-          <div className="glass-panel" style={{ flex: 1, minWidth: '250px', padding: '32px', textAlign: 'center', borderTop: '4px solid #eab308', transform: 'scale(1.05)', boxShadow: '0 10px 30px rgba(234, 179, 8, 0.2)' }}>
+          <div className="glass-panel" style={{ flex: 1, minWidth: '250px', padding: '32px', textAlign: 'center', borderTop: '4px solid #eab308', transform: 'scale(1.05)', boxShadow: '0 10px 30px rgba(234, 179, 8, 0.15)' }}>
             <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#eab308', color: '#000', padding: '4px 16px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 700 }}>MOST POPULAR</div>
             <h3 style={{ fontSize: '1.2rem', color: 'var(--text-muted)', marginBottom: '16px' }}>Professional Bundle</h3>
-            <div style={{ fontSize: '3.5rem', fontWeight: 800, color: '#eab308', marginBottom: '8px' }}>500 <span style={{ fontSize: '1.4rem', color: '#eab308' }}>Tokens</span></div>
-            <div style={{ color: '#fef08a', fontSize: '1.5rem', fontWeight: 600, marginBottom: '16px' }}>$200 USD</div>
-            <p style={{ color: '#eab308', fontSize: '0.9rem', marginBottom: '24px' }}>Save 20%</p>
+            <div style={{ fontSize: '3.5rem', fontWeight: 800, color: '#ca8a04', marginBottom: '8px' }}>500 <span style={{ fontSize: '1.4rem', color: '#ca8a04' }}>Tokens</span></div>
+            <div style={{ color: '#854d0e', fontSize: '1.5rem', fontWeight: 600, marginBottom: '16px' }}>$200 USD</div>
+            <p style={{ color: '#ca8a04', fontSize: '0.9rem', marginBottom: '24px' }}>Save 20%</p>
             <button className="btn-primary" style={{ width: '100%', padding: '12px', background: '#eab308', color: '#000' }}>Buy Now</button>
           </div>
 
           <div className="glass-panel" style={{ flex: 1, minWidth: '250px', padding: '32px', textAlign: 'center', borderTop: '4px solid #c084fc' }}>
             <h3 style={{ fontSize: '1.2rem', color: 'var(--text-muted)', marginBottom: '16px' }}>School Enterprise</h3>
-            <div style={{ fontSize: '3rem', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>2000 <span style={{ fontSize: '1.2rem', color: '#c084fc' }}>Tokens</span></div>
-            <div style={{ color: '#c084fc', fontSize: '1.5rem', fontWeight: 600, marginBottom: '16px' }}>$700 USD</div>
-            <p style={{ color: '#c084fc', fontSize: '0.9rem', marginBottom: '24px' }}>Save 30%</p>
-            <button className="btn-secondary" style={{ width: '100%', padding: '12px', border: '1px solid #c084fc', color: '#c084fc' }}>Buy Now</button>
+            <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>2000 <span style={{ fontSize: '1.2rem', color: '#c084fc' }}>Tokens</span></div>
+            <div style={{ color: '#9333ea', fontSize: '1.5rem', fontWeight: 600, marginBottom: '16px' }}>$700 USD</div>
+            <p style={{ color: '#9333ea', fontSize: '0.9rem', marginBottom: '24px' }}>Save 30%</p>
+            <button className="btn-secondary" style={{ width: '100%', padding: '12px', border: '1px solid #c084fc', color: '#9333ea' }}>Buy Now</button>
           </div>
 
         </div>
@@ -77,7 +77,7 @@ export default function TokenStorePage() {
         {/* Legal & Policy Notice */}
         <div className="glass-panel" style={{ marginTop: '48px', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h4 style={{ color: '#fff', fontSize: '1rem', marginBottom: '4px' }}>Purchase Protection & Policies</h4>
+            <h4 style={{ color: 'var(--text-main)', fontSize: '1rem', marginBottom: '4px' }}>Purchase Protection & Policies</h4>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>All token transactions are encrypted and secured. Unused tokens are covered by our 14-day policy.</p>
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>

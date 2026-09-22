@@ -29,90 +29,90 @@ export function getSyncInjectorHTML() {
     </style>
 
     <!-- Teacher Sync Controls -->
-    <div id="teacher-controls" class="fixed top-6 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-50 bg-slate-900/90 backdrop-blur-md px-5 py-2.5 rounded-full border border-slate-700 shadow-2xl hidden">
-        <div class="flex items-center gap-2 pr-2 border-r border-slate-700">
-            <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
-            <span class="text-white font-bold text-sm">
+    <div id="teacher-controls" class="fixed top-6 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-50 bg-white/95 backdrop-blur-md px-5 py-2.5 rounded-full border border-slate-300 shadow-xl text-slate-800 hidden">
+        <div class="flex items-center gap-2 pr-2 border-r border-slate-300">
+            <i class="fa-solid fa-chalkboard-user text-indigo-600"></i>
+            <span class="text-slate-900 font-bold text-sm">
                 <span class="lang-en">Teacher</span><span class="lang-zh hidden">教師模式</span>
             </span>
         </div>
         
         <!-- Sync Toggle -->
-        <button id="sync-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1.5 shadow">
+        <button id="sync-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-tower-broadcast"></i>
             <span class="lang-en">Sync Class</span><span class="lang-zh hidden">同步課堂</span>
         </button>
-        <button id="desync-btn" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all hidden items-center gap-1.5 border border-slate-600 shadow">
+        <button id="desync-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all hidden items-center gap-1.5 border border-slate-300 shadow-sm">
             <i class="fa-solid fa-pause"></i>
             <span class="lang-en">Desync</span><span class="lang-zh hidden">取消同步</span>
         </button>
         <div id="sync-indicator" class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" title="Sync Status"></div>
         
-        <div class="h-5 border-l border-slate-700"></div>
+        <div class="h-5 border-l border-slate-300"></div>
         
         <!-- Publish Page Controls -->
-        <button id="publish-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1.5 shadow" title="Publish current slide to students">
+        <button id="publish-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1.5 shadow-sm" title="Publish current slide to students">
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <span class="lang-en">Publish Page</span><span class="lang-zh hidden">發佈頁面</span>
         </button>
-        <button id="unpublish-btn" class="bg-rose-700 hover:bg-rose-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hidden items-center gap-1 shadow" title="Roll back published page limit">
+        <button id="unpublish-btn" class="bg-rose-600 hover:bg-rose-500 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hidden items-center gap-1 shadow-sm" title="Roll back published page limit">
             <i class="fa-solid fa-backward-step"></i>
             <span class="lang-en">Unpublish</span><span class="lang-zh hidden">取消發佈</span>
         </button>
-        <span id="published-badge" class="bg-indigo-950 border border-indigo-500/40 text-indigo-300 text-xs px-2.5 py-0.5 rounded-full font-mono font-bold">
+        <span id="published-badge" class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs px-2.5 py-0.5 rounded-full font-mono font-bold">
             <span id="published-badge-text">Pub: Slide 1</span>
         </span>
-        <span id="publish-status" class="text-indigo-400 text-xs font-bold hidden animate-pulse">Published!</span>
+        <span id="publish-status" class="text-indigo-600 text-xs font-bold hidden animate-pulse">Published!</span>
         
-        <div class="h-5 border-l border-slate-700"></div>
+        <div class="h-5 border-l border-slate-300"></div>
         
         <!-- Active Students Indicator -->
         <div class="relative group" tabindex="0">
-            <div class="flex items-center text-slate-300 text-xs font-bold bg-slate-800 px-3 py-1 rounded-full border border-slate-700 cursor-pointer hover:bg-slate-700 transition-colors">
-                <i class="fa-solid fa-users mr-1.5 text-emerald-400"></i>
-                <span id="active-students-count" class="text-emerald-400 font-mono font-bold">0</span>
-                <span class="ml-1 text-slate-400"><span class="lang-en">online</span><span class="lang-zh hidden">在線</span></span>
-                <button onclick="pollSyncState()" class="ml-2 hover:text-white transition-colors text-slate-400" title="Refresh">
+            <div class="flex items-center text-slate-700 text-xs font-bold bg-slate-100 px-3 py-1 rounded-full border border-slate-300 cursor-pointer hover:bg-slate-200 transition-colors">
+                <i class="fa-solid fa-users mr-1.5 text-emerald-600"></i>
+                <span id="active-students-count" class="text-emerald-700 font-mono font-bold">0</span>
+                <span class="ml-1 text-slate-600"><span class="lang-en">online</span><span class="lang-zh hidden">在線</span></span>
+                <button onclick="pollSyncState()" class="ml-2 hover:text-slate-900 transition-colors text-slate-500" title="Refresh">
                     <i id="refresh-icon" class="fa-solid fa-arrows-rotate text-xs"></i>
                 </button>
             </div>
             <!-- Tooltip for active students -->
-            <div id="active-students-tooltip" class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-52 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] max-h-52 overflow-y-auto">
-                <div class="text-[11px] text-slate-400 font-bold mb-2 uppercase tracking-wider border-b border-slate-800 pb-1 flex justify-between">
+            <div id="active-students-tooltip" class="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-52 bg-white border border-slate-300 rounded-xl shadow-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] max-h-52 overflow-y-auto">
+                <div class="text-[11px] text-slate-500 font-bold mb-2 uppercase tracking-wider border-b border-slate-200 pb-1 flex justify-between">
                     <span>Active Students</span>
-                    <span id="active-students-tooltip-count" class="text-emerald-400 font-mono font-bold">0</span>
+                    <span id="active-students-tooltip-count" class="text-emerald-600 font-mono font-bold">0</span>
                 </div>
-                <div id="active-students-list" class="flex flex-col gap-1.5 text-xs text-slate-200">
-                    <div class="text-slate-500 italic text-xs">No students online</div>
+                <div id="active-students-list" class="flex flex-col gap-1.5 text-xs text-slate-700">
+                    <div class="text-slate-400 italic text-xs">No students online</div>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Student Sync Indicator -->
-    <div id="student-indicator" class="fixed top-6 right-6 z-50 bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 shadow-xl hidden items-center gap-2.5">
-        <div id="student-sync-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></div>
-        <span id="student-sync-text" class="text-slate-300 text-xs font-semibold">
+    <div id="student-indicator" class="fixed top-6 right-6 z-50 bg-white/95 backdrop-blur-md px-4 py-2 rounded-full border border-slate-300 shadow-xl hidden items-center gap-2.5">
+        <div id="student-sync-dot" class="w-2.5 h-2.5 rounded-full bg-slate-400"></div>
+        <span id="student-sync-text" class="text-slate-700 text-xs font-semibold">
             <span class="lang-en">Independent Mode</span><span class="lang-zh hidden">獨立模式</span>
         </span>
-        <span id="student-published-badge" class="text-[11px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full border border-slate-700 font-mono hidden"></span>
+        <span id="student-published-badge" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full border border-slate-300 font-mono hidden"></span>
     </div>
 
     <!-- Sync Toast Alert -->
-    <div id="sync-toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[70] bg-slate-900/95 border border-indigo-500/50 text-slate-100 text-sm px-5 py-2.5 rounded-xl shadow-2xl opacity-0 pointer-events-none translate-y-2 flex items-center gap-2">
-        <i id="sync-toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+    <div id="sync-toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[70] bg-white/95 border border-indigo-300 text-slate-800 text-sm px-5 py-2.5 rounded-xl shadow-2xl opacity-0 pointer-events-none translate-y-2 flex items-center gap-2">
+        <i id="sync-toast-icon" class="fa-solid fa-circle-check text-emerald-600"></i>
         <span id="sync-toast-text">Notification</span>
     </div>
 
     <!-- Back to Dashboard -->
-    <button id="back-dashboard-btn" onclick="goBack()" class="fixed top-6 left-6 z-[60] bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 shadow-xl text-slate-300 text-xs font-bold hover:text-white hover:bg-slate-800 transition-colors flex items-center gap-2">
+    <button id="back-dashboard-btn" onclick="goBack()" class="fixed top-6 left-6 z-[60] bg-white/95 backdrop-blur-md px-4 py-2 rounded-full border border-slate-300 shadow-xl text-slate-700 text-xs font-bold hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-2">
         <i class="fa-solid fa-arrow-left"></i>
         <span class="lang-en">Dashboard</span><span class="lang-zh hidden">返回首頁</span>
     </button>
     
     <!-- Language Toggle Button -->
-    <button id="lang-toggle-btn" onclick="toggleLang()" class="fixed top-6 right-6 z-[60] bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700 shadow-xl text-slate-300 text-xs font-bold hover:text-white hover:bg-slate-800 transition-colors flex items-center gap-1.5" style="margin-right: 170px;">
-        <i class="fa-solid fa-globe text-cyan-400"></i>
+    <button id="lang-toggle-btn" onclick="toggleLang()" class="fixed top-6 right-6 z-[60] bg-white/95 backdrop-blur-md px-4 py-2 rounded-full border border-slate-300 shadow-xl text-slate-700 text-xs font-bold hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5" style="margin-right: 170px;">
+        <i class="fa-solid fa-globe text-sky-600"></i>
         <span id="lang-toggle-text">繁體中文</span>
     </button>`;
 }

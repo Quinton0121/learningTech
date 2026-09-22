@@ -36,7 +36,8 @@ async function main() {
         await prisma.course.upsert({
             where: { id: 'cms1kpibu0001wfaoyhkvj9id' },
             update: {
-                htmlContent: htmlA
+                htmlContent: htmlA,
+                publishedSlide: 16
             },
             create: {
                 id: 'cms1kpibu0001wfaoyhkvj9id',
@@ -45,7 +46,8 @@ async function main() {
                 educatorId: quinton.id,
                 htmlContent: htmlA,
                 isPublic: true,
-                studentQuota: 50
+                studentQuota: 50,
+                publishedSlide: 16
             }
         });
         console.log("Upserted Excel A course (id: cms1kpibu0001wfaoyhkvj9id)");
@@ -57,7 +59,8 @@ async function main() {
         await prisma.course.upsert({
             where: { id: 'cms7c77ap0001wfpk6qjc1nm7' },
             update: {
-                htmlContent: htmlB
+                htmlContent: htmlB,
+                publishedSlide: 16
             },
             create: {
                 id: 'cms7c77ap0001wfpk6qjc1nm7',
@@ -66,7 +69,8 @@ async function main() {
                 educatorId: quinton.id,
                 htmlContent: htmlB,
                 isPublic: true,
-                studentQuota: 50
+                studentQuota: 50,
+                publishedSlide: 16
             }
         });
         console.log("Upserted Excel B course (id: cms7c77ap0001wfpk6qjc1nm7)");

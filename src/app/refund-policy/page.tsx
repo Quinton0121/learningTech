@@ -236,17 +236,17 @@ export default function RefundPolicyPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#000', color: '#f5f5f7', fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: 'var(--background)', color: 'var(--text-main)', fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', sans-serif" }}>
       {/* Header */}
-      <header style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 100 }}>
+      <header style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255, 255, 255, 0.88)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#fff', fontWeight: 600, fontSize: '1.1rem' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'var(--text-main)', fontWeight: 600, fontSize: '1.1rem' }}>
             <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '32px', width: 'auto' }} />
             <span>Interlectic</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <LanguageToggle />
-            <Link href="/dashboard" style={{ padding: '6px 14px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.1)', color: '#fff', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500 }}>
+            <Link href="/dashboard" style={{ padding: '6px 14px', borderRadius: '980px', background: '#f1f5f9', color: 'var(--text-main)', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500, border: '1px solid #cbd5e1' }}>
               {language === 'en' ? 'Dashboard' : (language === 'zh-TW' ? '進入控制台' : '进入控制台')}
             </Link>
           </div>
@@ -256,16 +256,16 @@ export default function RefundPolicyPage() {
       {/* Hero */}
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px 100px' }}>
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 14px', borderRadius: '980px', background: 'rgba(41, 151, 255, 0.12)', border: '1px solid rgba(41, 151, 255, 0.3)', color: '#2997ff', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '16px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 14px', borderRadius: '980px', background: 'rgba(2, 132, 199, 0.08)', border: '1px solid rgba(2, 132, 199, 0.25)', color: '#0284c7', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '16px' }}>
             {content.badge[language]}
           </div>
-          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', margin: '0 0 16px', lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-main)', margin: '0 0 16px', lineHeight: 1.2 }}>
             {content.title[language]}
           </h1>
-          <p style={{ color: '#86868b', fontSize: '1.15rem', maxWidth: '680px', margin: '0 auto 16px', lineHeight: 1.5 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.15rem', maxWidth: '680px', margin: '0 auto 16px', lineHeight: 1.5 }}>
             {content.subtitle[language]}
           </p>
-          <div style={{ fontSize: '0.82rem', color: '#6e6e73' }}>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
             {content.lastUpdated[language]}
           </div>
         </div>
@@ -273,11 +273,11 @@ export default function RefundPolicyPage() {
         {/* Summary Highlights */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '56px' }}>
           {content.summaryCards.map((card, idx) => (
-            <div key={idx} style={{ background: '#161617', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '24px', boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.06)' }}>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#f5f5f7', margin: '0 0 8px' }}>
+            <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '24px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-main)', margin: '0 0 8px' }}>
                 {card.title[language]}
               </h3>
-              <p style={{ fontSize: '0.88rem', color: '#86868b', lineHeight: 1.45, margin: 0 }}>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.45, margin: 0 }}>
                 {card.desc[language]}
               </p>
             </div>
@@ -287,23 +287,23 @@ export default function RefundPolicyPage() {
         {/* Policy Sections */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {content.sections.map((sec, idx) => (
-            <div key={idx} style={{ background: '#161617', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '20px', padding: '32px', boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.06)' }}>
+            <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '32px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#2997ff', padding: '3px 8px', borderRadius: '6px', background: 'rgba(41, 151, 255, 0.12)' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0284c7', padding: '3px 8px', borderRadius: '6px', background: 'rgba(2, 132, 199, 0.1)' }}>
                   {sec.num}
                 </span>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#f5f5f7', margin: 0, letterSpacing: '-0.02em' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.02em' }}>
                   {sec.title[language]}
                 </h2>
               </div>
-              <p style={{ fontSize: '0.96rem', color: '#a1a1a6', lineHeight: 1.65, margin: '0 0 16px' }}>
+              <p style={{ fontSize: '0.96rem', color: 'var(--text-main)', lineHeight: 1.65, margin: '0 0 16px' }}>
                 {sec.text[language]}
               </p>
               {sec.items && (
                 <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {sec.items.map((item, itemIdx) => (
-                    <li key={itemIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.92rem', color: '#86868b', lineHeight: 1.5 }}>
-                      <span style={{ color: '#2997ff', fontWeight: 'bold' }}>•</span>
+                    <li key={itemIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                      <span style={{ color: '#0284c7', fontWeight: 'bold' }}>•</span>
                       <span>{item[language]}</span>
                     </li>
                   ))}
@@ -314,16 +314,16 @@ export default function RefundPolicyPage() {
         </div>
 
         {/* Contact CTA */}
-        <div style={{ textAlign: 'center', marginTop: '60px', padding: '40px', background: 'radial-gradient(ellipse at center, rgba(41, 151, 255, 0.1) 0%, rgba(0,0,0,0) 70%)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '24px' }}>
-          <h3 style={{ fontSize: '1.4rem', fontWeight: 600, color: '#f5f5f7', margin: '0 0 10px' }}>
+        <div style={{ textAlign: 'center', marginTop: '60px', padding: '40px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
+          <h3 style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-main)', margin: '0 0 10px' }}>
             {language === 'en' ? 'Need Help with a Billing Inquiry?' : (language === 'zh-TW' ? '需要退款或帳務協助？' : '需要退款或账务协助？')}
           </h3>
-          <p style={{ color: '#86868b', fontSize: '0.95rem', maxWidth: '500px', margin: '0 auto 24px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '500px', margin: '0 auto 24px' }}>
             {language === 'en' 
               ? 'Our finance and customer protection team is available to assist you within 24-48 business hours.' 
               : (language === 'zh-TW' ? '我們的財務與客戶權益保護團隊將於 24 至 48 小時內為您提供專業解答。' : '我们的财务与客户权益保护团队将于 24 至 48 小时内为您提供专业解答。')}
           </p>
-          <a href="mailto:support@interlectic.com" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 28px', borderRadius: '980px', background: '#2997ff', color: '#fff', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none', transition: 'all 0.2s' }}>
+          <a href="mailto:support@interlectic.com" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 28px', borderRadius: '980px', background: '#0284c7', color: '#fff', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none', transition: 'all 0.2s' }}>
             <span>support@interlectic.com</span>
           </a>
         </div>

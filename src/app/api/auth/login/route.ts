@@ -21,21 +21,22 @@ export async function POST(request: Request) {
 
     // Find the user by either email or phone
     const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: email || undefined },
-          { phoneNumber: phoneNumber || undefined }
-        ]
-      }
+      where: email ? { email } : { phoneNumber }
     });
 
+    console.log("Querying for email:", email, "phoneNumber:", phoneNumber);
+    console.log("Found user:", user?.email, "ID:", user?.id);
+
     if (!user || !user.passwordHash) {
+      console.log("No user or passwordHash");
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     
+    console.log("Password valid:", isPasswordValid);
+
     if (!isPasswordValid) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }

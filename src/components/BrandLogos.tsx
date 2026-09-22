@@ -15,7 +15,7 @@ export function BenQLogo({ height = 24 }: { height?: number }) {
       {/* 'n' */}
       <path d="M47 5.5H52V8.2C53.2 6.2 55.5 5 58.5 5C63 5 66 7.8 66 12.8V23H60.5V13.8C60.5 11 59 9.5 56.8 9.5C54.2 9.5 52.2 11.2 52.2 14.2V23H47V5.5Z" fill="#A855F7" />
       {/* 'Q' */}
-      <path d="M70 13.5C70 7.8 74.8 3.5 81.5 3.5C88.2 3.5 93 7.8 93 13.5C93 16.5 91.5 19.2 89.2 21L93.5 25.2L89.8 27.2L86 23.2C84.5 23.8 82.8 24 81.2 24C74.8 24 70 19.2 70 13.5ZM87.5 13.5C87.5 10 84.8 7.5 81.2 7.5C77.5 7.5 75 10 75 13.5C75 17 77.5 19.5 81.2 19.5C84.8 19.5 87.5 17 87.5 13.5Z" fill="#F5F5F7" />
+      <path d="M70 13.5C70 7.8 74.8 3.5 81.5 3.5C88.2 3.5 93 7.8 93 13.5C93 16.5 91.5 19.2 89.2 21L93.5 25.2L89.8 27.2L86 23.2C84.5 23.8 82.8 24 81.2 24C74.8 24 70 19.2 70 13.5ZM87.5 13.5C87.5 10 84.8 7.5 81.2 7.5C77.5 7.5 75 10 75 13.5C75 17 77.5 19.5 81.2 19.5C84.8 19.5 87.5 17 87.5 13.5Z" fill="currentColor" />
       {/* Signature BenQ Purple Accent Dot */}
       <circle cx="101" cy="7" r="4.5" fill="#A855F7" />
     </svg>
@@ -26,7 +26,7 @@ export function MaxhubLogo({ height = 24 }: { height?: number }) {
   // Official MAXHUB Logo: Clean, modern, high-end geometric all-caps wordmark
   return (
     <svg height={height} viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      <g fill="#F5F5F7" transform="translate(2, 4)">
+      <g fill="currentColor" transform="translate(2, 4)">
         {/* M */}
         <path d="M0 20V0H4.2L9.5 11.5L14.8 0H19V20H15.2V7.8L10.8 16.8H8.2L3.8 7.8V20H0Z" />
         {/* A */}
@@ -103,7 +103,7 @@ export function PrometheanLogo({ height = 24 }: { height?: number }) {
         <path d="M12 12C10.5 14 8.5 16 8.5 18.5C8.5 20.5 10.2 22 12.2 22C14.2 22 15.8 20.5 15.8 18.5C15.8 16 13.5 14 12 12Z" fill="#ED1C24" />
       </g>
       {/* 'Promethean' Wordmark */}
-      <g fill="#F5F5F7" transform="translate(28, 6)">
+      <g fill="currentColor" transform="translate(28, 6)">
         {/* P */}
         <path d="M2 16V0H8C11.5 0 13.5 1.8 13.5 5C13.5 8.2 11.5 10 8 10H5V16H2ZM5 7.2H7.8C9.5 7.2 10.5 6.2 10.5 5C10.5 3.8 9.5 2.8 7.8 2.8H5V7.2Z" />
         {/* r */}
@@ -135,7 +135,7 @@ export function SmartBoardLogo({ height = 24 }: { height?: number }) {
     <svg height={height} viewBox="0 0 115 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
       <rect x="2" y="2" width="24" height="24" rx="6" fill="#00A3E0" />
       <path d="M10 17C11 18 12.5 18.8 14.2 18.8C16.2 18.8 17.5 17.8 17.5 16.2C17.5 14.2 15 13.8 13.2 13.2C11 12.5 10.2 11.5 10.2 10C10.2 8 12 6.5 14.2 6.5C16 6.5 17.5 7.2 18.5 8.5L16.8 10C16.2 9.2 15.2 8.8 14.2 8.8C13.2 8.8 12.5 9.2 12.5 10C12.5 11 14.5 11.5 16.5 12C18.8 12.8 19.8 14 19.8 16C19.8 18.5 17.5 20.5 14.2 20.5C12 20.5 10 19.5 9 18.2L10 17Z" fill="#FFFFFF" />
-      <g fill="#F5F5F7" transform="translate(32, 5)">
+      <g fill="currentColor" transform="translate(32, 5)">
         {/* S */}
         <path d="M1.5 14.2C2.8 15.5 4.8 16.5 7.2 16.5C10.2 16.5 12.2 14.8 12.2 12.5C12.2 9.8 8.8 9.2 6.5 8.5C4 7.8 3 6.8 3 5C3 3 5 1.5 7.5 1.5C9.8 1.5 11.5 2.5 12.8 3.8L10.8 5.8C9.8 4.8 8.8 4 7.5 4C6 4 5.2 4.8 5.2 5.8C5.2 7 7.5 7.5 10 8.2C12.8 9.2 14.5 10.5 14.5 13C14.5 16 11.8 18.8 7.2 18.8C4.5 18.8 2 17.5 0.5 15.8L1.5 14.2Z" />
         {/* M */}
@@ -185,12 +185,12 @@ export function ViewSonicLogo({ height = 24 }: { height?: number }) {
         <polygon points="10,4.5 13,5.5 10,6.5" fill="#FFFFFF" />
       </g>
       {/* ViewSonic Classic Wordmark */}
-      <g fill="#F5F5F7" transform="translate(38, 6)">
+      <g fill="currentColor" transform="translate(38, 6)">
         {/* V */}
         <path d="M1 2H4L7.5 13.5L11 2H14L9 16H6L1 2Z" />
         {/* i */}
         <path d="M16 5.5H18.5V16H16V5.5Z" />
-        <circle cx="17.2" cy="2.5" r="1.3" fill="#F5F5F7" />
+        <circle cx="17.2" cy="2.5" r="1.3" fill="currentColor" />
         {/* e */}
         <path d="M21 10.8C21 7.5 23 5.5 26 5.5C29 5.5 31 7.5 31 11V11.5H23.2C23.5 13.5 24.8 14.5 26.5 14.5C27.5 14.5 28.5 14 29 13.2L30.8 14.5C29.8 15.8 28.2 16.5 26.5 16.5C23 16.5 21 14.2 21 10.8ZM28.5 9.8C28.2 8.2 27.2 7.2 26 7.2C24.8 7.2 23.8 8.2 23.5 9.8H28.5Z" />
         {/* w */}
@@ -203,7 +203,7 @@ export function ViewSonicLogo({ height = 24 }: { height?: number }) {
         <path d="M78 5.5H80.5V7.5C81.2 6.2 82.8 5.5 84.5 5.5C87.2 5.5 89 7.2 89 10.5V16H86.5V11C86.5 9.2 85.5 8 83.8 8C82.2 8 81 9.2 80.5 11V16H78V5.5Z" />
         {/* i */}
         <path d="M92 5.5H94.5V16H92V5.5Z" />
-        <circle cx="93.2" cy="2.5" r="1.3" fill="#F5F5F7" />
+        <circle cx="93.2" cy="2.5" r="1.3" fill="currentColor" />
         {/* c */}
         <path d="M97 11C97 7.8 99.2 5.5 102.5 5.5C104.2 5.5 105.8 6.5 106.5 7.8L104.5 9.2C104 8.5 103.2 7.8 102.5 7.8C100.8 7.8 99.5 9.2 99.5 11C99.5 12.8 100.8 14.2 102.5 14.2C103.5 14.2 104.2 13.5 104.8 12.8L106.8 14.2C105.8 15.5 104.2 16.5 102.5 16.5C99.2 16.5 97 14.2 97 11Z" />
       </g>
@@ -221,7 +221,7 @@ export function HuaweiLogo({ height = 24 }: { height?: number }) {
         <ellipse cx="12" cy="0" rx="3" ry="7" transform="rotate(90, 12, 0)" fill="#EF4444" />
         <ellipse cx="-12" cy="0" rx="3" ry="7" transform="rotate(-90, -12, 0)" fill="#EF4444" />
       </g>
-      <text x="28" y="20" fontFamily="'Arial Black', 'Helvetica Black', sans-serif" fontWeight="900" fontSize="15" fill="#F5F5F7" letterSpacing="1">
+      <text x="28" y="20" fontFamily="'Arial Black', 'Helvetica Black', sans-serif" fontWeight="900" fontSize="15" fill="currentColor" letterSpacing="1">
         HUAWEI
       </text>
     </svg>
@@ -259,7 +259,7 @@ export function SamsungLogo({ height = 24 }: { height?: number }) {
 // 2. OS & Multi-Platform Vector Logos
 // =========================================================================
 
-export function AppleLogo({ height = 24, fill = '#F5F5F7' }: { height?: number; fill?: string }) {
+export function AppleLogo({ height = 24, fill = 'currentColor' }: { height?: number; fill?: string }) {
   return (
     <svg height={height} viewBox="0 0 24 24" fill={fill} xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
       <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.54c.66-.8 1.11-1.92.99-3.04-1 .04-2.19.67-2.88 1.47-.6.69-1.13 1.8-0.99 2.89 1.13.09 2.22-.52 2.88-1.32z"/>

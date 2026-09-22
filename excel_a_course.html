@@ -5,14 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>What is Excel? | Interactive Learning</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* Slate 900 */
-            color: #f8fafc;
-            overflow: hidden; /* Prevent scrolling, we control transitions */
+            background-color: #f1f5f9;
+            color: #1e293b;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom light scrollbars */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         /* Slide Container */
@@ -28,9 +51,9 @@
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.8s ease-in-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            transform: translateY(20px);
-            padding: 2rem;
+            transition: opacity 0.6s ease-in-out, transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translateY(16px);
+            padding: 1.5rem;
         }
 
         .slide-container.active {
@@ -40,47 +63,53 @@
         }
 
         .slide-container.previous {
-            transform: translateY(-20px);
+            transform: translateY(-16px);
         }
 
         /* Visual Grid Animations */
         .demo-grid {
             display: grid;
             gap: 2px;
-            background-color: #334155;
-            border: 2px solid #475569;
+            background-color: #cbd5e1;
+            border: 2px solid #94a3b8;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: all 0.5s ease;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
         }
 
         .demo-cell {
-            background-color: #1e293b;
+            background-color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: monospace;
-            color: #94a3b8;
-            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            color: #334155;
+            font-size: 0.85rem;
+            transition: all 0.25s ease;
         }
 
         .demo-header {
-            background-color: #0f172a;
-            color: #cbd5e1;
-            font-weight: bold;
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
         }
 
         /* Specific Highlight Classes triggered by JS */
-        .highlight-col { background-color: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #e0f2fe; }
-        .highlight-row { background-color: rgba(167, 139, 250, 0.2); border: 1px solid #a78bfa; color: #ede9fe; }
+        .highlight-col { background-color: rgba(56, 189, 248, 0.22); border: 1px solid #0284c7; color: #0369a1; font-weight: 700; }
+        .highlight-row { background-color: rgba(167, 139, 250, 0.22); border: 1px solid #7c3aed; color: #6d28d9; font-weight: 700; }
         .highlight-cell { 
             background-color: #10b981; 
             color: white; 
             font-weight: bold; 
-            transform: scale(1.1); 
+            transform: scale(1.08); 
             z-index: 10; 
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
         }
         
         .pulse-cell {
@@ -88,7 +117,7 @@
         }
 
         @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
             70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
@@ -110,15 +139,15 @@
         }
 
         /* Slide 6 Excel Interaction Styles */
-        .excel-selected-blue { border: 2px dashed #38bdf8 !important; background-color: rgba(56, 189, 248, 0.1); z-index: 5; }
-        .excel-selected-red { border: 2px dashed #f87171 !important; background-color: rgba(248, 113, 113, 0.1); z-index: 5; }
-        .active-typing { border: 2px solid #10b981 !important; box-shadow: inset 0 0 10px rgba(16,185,129,0.2); background-color: #1e293b; color: white;}
+        .excel-selected-blue { border: 2px dashed #0284c7 !important; background-color: rgba(56, 189, 248, 0.15) !important; color: #0369a1 !important; z-index: 5; font-weight: 600; }
+        .excel-selected-red { border: 2px dashed #ef4444 !important; background-color: rgba(239, 68, 68, 0.15) !important; color: #b91c1c !important; z-index: 5; font-weight: 600; }
+        .active-typing { border: 2px solid #10b981 !important; box-shadow: inset 0 0 10px rgba(16,185,129,0.15); background-color: #ffffff !important; color: #0f172a !important; font-weight: 600; }
         
         /* Slide 7 Range Selection Styles */
         .range-selected { 
-            background-color: rgba(56, 189, 248, 0.3) !important; 
-            border: 1px solid #38bdf8 !important;
-            color: #fff;
+            background-color: rgba(56, 189, 248, 0.25) !important; 
+            border: 1px solid #0284c7 !important;
+            color: #0f172a !important;
         }
 
         /* Slide 12 Fill Handle Styles */
@@ -126,15 +155,15 @@
             position: absolute;
             bottom: -4px;
             right: -4px;
-            width: 10px;
-            height: 10px;
-            background-color: #10b981;
+            width: 9px;
+            height: 9px;
+            background-color: #15803d;
             border: 1px solid white;
             cursor: crosshair;
             z-index: 30;
         }
         .fill-preview {
-            background-color: rgba(16, 185, 129, 0.2) !important;
+            background-color: rgba(16, 185, 129, 0.15) !important;
             border-left: 2px solid #10b981 !important;
             border-right: 2px solid #10b981 !important;
         }
@@ -147,33 +176,33 @@
             position: relative;
             width: 100%;
             height: 300px;
-            background-color: #0f172a;
+            background-color: #ffffff;
             border-radius: 12px;
             overflow: hidden;
-            border: 1px solid #334155;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .manim-grid-line {
             position: absolute;
-            background-color: #334155;
+            background-color: #e2e8f0;
         }
 
         .manim-formula-box {
             position: absolute;
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 2rem;
             font-weight: bold;
-            color: #f8fafc;
+            color: #0f172a;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth easing */
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
         }
 
         .manim-highlight-text {
-            color: #fuchsia;
+            color: #d946ef;
             display: inline-block;
             transition: color 0.5s ease;
         }
@@ -199,8 +228,7 @@
             transform: rotate(45deg);
         }
 
-/* Sandbox CSS */
-
+        /* Sandbox CSS */
         .layout-container {
             display: flex;
             flex: 1;
@@ -210,37 +238,38 @@
         .instructions-pane {
             width: 35%;
             min-width: 300px;
-            background-color: #1e293b;
-            border-right: 1px solid #334155;
+            background-color: #f8fafc;
+            border-right: 1px solid #e2e8f0;
             padding: 2rem;
             overflow-y: auto;
-            box-shadow: inset -10px 0 20px rgba(0,0,0,0.2);
+            color: #334155;
+            box-shadow: inset -5px 0 15px rgba(0,0,0,0.03);
         }
 
         .spreadsheet-pane {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background-color: #0f172a;
+            background-color: #f1f5f9;
         }
 
         /* Formula Bar */
         .formula-bar-container {
             display: flex;
             align-items: center;
-            background-color: #1e293b;
-            border-bottom: 1px solid #334155;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
             padding: 0.5rem 1rem;
             gap: 1rem;
         }
 
         .active-cell-indicator {
-            background-color: #0f172a;
-            border: 1px solid #475569;
-            color: #cbd5e1;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #334155;
             padding: 0.25rem 0.75rem;
             border-radius: 4px;
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-weight: bold;
             min-width: 3rem;
             text-align: center;
@@ -248,12 +277,12 @@
 
         .formula-input {
             flex: 1;
-            background-color: #0f172a;
-            border: 1px solid #475569;
-            color: #f8fafc;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
             padding: 0.4rem 1rem;
             border-radius: 4px;
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 1rem;
         }
         
@@ -274,20 +303,20 @@
         .spreadsheet {
             display: grid;
             border-collapse: collapse;
-            background-color: #334155;
-            border: 1px solid #475569;
+            background-color: #cbd5e1;
+            border: 1px solid #94a3b8;
             width: max-content;
         }
 
         .cell {
-            background-color: #1e293b;
-            border: 1px solid #334155;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
             min-width: 100px;
             height: 32px;
             display: flex;
             align-items: center;
             padding: 0 0.5rem;
-            color: #e2e8f0;
+            color: #1e293b;
             font-family: sans-serif;
             font-size: 0.9rem;
             user-select: none;
@@ -298,10 +327,11 @@
         }
 
         .cell.header {
-            background-color: #0f172a;
-            color: #94a3b8;
+            background-color: #f8fafc;
+            color: #64748b;
             justify-content: center;
             font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
             user-select: none;
         }
 
@@ -323,12 +353,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #1e293b;
-            color: #f8fafc;
+            background-color: #ffffff;
+            color: #0f172a;
             border: none;
             outline: none;
             padding: 0 0.5rem;
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.9rem;
             box-sizing: border-box;
             z-index: 20;
@@ -339,37 +369,71 @@
         .task-done { color: #10b981; text-decoration: line-through; opacity: 0.7; }
         .task-done i { color: #10b981; }
 
-    
         /* 10x10 Strategic Range Highlight Classes */
-        .s16-pos-range { background-color: rgba(16, 185, 129, 0.45) !important; border: 1.5px solid #10b981 !important; color: #ffffff !important; font-weight: bold; }
-        .s16-neg-range { background-color: rgba(6, 182, 212, 0.45) !important; border: 1.5px solid #06b6d4 !important; color: #ffffff !important; font-weight: bold; }
-        .s16-overlap-range { background-color: rgba(245, 158, 11, 0.5) !important; border: 1.5px dashed #f59e0b !important; color: #ffffff !important; font-weight: bold; }
-        .s16-cell-val { color: #e2e8f0; font-weight: 600; }
+        .s16-pos-range { background-color: rgba(16, 185, 129, 0.25) !important; border: 1.5px solid #10b981 !important; color: #065f46 !important; font-weight: bold; }
+        .s16-neg-range { background-color: rgba(6, 182, 212, 0.25) !important; border: 1.5px solid #0891b2 !important; color: #155e75 !important; font-weight: bold; }
+        .s16-overlap-range { background-color: rgba(245, 158, 11, 0.3) !important; border: 1.5px dashed #d97706 !important; color: #92400e !important; font-weight: bold; }
+        .s16-cell-val { color: #334155; font-weight: 600; }
 
+                /* Slide 17 Visualizer Styles */
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .grid-cell {
+            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+            user-select: none;
+        }
+        .grid-cell:hover:not(.is-header) {
+            background-color: #f0fdf4;
+        }
+        @keyframes dashMove {
+            to { stroke-dashoffset: -24; }
+        }
+        .anim-dash {
+            stroke-dasharray: 6 6;
+            animation: dashMove 1.2s linear infinite;
+        }
+        @keyframes gentlePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+        }
+        .source-cell-glow {
+            animation: gentlePulse 2s infinite ease-in-out;
+        }
+        .fill-handle {
+            width: 9px;
+            height: 9px;
+            background-color: #15803d;
+            position: absolute;
+            bottom: -4.5px;
+            right: -4.5px;
+            cursor: crosshair;
+            z-index: 30;
+            border: 1px solid white;
+        }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 selection:bg-emerald-200">
 
     <!-- Progress Indicator -->
-    <div class="fixed top-0 left-0 w-full h-1 bg-slate-800 z-50">
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-200 z-50">
         <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-500 w-0"></div>
     </div>
 
     <!-- Navigation Controls -->
-    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50 bg-slate-800/80 backdrop-blur-md px-6 py-3 rounded-full border border-slate-700 shadow-xl">
-        <button id="prev-btn" class="text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors" disabled>
+    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full border border-slate-300 shadow-xl">
+        <button id="prev-btn" class="text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" disabled>
             <i class="fa-solid fa-chevron-left text-xl"></i>
         </button>
-        <div class="text-slate-300 font-mono text-sm tracking-widest">
-            <span id="current-slide-num">1</span> / <span id="total-slide-num">16</span>
+        <div class="text-slate-600 font-mono text-sm tracking-widest font-semibold">
+            <span id="current-slide-num">1</span> / <span id="total-slide-num">17</span>
         </div>
-        <button id="next-btn" class="text-emerald-400 hover:text-emerald-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+        <button id="next-btn" class="text-emerald-600 hover:text-emerald-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
             <i class="fa-solid fa-chevron-right text-xl"></i>
         </button>
     </div>
 
-    <!-- Slide 1 -->
-    <div class="slide-container active" id="slide-1">
+<div class="slide-container active" id="slide-1">
         <div class="text-center max-w-3xl">
             <div class="w-24 h-24 bg-emerald-600 rounded-2xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-emerald-900/50 transform rotate-3 hover:rotate-0 transition-transform duration-500">
                 <i class="fa-solid fa-file-excel text-5xl text-white"></i>
@@ -377,7 +441,7 @@
             <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
                 What is a Spreadsheet?
             </h1>
-            <p class="text-xl md:text-2xl text-slate-400 mb-12 leading-relaxed">
+            <p class="text-xl md:text-2xl text-slate-500 mb-12 leading-relaxed">
                 Before we write formulas, we need to understand the grid. It's simpler than you think.
             </p>
             <p class="text-slate-500 text-sm uppercase tracking-widest animate-pulse">
@@ -385,27 +449,26 @@
             </p>
         </div>
     </div>
-
-    <div class="slide-container" id="slide-2">
+<div class="slide-container" id="slide-2">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 1: THE STRUCTURE
                 </div>
                 <h2 class="text-4xl font-bold mb-6">It's just Columns and Rows.</h2>
                 <div class="space-y-6">
-                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-cyan-500/50 transition-colors cursor-pointer group" onmouseenter="highlightColumn()" onmouseleave="resetGrid1()">
-                        <h3 class="text-xl font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                    <div class="bg-white shadow-sm p-6 rounded-xl border border-slate-200 hover:border-cyan-500/50 transition-colors cursor-pointer group" onmouseenter="highlightColumn()" onmouseleave="resetGrid1()">
+                        <h3 class="text-xl font-semibold text-cyan-700 mb-2 flex items-center gap-2">
                             <i class="fa-solid fa-arrow-down"></i> Columns go down
                         </h3>
-                        <p class="text-slate-400">They are named with letters. Hover here to see Column B.</p>
+                        <p class="text-slate-500">They are named with letters. Hover here to see Column B.</p>
                     </div>
                     
-                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-purple-500/50 transition-colors cursor-pointer group" onmouseenter="highlightRow()" onmouseleave="resetGrid1()">
-                        <h3 class="text-xl font-semibold text-purple-400 mb-2 flex items-center gap-2">
+                    <div class="bg-white shadow-sm p-6 rounded-xl border border-slate-200 hover:border-purple-500/50 transition-colors cursor-pointer group" onmouseenter="highlightRow()" onmouseleave="resetGrid1()">
+                        <h3 class="text-xl font-semibold text-purple-700 mb-2 flex items-center gap-2">
                             <i class="fa-solid fa-arrow-right"></i> Rows go across
                         </h3>
-                        <p class="text-slate-400">They are named with numbers. Hover here to see Row 3.</p>
+                        <p class="text-slate-500">They are named with numbers. Hover here to see Row 3.</p>
                     </div>
                 </div>
             </div>
@@ -418,23 +481,22 @@
             </div>
         </div>
     </div>
-
-    <div class="slide-container" id="slide-3">
+<div class="slide-container" id="slide-3">
         <div class="flex flex-col md:flex-row-reverse items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 2: THE ADDRESS
                 </div>
-                <h2 class="text-4xl font-bold mb-6">Where they meet is a <span class="text-emerald-400">Cell</span>.</h2>
-                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                <h2 class="text-4xl font-bold mb-6">Where they meet is a <span class="text-emerald-600">Cell</span>.</h2>
+                <p class="text-xl text-slate-600 mb-6 leading-relaxed">
                     Every box on the screen has a unique name, created by combining its Column Letter and Row Number.
                 </p>
                 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-emerald-900/50 relative overflow-hidden">
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-emerald-900/50 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl rounded-full"></div>
-                    <p class="text-slate-400 mb-4">Try it! Type a cell address (like B2 or D3):</p>
+                    <p class="text-slate-500 mb-4">Try it! Type a cell address (like B2 or D3):</p>
                     <div class="flex items-center gap-4">
-                        <input type="text" id="cell-input" class="bg-slate-900 border-2 border-slate-600 rounded-lg px-4 py-2 text-2xl font-mono text-white w-32 uppercase focus:outline-none focus:border-emerald-500 transition-colors" placeholder="C2" maxlength="2">
+                        <input type="text" id="cell-input" class="bg-slate-50 border-2 border-slate-300 rounded-lg px-4 py-2 text-2xl font-mono text-white w-32 uppercase focus:outline-none focus:border-emerald-500 transition-colors" placeholder="C2" maxlength="2">
                         <button onclick="triggerCustomAnimation()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
                             Find Cell
                         </button>
@@ -451,24 +513,23 @@
             </div>
         </div>
     </div>
-
-    <div class="slide-container" id="slide-4">
+<div class="slide-container" id="slide-4">
         <div class="flex flex-col items-center max-w-5xl w-full text-center">
-            <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-4 tracking-wide">
+            <div class="inline-block px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold mb-4 tracking-wide">
                 STEP 3: THE MAGIC
             </div>
             <h2 class="text-4xl font-bold mb-4">Cells talk to each other.</h2>
-            <p class="text-xl text-slate-400 mb-12 max-w-2xl">
+            <p class="text-xl text-slate-500 mb-12 max-w-2xl">
                 Instead of adding numbers together, you add the <em>Cells</em> together. If the numbers inside change, the total updates automatically.
             </p>
 
-            <div class="w-full max-w-3xl bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+            <div class="w-full max-w-3xl bg-white shadow-sm p-8 rounded-3xl border border-slate-200 shadow-2xl relative">
                 
                 <div class="flex justify-between items-center mb-8">
                     <!-- Value 1 -->
                     <div class="text-center">
                         <div class="text-sm font-mono text-slate-500 mb-2">Cell A1</div>
-                        <div id="demo-cell-a1" class="w-24 h-24 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
+                        <div id="demo-cell-a1" class="w-24 h-24 bg-slate-50 rounded-xl border border-slate-300 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
                             100
                         </div>
                     </div>
@@ -478,7 +539,7 @@
                     <!-- Value 2 -->
                     <div class="text-center">
                         <div class="text-sm font-mono text-slate-500 mb-2">Cell B1</div>
-                        <div id="demo-cell-b1" class="w-24 h-24 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
+                        <div id="demo-cell-b1" class="w-24 h-24 bg-slate-50 rounded-xl border border-slate-300 flex items-center justify-center text-3xl font-bold text-white relative transition-transform duration-300">
                             50
                         </div>
                     </div>
@@ -487,8 +548,8 @@
 
                     <!-- Result -->
                     <div class="text-center relative">
-                        <div class="text-sm font-mono text-amber-400 mb-2 font-bold animate-pulse">=A1+B1</div>
-                        <div id="calc-result" class="w-32 h-24 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-4xl font-bold text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all duration-500">
+                        <div class="text-sm font-mono text-amber-700 mb-2 font-bold animate-pulse">=A1+B1</div>
+                        <div id="calc-result" class="w-32 h-24 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-4xl font-bold text-emerald-600 shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all duration-500">
                             150
                         </div>
                     </div>
@@ -502,41 +563,41 @@
     </div>
 
     <!-- Slide 5: Syntax -->
-    <div class="slide-container" id="slide-5">
+<div class="slide-container" id="slide-5">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-pink-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-pink-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 4: THE SECRET KEY
                 </div>
-                <h2 class="text-5xl font-bold mb-6">The Magic <span class="text-pink-400">Equals</span> Sign</h2>
-                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                <h2 class="text-5xl font-bold mb-6">The Magic <span class="text-pink-700">Equals</span> Sign</h2>
+                <p class="text-xl text-slate-600 mb-6 leading-relaxed">
                     By default, if you type "5+5" into a cell, Excel just thinks it's a piece of text. 
                 </p>
-                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed">
                     To tell Excel you want it to act as a calculator, you <strong>must</strong> start with an equals sign (<code>=</code>). This is called <strong>Syntax</strong>.
                 </p>
 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-pink-900/50 shadow-xl">
-                    <p class="text-slate-400 mb-4 font-semibold">Try it out in the Formula Bar below:</p>
-                    <ol class="list-decimal list-inside text-slate-300 space-y-2 mb-6 ml-2">
-                        <li>Type <code class="bg-slate-900 px-2 py-1 rounded text-pink-400">10+20</code></li>
-                        <li>Then, add an equals sign at the front: <code class="bg-slate-900 px-2 py-1 rounded text-pink-400">=10+20</code></li>
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-pink-900/50 shadow-xl">
+                    <p class="text-slate-500 mb-4 font-semibold">Try it out in the Formula Bar below:</p>
+                    <ol class="list-decimal list-inside text-slate-600 space-y-2 mb-6 ml-2">
+                        <li>Type <code class="bg-slate-50 px-2 py-1 rounded text-pink-700">10+20</code></li>
+                        <li>Then, add an equals sign at the front: <code class="bg-slate-50 px-2 py-1 rounded text-pink-700">=10+20</code></li>
                     </ol>
                     
-                    <div class="flex items-center gap-4 bg-slate-900 p-2 rounded-lg border border-slate-700">
-                        <div class="text-slate-500 px-3 font-mono border-r border-slate-700 italic">fx</div>
+                    <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                        <div class="text-slate-500 px-3 font-mono border-r border-slate-200 italic">fx</div>
                         <input type="text" id="syntax-input" class="bg-transparent w-full px-2 py-2 text-xl font-mono text-white focus:outline-none placeholder-slate-600" placeholder="Type here...">
                     </div>
                 </div>
             </div>
             
             <div class="flex-1 flex flex-col justify-center items-center w-full">
-                <h3 class="text-slate-400 uppercase tracking-widest text-sm mb-4">What you see in the cell:</h3>
+                <h3 class="text-slate-500 uppercase tracking-widest text-sm mb-4">What you see in the cell:</h3>
                 <div class="relative w-full max-w-sm">
-                    <div id="syntax-badge" class="absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-800 transition-colors shadow-lg z-10">
+                    <div id="syntax-badge" class="absolute -top-3 -right-3 bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-200 transition-colors shadow-lg z-10">
                         Empty
                     </div>
-                    <div id="syntax-result" class="w-full h-32 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-4xl font-bold text-slate-300 relative transition-all duration-300">
+                    <div id="syntax-result" class="w-full h-32 bg-slate-50 rounded-xl border border-slate-300 flex items-center justify-center text-4xl font-bold text-slate-600 relative transition-all duration-300">
                         
                     </div>
                 </div>
@@ -545,21 +606,21 @@
     </div>
 
     <!-- Slide 6: Point and Click Formula -->
-    <div class="slide-container" id="slide-6">
+<div class="slide-container" id="slide-6">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-indigo-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 5: POINT AND CLICK
                 </div>
                 <h2 class="text-4xl font-bold mb-6">Building Formulas by Clicking</h2>
-                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed">
                     You don't have to type cell addresses manually. It's much faster to just click them! Let's try calculating <code>=A2-B1</code>.
                 </p>
 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-indigo-900/50 shadow-xl">
-                    <p class="text-slate-400 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-indigo-900/50 shadow-xl">
+                    <p class="text-slate-500 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
                     <ul id="step-list" class="space-y-4 text-lg">
-                        <li id="s6-step-1" class="text-indigo-400 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>C2</strong></li>
+                        <li id="s6-step-1" class="text-indigo-700 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>C2</strong></li>
                         <li id="s6-step-2" class="text-slate-500 transition-all duration-300">2. Type the equal sign (<strong>=</strong>)</li>
                         <li id="s6-step-3" class="text-slate-500 transition-all duration-300">3. Click cell <strong>A2</strong> (320)</li>
                         <li id="s6-step-4" class="text-slate-500 transition-all duration-300">4. Type the minus sign (<strong>-</strong>)</li>
@@ -577,31 +638,31 @@
 
                 <!-- Success Message (Hidden initially) -->
                 <div id="s6-success" class="mt-12 hidden flex-col items-center animate-fade-in transition-all duration-500">
-                     <p class="text-emerald-400 font-bold text-xl mb-4"><i class="fa-solid fa-check-circle"></i> You did it! 281 is correct.</p>
-                     <p class="text-slate-400">Press the Right Arrow to continue.</p>
+                     <p class="text-emerald-600 font-bold text-xl mb-4"><i class="fa-solid fa-check-circle"></i> You did it! 281 is correct.</p>
+                     <p class="text-slate-500">Press the Right Arrow to continue.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Slide 7: Entire Rows and Columns -->
-    <div class="slide-container" id="slide-7">
+<div class="slide-container" id="slide-7">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 6: ENTIRE ROWS & COLUMNS
                 </div>
                 <h2 class="text-4xl font-bold mb-6">Selecting Everything</h2>
-                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-6 leading-relaxed">
                     Need to select an entire line of data? You can click the <strong>Column Letter</strong> or the <strong>Row Number</strong> at the edges of the grid. Excel uses a colon without numbers to indicate a full column (like <code>A:A</code>).
                 </p>
 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-cyan-900/50 shadow-xl">
-                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-hand-pointer text-cyan-400"></i> Click on a Letter (A-D) or Number (1-4) on the grid:</p>
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-cyan-900/50 shadow-xl">
+                    <p class="text-slate-500 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-hand-pointer text-cyan-700"></i> Click on a Letter (A-D) or Number (1-4) on the grid:</p>
                     
-                    <div class="flex flex-col items-center justify-center bg-slate-900 p-6 rounded-xl border border-slate-700 mt-6">
+                    <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-xl border border-slate-200 mt-6">
                         <span class="text-slate-500 text-sm mb-2 uppercase tracking-widest">Excel Syntax</span>
-                        <div id="s7-range-display" class="text-5xl font-mono font-bold text-cyan-400 transition-all duration-200">
+                        <div id="s7-range-display" class="text-5xl font-mono font-bold text-cyan-700 transition-all duration-200">
                             -
                         </div>
                     </div>
@@ -618,23 +679,23 @@
     </div>
 
     <!-- Slide 8: Ranges -->
-    <div class="slide-container" id="slide-8">
+<div class="slide-container" id="slide-8">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-sky-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 7: RANGES
                 </div>
                 <h2 class="text-4xl font-bold mb-6">Grouping Cells Together</h2>
-                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-6 leading-relaxed">
                     A <strong>Range</strong> is a collection of two or more cells. Instead of writing <code>=A1+A2+A3+A4</code>, Excel uses a colon (<strong>:</strong>) to connect the first and last cells.
                 </p>
 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-sky-900/50 shadow-xl">
-                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-sky-400"></i> Click and drag on the grid to create a range:</p>
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-sky-900/50 shadow-xl">
+                    <p class="text-slate-500 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-sky-700"></i> Click and drag on the grid to create a range:</p>
                     
-                    <div class="flex flex-col items-center justify-center bg-slate-900 p-6 rounded-xl border border-slate-700 mt-6">
+                    <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-xl border border-slate-200 mt-6">
                         <span class="text-slate-500 text-sm mb-2 uppercase tracking-widest">Selected Range</span>
-                        <div id="range-display" class="text-5xl font-mono font-bold text-sky-400 transition-all duration-200">
+                        <div id="range-display" class="text-5xl font-mono font-bold text-sky-700 transition-all duration-200">
                             A1
                         </div>
                     </div>
@@ -648,7 +709,7 @@
                 </div>
                 
                 <!-- Success indicator for Slide 8 -->
-                <div id="s8-success" class="mt-8 text-sky-400 font-bold opacity-0 transition-opacity duration-500">
+                <div id="s8-success" class="mt-8 text-sky-700 font-bold opacity-0 transition-opacity duration-500">
                     <i class="fa-solid fa-check-circle"></i> Range Selected! Press Right Arrow to continue.
                 </div>
             </div>
@@ -656,64 +717,64 @@
     </div>
 
     <!-- Slide 9: Math Operators -->
-    <div class="slide-container" id="slide-9">
+<div class="slide-container" id="slide-9">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-yellow-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 8: THE MATH OPERATORS
                 </div>
                 <h2 class="text-4xl font-bold mb-6">Excel's Calculator Keys</h2>
-                <p class="text-xl text-slate-300 mb-6 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-6 leading-relaxed">
                     Excel can do any math you want, but the symbols might look a little different than a math textbook.
                 </p>
 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-yellow-900/50 shadow-xl space-y-4">
-                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
-                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-900 text-xl">+</kbd>
-                        <span class="text-slate-300 text-lg">Addition</span>
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-yellow-900/50 shadow-xl space-y-4">
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-300 text-xl">+</kbd>
+                        <span class="text-slate-600 text-lg">Addition</span>
                     </div>
-                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
-                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-900 text-xl">-</kbd>
-                        <span class="text-slate-300 text-lg">Subtraction</span>
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <kbd class="bg-slate-700 text-white font-mono px-3 py-1 rounded border-b-2 border-slate-300 text-xl">-</kbd>
+                        <span class="text-slate-600 text-lg">Subtraction</span>
                     </div>
-                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
                         <div class="absolute inset-0 bg-yellow-500/10"></div>
                         <kbd class="bg-yellow-600 text-white font-mono px-3 py-1 rounded border-b-2 border-yellow-800 text-xl relative z-10">*</kbd>
-                        <span class="text-slate-200 text-lg font-bold relative z-10">Multiplication (Asterisk)</span>
+                        <span class="text-slate-800 text-lg font-bold relative z-10">Multiplication (Asterisk)</span>
                     </div>
-                    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-yellow-700/50 relative overflow-hidden">
                          <div class="absolute inset-0 bg-yellow-500/10"></div>
                         <kbd class="bg-yellow-600 text-white font-mono px-3 py-1 rounded border-b-2 border-yellow-800 text-xl relative z-10">/</kbd>
-                        <span class="text-slate-200 text-lg font-bold relative z-10">Division (Forward Slash)</span>
+                        <span class="text-slate-800 text-lg font-bold relative z-10">Division (Forward Slash)</span>
                     </div>
                 </div>
             </div>
             
             <div class="flex-1 flex flex-col items-center justify-center w-full">
-                <div class="w-full max-w-md bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
-                    <p class="text-slate-400 mb-6 text-center font-semibold uppercase tracking-wider text-sm">Try the different operators:</p>
+                <div class="w-full max-w-md bg-white shadow-sm p-8 rounded-3xl border border-slate-200 shadow-2xl relative">
+                    <p class="text-slate-500 mb-6 text-center font-semibold uppercase tracking-wider text-sm">Try the different operators:</p>
                     <div class="flex justify-center gap-3 mb-8">
                         <button id="btn-op-add" onclick="setOperator('+')" class="s9-op-btn w-12 h-12 bg-emerald-600 border-2 border-emerald-400 rounded-lg text-2xl font-mono text-white transition-colors">+</button>
-                        <button id="btn-op-sub" onclick="setOperator('-')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">-</button>
-                        <button id="btn-op-mul" onclick="setOperator('*')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">*</button>
-                        <button id="btn-op-div" onclick="setOperator('/')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-600 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">/</button>
+                        <button id="btn-op-sub" onclick="setOperator('-')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-300 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">-</button>
+                        <button id="btn-op-mul" onclick="setOperator('*')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-300 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">*</button>
+                        <button id="btn-op-div" onclick="setOperator('/')" class="s9-op-btn w-12 h-12 bg-slate-700 border-2 border-slate-300 rounded-lg text-2xl font-mono text-white hover:bg-slate-600 transition-colors">/</button>
                     </div>
 
                     <div class="flex justify-center items-center gap-4 mb-6">
                         <div class="text-center">
                             <div class="text-sm font-mono text-slate-500 mb-1">A1</div>
-                            <div class="w-16 h-16 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-xl font-bold text-white">120</div>
+                            <div class="w-16 h-16 bg-slate-50 rounded-xl border border-slate-300 flex items-center justify-center text-xl font-bold text-white">120</div>
                         </div>
-                        <div id="s9-formula-op" class="text-3xl text-emerald-400 font-mono font-bold">+</div>
+                        <div id="s9-formula-op" class="text-3xl text-emerald-600 font-mono font-bold">+</div>
                         <div class="text-center">
                             <div class="text-sm font-mono text-slate-500 mb-1">B1</div>
-                            <div class="w-16 h-16 bg-slate-900 rounded-xl border border-slate-600 flex items-center justify-center text-xl font-bold text-white">10</div>
+                            <div class="w-16 h-16 bg-slate-50 rounded-xl border border-slate-300 flex items-center justify-center text-xl font-bold text-white">10</div>
                         </div>
                         <div class="text-3xl text-slate-600 font-mono">=</div>
                     </div>
 
                     <div class="text-center">
-                        <div id="s9-result" class="w-full h-20 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-5xl font-bold text-emerald-400 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.2)]">130</div>
+                        <div id="s9-result" class="w-full h-20 bg-emerald-900/40 rounded-xl border-2 border-emerald-500 flex items-center justify-center text-5xl font-bold text-emerald-600 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.2)]">130</div>
                     </div>
                 </div>
             </div>
@@ -721,21 +782,21 @@
     </div>
 
     <!-- Slide 10: Formulas Application -->
-    <div class="slide-container" id="slide-10">
+<div class="slide-container" id="slide-10">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 9: PUTTING IT TOGETHER
                 </div>
                 <h2 class="text-4xl font-bold mb-6">Calculate the Cost</h2>
-                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed">
                     Let's use multiplication in a real scenario. Find the Total Cost of the Apples by multiplying Quantity by Price (<code>=B2*C2</code>).
                 </p>
 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-amber-900/50 shadow-xl">
-                    <p class="text-slate-400 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-amber-900/50 shadow-xl">
+                    <p class="text-slate-500 mb-6 font-semibold uppercase tracking-wider text-sm">Follow these steps:</p>
                     <ul id="s10-step-list" class="space-y-4 text-lg">
-                        <li id="s10-step-1" class="text-amber-400 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>D2</strong></li>
+                        <li id="s10-step-1" class="text-amber-700 font-bold scale-105 origin-left transform transition-all duration-300">1. Select the cell <strong>D2</strong></li>
                         <li id="s10-step-2" class="text-slate-500 transition-all duration-300">2. Type the equal sign (<strong>=</strong>)</li>
                         <li id="s10-step-3" class="text-slate-500 transition-all duration-300">3. Click cell <strong>B2</strong> (5)</li>
                         <li id="s10-step-4" class="text-slate-500 transition-all duration-300">4. Type the multiply sign (<strong>*</strong>)</li>
@@ -755,20 +816,20 @@
     </div>
 
     <!-- Slide 11: Relative References Concept -->
-    <div class="slide-container" id="slide-11">
+<div class="slide-container" id="slide-11">
         <div class="flex flex-col items-center max-w-5xl w-full text-center">
-            <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-fuchsia-400 text-sm font-semibold mb-4 tracking-wide">
+            <div class="inline-block px-3 py-1 rounded-full bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 text-sm font-semibold mb-4 tracking-wide">
                 STEP 10: RELATIVE REFERENCES
             </div>
             <h2 class="text-4xl font-bold mb-4">The True Power of Excel</h2>
-            <p class="text-xl text-slate-400 mb-8 max-w-3xl">
+            <p class="text-xl text-slate-500 mb-8 max-w-3xl">
                 Why do we use cell addresses like <code>A1</code> instead of typing the numbers directly? Because when you copy a formula down to the next row, Excel changes the numbers automatically. 
             </p>
 
-            <div class="w-full bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+            <div class="w-full bg-white shadow-sm p-8 rounded-3xl border border-slate-200 shadow-2xl relative">
                 
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-slate-300 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-eye text-fuchsia-400 mr-2"></i> Visualize the Shift</h3>
+                    <h3 class="text-slate-600 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-eye text-fuchsia-700 mr-2"></i> Visualize the Shift</h3>
                     <button id="s11-play-btn" onclick="playManimAnimation()" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-6 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-play"></i> Play Animation
                     </button>
@@ -789,12 +850,12 @@
                     <div class="absolute text-slate-500 font-mono text-xl" style="top: 78%; left: 5%;">Row 3</div>
 
                     <!-- Data Cells -->
-                    <div class="absolute text-slate-300 font-mono text-2xl" style="top: 10%; left: 30%;">Data A</div>
-                    <div class="absolute text-slate-300 font-mono text-2xl" style="top: 45%; left: 30%;">Data B</div>
-                    <div class="absolute text-slate-300 font-mono text-2xl" style="top: 78%; left: 30%;">Data C</div>
+                    <div class="absolute text-slate-600 font-mono text-2xl" style="top: 10%; left: 30%;">Data A</div>
+                    <div class="absolute text-slate-600 font-mono text-2xl" style="top: 45%; left: 30%;">Data B</div>
+                    <div class="absolute text-slate-600 font-mono text-2xl" style="top: 78%; left: 30%;">Data C</div>
 
                     <!-- The Moving Formula -->
-                    <div id="manim-formula" class="manim-formula-box bg-slate-900 border-2 border-fuchsia-500 px-6 py-2 rounded-xl shadow-[0_0_20px_rgba(217,70,239,0.3)]" style="top: 8%; left: 65%;">
+                    <div id="manim-formula" class="manim-formula-box bg-slate-50 border-2 border-fuchsia-500 px-6 py-2 rounded-xl shadow-[0_0_20px_rgba(217,70,239,0.3)]" style="top: 8%; left: 65%;">
                         =A<span id="manim-num-1" class="manim-highlight-text mx-1">1</span> + B<span id="manim-num-2" class="manim-highlight-text mx-1">1</span>
                     </div>
 
@@ -802,7 +863,7 @@
                     <div id="manim-arrow" class="manim-arrow" style="top: 25%; left: 75%; height: 0px;"></div>
                 </div>
                 
-                <p id="s11-explanation" class="text-fuchsia-400 mt-6 font-semibold opacity-0 transition-opacity duration-500">
+                <p id="s11-explanation" class="text-fuchsia-700 mt-6 font-semibold opacity-0 transition-opacity duration-500">
                     Notice how the row numbers in the formula increase exactly by 1 as the formula moves down 1 row.
                 </p>
             </div>
@@ -810,20 +871,20 @@
     </div>
 
     <!-- Slide 12: The Fill Handle -->
-    <div class="slide-container" id="slide-12">
+<div class="slide-container" id="slide-12">
         <div class="flex flex-col md:flex-row items-center gap-12 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-sm font-semibold mb-4 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold mb-4 tracking-wide">
                     STEP 11: THE FILL HANDLE
                 </div>
                 <h2 class="text-4xl font-bold mb-6">Drag to Copy</h2>
-                <p class="text-xl text-slate-300 mb-8 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed">
                     Let's see relative references in action. In Excel, the bottom-right corner of a selected cell has a small green square called the <strong>Fill Handle</strong>.
                 </p>
 
-                <div class="bg-slate-800 p-8 rounded-2xl border border-emerald-900/50 shadow-xl">
-                    <p class="text-slate-400 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-emerald-400"></i> Try it yourself:</p>
-                    <ol class="list-decimal list-inside text-slate-300 space-y-3">
+                <div class="bg-white shadow-sm p-8 rounded-2xl border border-emerald-900/50 shadow-xl">
+                    <p class="text-slate-500 mb-4 font-semibold uppercase tracking-wider text-sm"><i class="fa-solid fa-mouse-pointer text-emerald-600"></i> Try it yourself:</p>
+                    <ol class="list-decimal list-inside text-slate-600 space-y-3">
                         <li>Look at cell <strong>C2</strong>. It already has the formula <code>=A2+B2</code>.</li>
                         <li>Click and hold the tiny green square on <strong>C2</strong>.</li>
                         <li>Drag it down to row 4 to instantly calculate the rest!</li>
@@ -839,7 +900,7 @@
 
                 <!-- Success Message -->
                 <div id="s12-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500 mb-6">
-                     <p class="text-emerald-400 font-bold text-xl mb-2"><i class="fa-solid fa-check-circle"></i> Awesome! The formula adapted automatically.</p>
+                     <p class="text-emerald-600 font-bold text-xl mb-2"><i class="fa-solid fa-check-circle"></i> Awesome! The formula adapted automatically.</p>
                 </div>
 
                 <button id="final-sandbox-btn" class="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:scale-105 flex items-center gap-3" onclick="document.getElementById('sandbox-wrapper').style.display = 'flex';">
@@ -850,39 +911,39 @@
     </div>
 
     <!-- Slide 13: Practice 1 - Mini Theme Park Ticket Booth -->
-    <div class="slide-container" id="slide-13">
+<div class="slide-container" id="slide-13">
         <div class="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-sm font-semibold mb-3 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold mb-3 tracking-wide">
                     PRACTICE 1: THEME PARK TICKET BOOTH
                 </div>
                 <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
-                    <i class="fa-solid fa-ticket text-amber-400"></i> Live Sales Calculator
+                    <i class="fa-solid fa-ticket text-amber-700"></i> Live Sales Calculator
                 </h2>
-                <p class="text-slate-300 mb-5 leading-relaxed text-base">
-                    Calculate ticket sales for visitors. Start each formula with <code class="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">=</code> and multiply Quantity by Price (<code class="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">*</code>).
+                <p class="text-slate-600 mb-5 leading-relaxed text-base">
+                    Calculate ticket sales for visitors. Start each formula with <code class="text-emerald-600 bg-white shadow-sm px-1.5 py-0.5 rounded font-bold">=</code> and multiply Quantity by Price (<code class="text-amber-700 bg-white shadow-sm px-1.5 py-0.5 rounded font-bold">*</code>).
                 </p>
 
-                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3 mb-4">
-                    <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-amber-400"></i> Tasks to complete:
+                <div class="bg-white shadow-sm p-5 rounded-2xl border border-slate-200 shadow-xl space-y-3 mb-4">
+                    <p class="text-slate-500 font-semibold uppercase tracking-wider text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-amber-700"></i> Tasks to complete:
                     </p>
-                    <div id="s13-task-1" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                    <div id="s13-task-1" class="flex items-center gap-2 text-sm text-slate-600 transition-colors">
                         <i class="fa-regular fa-circle text-slate-500"></i>
                         <span><strong>Adults:</strong> In <code>D2</code>, enter <code>=B2*C2</code></span>
                     </div>
-                    <div id="s13-task-2" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                    <div id="s13-task-2" class="flex items-center gap-2 text-sm text-slate-600 transition-colors">
                         <i class="fa-regular fa-circle text-slate-500"></i>
                         <span><strong>Children:</strong> In <code>D3</code>, enter <code>=B3*C3</code></span>
                     </div>
-                    <div id="s13-task-3" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                    <div id="s13-task-3" class="flex items-center gap-2 text-sm text-slate-600 transition-colors">
                         <i class="fa-regular fa-circle text-slate-500"></i>
                         <span><strong>VIP:</strong> In <code>D4</code>, enter <code>=B4*C4</code></span>
                     </div>
                 </div>
 
                 <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-3 text-xs text-indigo-300 flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i>
+                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-700"></i>
                     <span><strong>Pro Tip:</strong> After formulas are entered, use the <strong>+ / -</strong> buttons on quantities to watch the revenue auto-update live!</span>
                 </div>
             </div>
@@ -894,54 +955,54 @@
                 </div>
 
                 <!-- Total Revenue Banner -->
-                <div id="s13-total-banner" class="w-full max-w-sm bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 flex justify-between items-center mb-4">
-                    <span class="text-xs uppercase font-bold text-slate-400">Total Theme Park Revenue:</span>
-                    <span id="s13-grand-total" class="text-xl font-extrabold text-amber-400 font-mono">$0</span>
+                <div id="s13-total-banner" class="w-full max-w-sm bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-2.5 flex justify-between items-center mb-4">
+                    <span class="text-xs uppercase font-bold text-slate-500">Total Theme Park Revenue:</span>
+                    <span id="s13-grand-total" class="text-xl font-extrabold text-amber-700 font-mono">$0</span>
                 </div>
 
                 <!-- Success Message -->
                 <div id="s13-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500">
-                     <p class="text-emerald-400 font-bold text-base mb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-emerald-400"></i> Excellent! All ticket lines calculated!
+                     <p class="text-emerald-600 font-bold text-base mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> Excellent! All ticket lines calculated!
                      </p>
-                     <span class="text-xs text-slate-400">Try clicking the + and - steppers to see the live math in action.</span>
+                     <span class="text-xs text-slate-500">Try clicking the + and - steppers to see the live math in action.</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Slide 14: Practice 2 - RPG Battle Damage Calculator -->
-    <div class="slide-container" id="slide-14">
+<div class="slide-container" id="slide-14">
         <div class="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-3 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-sm font-semibold mb-3 tracking-wide">
                     PRACTICE 2: RPG BATTLE CALCULATOR
                 </div>
                 <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
-                    <i class="fa-solid fa-shield-halved text-cyan-400"></i> Hero Combat Formulas
+                    <i class="fa-solid fa-shield-halved text-cyan-700"></i> Hero Combat Formulas
                 </h2>
-                <p class="text-slate-300 mb-5 leading-relaxed text-base">
-                    Combine addition (<code class="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">+</code>) and subtraction (<code class="text-rose-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">-</code>) to calculate damage against the Dragon Boss!
+                <p class="text-slate-600 mb-5 leading-relaxed text-base">
+                    Combine addition (<code class="text-emerald-600 bg-white shadow-sm px-1.5 py-0.5 rounded font-bold">+</code>) and subtraction (<code class="text-rose-400 bg-white shadow-sm px-1.5 py-0.5 rounded font-bold">-</code>) to calculate damage against the Dragon Boss!
                 </p>
 
                 <!-- Formula Rule -->
-                <div class="bg-slate-800/90 p-4 rounded-xl border border-cyan-900/50 mb-4">
-                    <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Combat Formula Rule:</div>
+                <div class="bg-white shadow-sm p-4 rounded-xl border border-cyan-900/50 mb-4">
+                    <div class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Combat Formula Rule:</div>
                     <div class="text-base font-mono text-cyan-300 font-bold">
                         Final DMG = (Base ATK + Buff) - Boss DEF
                     </div>
                 </div>
 
-                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3 mb-4">
-                    <div id="s14-task-1" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                <div class="bg-white shadow-sm p-5 rounded-2xl border border-slate-200 shadow-xl space-y-3 mb-4">
+                    <div id="s14-task-1" class="flex items-center gap-2 text-sm text-slate-600 transition-colors">
                         <i class="fa-regular fa-circle text-slate-500"></i>
                         <span><strong>Knight:</strong> In <code>E2</code>, build <code>=B2+C2-D2</code></span>
                     </div>
-                    <div id="s14-task-2" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                    <div id="s14-task-2" class="flex items-center gap-2 text-sm text-slate-600 transition-colors">
                         <i class="fa-regular fa-circle text-slate-500"></i>
                         <span><strong>Mage:</strong> In <code>E3</code>, build <code>=B3+C3-D3</code></span>
                     </div>
-                    <div id="s14-task-3" class="flex items-center gap-2 text-sm text-slate-300 transition-colors">
+                    <div id="s14-task-3" class="flex items-center gap-2 text-sm text-slate-600 transition-colors">
                         <i class="fa-regular fa-circle text-slate-500"></i>
                         <span><strong>Archer:</strong> In <code>E4</code>, build <code>=B4+C4-D4</code></span>
                     </div>
@@ -950,12 +1011,12 @@
             
             <div class="flex-1 flex flex-col items-center justify-center w-full select-none">
                 <!-- Boss Status Bar -->
-                <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-xl p-3 mb-4 shadow-xl">
+                <div class="w-full max-w-md bg-slate-50 border border-slate-200 rounded-xl p-3 mb-4 shadow-xl">
                     <div class="flex justify-between items-center text-xs font-bold mb-1.5">
                         <span class="text-rose-400 flex items-center gap-1.5"><i class="fa-solid fa-dragon"></i> Dragon Boss HP</span>
                         <span id="s14-boss-hp" class="text-white font-mono">1000 / 1000</span>
                     </div>
-                    <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+                    <div class="w-full bg-white shadow-sm rounded-full h-3 overflow-hidden border border-slate-200">
                         <div id="s14-hp-bar" class="bg-gradient-to-r from-rose-500 to-amber-500 h-full w-full transition-all duration-700"></div>
                     </div>
                 </div>
@@ -967,8 +1028,8 @@
 
                 <!-- Success Message -->
                 <div id="s14-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500">
-                     <p class="text-cyan-400 font-bold text-base mb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-trophy text-yellow-400"></i> Critical Strike! Party damage evaluated!
+                     <p class="text-cyan-700 font-bold text-base mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-700"></i> Critical Strike! Party damage evaluated!
                      </p>
                 </div>
             </div>
@@ -976,24 +1037,24 @@
     </div>
 
     <!-- Slide 15: Practice 3 - Pizza Party Budget & Drag-to-Copy -->
-    <div class="slide-container" id="slide-15">
+<div class="slide-container" id="slide-15">
         <div class="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
             <div class="flex-1 text-left">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-sm font-semibold mb-3 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold mb-3 tracking-wide">
                     PRACTICE 3: PIZZA PARTY BUDGET
                 </div>
                 <h2 class="text-3xl font-bold mb-4 flex items-center gap-3">
-                    <i class="fa-solid fa-pizza-slice text-emerald-400"></i> Drag-to-Copy Master
+                    <i class="fa-solid fa-pizza-slice text-emerald-600"></i> Drag-to-Copy Master
                 </h2>
-                <p class="text-slate-300 mb-5 leading-relaxed text-base">
-                    You have 5 items for the class pizza party. Don't write 5 separate formulas! Cell <code>D2</code> already has <code class="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded font-bold">=B2*C2</code> ($90).
+                <p class="text-slate-600 mb-5 leading-relaxed text-base">
+                    You have 5 items for the class pizza party. Don't write 5 separate formulas! Cell <code>D2</code> already has <code class="text-emerald-600 bg-white shadow-sm px-1.5 py-0.5 rounded font-bold">=B2*C2</code> ($90).
                 </p>
 
-                <div class="bg-slate-800/90 p-5 rounded-2xl border border-emerald-900/50 shadow-xl space-y-3 mb-5">
-                    <p class="text-slate-400 font-semibold uppercase tracking-wider text-xs flex items-center gap-2">
-                        <i class="fa-solid fa-hand-pointer text-emerald-400"></i> How to Drag & Fill:
+                <div class="bg-white shadow-sm p-5 rounded-2xl border border-emerald-900/50 shadow-xl space-y-3 mb-5">
+                    <p class="text-slate-500 font-semibold uppercase tracking-wider text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-hand-pointer text-emerald-600"></i> How to Drag & Fill:
                     </p>
-                    <ol class="list-decimal list-inside text-sm text-slate-300 space-y-2">
+                    <ol class="list-decimal list-inside text-sm text-slate-600 space-y-2">
                         <li>Locate the tiny green square (<strong>Fill Handle</strong>) at the bottom-right of cell <strong>D2</strong>.</li>
                         <li>Click and hold, then <strong>drag straight down</strong> across rows 3, 4, 5, and 6.</li>
                         <li>Release to auto-fill the calculations for all 5 party items instantly!</li>
@@ -1008,15 +1069,15 @@
                 </div>
 
                 <!-- Grand Total Banner -->
-                <div class="w-full max-w-sm bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2 flex justify-between items-center mb-4">
-                    <span class="text-xs uppercase font-bold text-slate-400">Party Budget Grand Total:</span>
-                    <span id="s15-grand-total" class="text-lg font-extrabold text-emerald-400 font-mono">$90.00</span>
+                <div class="w-full max-w-sm bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-2 flex justify-between items-center mb-4">
+                    <span class="text-xs uppercase font-bold text-slate-500">Party Budget Grand Total:</span>
+                    <span id="s15-grand-total" class="text-lg font-extrabold text-emerald-600 font-mono">$90.00</span>
                 </div>
 
                 <!-- Success Message & Sandbox Launcher -->
                 <div id="s15-success" class="hidden flex-col items-center animate-fade-in transition-all duration-500">
-                     <p class="text-emerald-400 font-bold text-base mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Superb! Party budget completely solved with 1 drag!
+                     <p class="text-emerald-600 font-bold text-base mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-700"></i> Superb! Party budget completely solved with 1 drag!
                      </p>
                 </div>
             </div>
@@ -1024,37 +1085,37 @@
     </div>
 
     <!-- Slide 16: Practice 4 - 10x10 Strategic Range Minefield Game -->
-    <div class="slide-container" id="slide-16">
+<div class="slide-container" id="slide-16">
         <div class="flex flex-col lg:flex-row items-center gap-7 max-w-7xl w-full px-2">
             <!-- Left Panel: Game Rules & Controls -->
             <div class="flex-1 text-left max-w-lg">
-                <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-cyan-400 text-sm font-semibold mb-2 tracking-wide">
+                <div class="inline-block px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-sm font-semibold mb-2 tracking-wide">
                     PRACTICE 4: 10×10 STRATEGIC RANGE MINING
                 </div>
                 <h2 class="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-gem text-cyan-400"></i> Find Gold, Dodge Traps!
+                    <i class="fa-solid fa-gem text-cyan-700"></i> Find Gold, Dodge Traps!
                 </h2>
                 
                 <!-- Game Rules Bar -->
                 <div class="grid grid-cols-4 gap-1.5 mb-3">
-                    <div id="s16-rule-r1" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
-                        <div class="text-slate-400 font-bold">Range 1</div>
-                        <div id="s16-r1-count" class="text-emerald-400 font-bold font-mono">4 cells ✅</div>
+                    <div id="s16-rule-r1" class="bg-white shadow-sm border border-slate-200 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-500 font-bold">Range 1</div>
+                        <div id="s16-r1-count" class="text-emerald-600 font-bold font-mono">4 cells ✅</div>
                         <div class="text-[10px] text-slate-500">Min 4 cells</div>
                     </div>
-                    <div id="s16-rule-r2" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
-                        <div class="text-slate-400 font-bold">Range 2</div>
-                        <div id="s16-r2-count" class="text-cyan-400 font-bold font-mono">4 cells ✅</div>
+                    <div id="s16-rule-r2" class="bg-white shadow-sm border border-slate-200 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-500 font-bold">Range 2</div>
+                        <div id="s16-r2-count" class="text-cyan-700 font-bold font-mono">4 cells ✅</div>
                         <div class="text-[10px] text-slate-500">Min 4 cells</div>
                     </div>
-                    <div id="s16-rule-total" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
-                        <div class="text-slate-400 font-bold">Combined</div>
-                        <div id="s16-tot-count" class="text-cyan-400 font-bold font-mono">8 / 20 ✅</div>
+                    <div id="s16-rule-total" class="bg-white shadow-sm border border-slate-200 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-500 font-bold">Combined</div>
+                        <div id="s16-tot-count" class="text-cyan-700 font-bold font-mono">8 / 20 ✅</div>
                         <div class="text-[10px] text-slate-500">Max 20 cells</div>
                     </div>
-                    <div id="s16-rule-overlap" class="bg-slate-800/90 border border-slate-700 rounded-lg p-2 text-center text-[11px]">
-                        <div class="text-slate-400 font-bold">No Overlap</div>
-                        <div id="s16-overlap-status" class="text-emerald-400 font-bold font-mono">None ✅</div>
+                    <div id="s16-rule-overlap" class="bg-white shadow-sm border border-slate-200 rounded-lg p-2 text-center text-[11px]">
+                        <div class="text-slate-500 font-bold">No Overlap</div>
+                        <div id="s16-overlap-status" class="text-emerald-600 font-bold font-mono">None ✅</div>
                         <div class="text-[10px] text-slate-500">1 use / cell</div>
                     </div>
                 </div>
@@ -1062,38 +1123,38 @@
                 <!-- Dual Range Input Cards (Typing Only) -->
                 <div class="space-y-2.5 mb-3">
                     <!-- Range 1 -->
-                    <div class="bg-slate-800/90 p-3 rounded-xl border border-emerald-500/40 shadow-lg">
+                    <div class="bg-white shadow-sm p-3 rounded-xl border border-emerald-500/40 shadow-lg">
                         <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-xs font-bold uppercase text-emerald-400 flex items-center gap-1.5">
+                            <span class="text-xs font-bold uppercase text-emerald-600 flex items-center gap-1.5">
                                 <i class="fa-solid fa-keyboard"></i> 1. Type Range 1
                             </span>
                             <span id="s16-score-sum" class="text-xs font-bold font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">-60 pts (4 cells)</span>
                         </div>
-                        <input type="text" id="s16-input-pos" value="A1:B2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center tracking-wider" placeholder="e.g. A1:B2">
+                        <input type="text" id="s16-input-pos" value="A1:B2" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-mono text-emerald-600 font-bold focus:outline-none focus:border-emerald-400 uppercase text-center tracking-wider" placeholder="e.g. A1:B2">
                     </div>
 
                     <!-- Range 2 -->
-                    <div class="bg-slate-800/90 p-3 rounded-xl border border-cyan-500/40 shadow-lg">
+                    <div class="bg-white shadow-sm p-3 rounded-xl border border-cyan-500/40 shadow-lg">
                         <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-xs font-bold uppercase text-cyan-400 flex items-center gap-1.5">
+                            <span class="text-xs font-bold uppercase text-cyan-700 flex items-center gap-1.5">
                                 <i class="fa-solid fa-keyboard"></i> 2. Type Range 2
                             </span>
                             <span id="s16-deduct-sum" class="text-xs font-bold font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">-40 pts (4 cells)</span>
                         </div>
-                        <input type="text" id="s16-input-neg" value="I9:J10" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono text-cyan-400 font-bold focus:outline-none focus:border-cyan-400 uppercase text-center tracking-wider" placeholder="e.g. I9:J10">
+                        <input type="text" id="s16-input-neg" value="I9:J10" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-mono text-cyan-700 font-bold focus:outline-none focus:border-cyan-400 uppercase text-center tracking-wider" placeholder="e.g. I9:J10">
                     </div>
                 </div>
 
                 <!-- Live Formula Math Output -->
-                <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-3 flex justify-between items-center shadow-md mb-3">
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center shadow-md mb-3">
                     <div>
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Net Score Formula:</div>
+                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-0.5">Net Score Formula:</div>
                         <div id="s16-formula-preview" class="text-xs font-mono text-cyan-300 font-bold">=(SUM(A1:B2) + SUM(I9:J10)) / 100</div>
                         <div id="s16-rule-warning" class="text-[11px] text-rose-400 font-bold mt-0.5 hidden">⚠️ Rule violated!</div>
                     </div>
                     <div class="text-right">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Net Score:</div>
-                        <div id="s16-net-score" class="text-2xl font-extrabold text-amber-400 font-mono">-1.0</div>
+                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-0.5">Net Score:</div>
+                        <div id="s16-net-score" class="text-2xl font-extrabold text-amber-700 font-mono">-1.0</div>
                     </div>
                 </div>
 
@@ -1112,16 +1173,619 @@
                 </div>
                 
                 <!-- Success / Strategy Status -->
-                <div id="s16-status-banner" class="mt-2.5 text-emerald-400 font-bold text-xs flex items-center gap-2 animate-fade-in">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> Type ranges in boxes above to highlight and calculate score!
+                <div id="s16-status-banner" class="mt-2.5 text-emerald-600 font-bold text-xs flex items-center gap-2 animate-fade-in">
+                    <i class="fa-solid fa-trophy text-amber-700"></i> Type ranges in boxes above to highlight and calculate score!
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Slide 17: Excel Visual Learning Lab -->
+    <div class="slide-container" id="slide-17">
+        <div class="max-w-7xl w-full mx-auto px-2 sm:px-4 py-1 flex flex-col gap-3 overflow-y-auto max-h-[86vh] custom-scrollbar">
+<header class="bg-emerald-800 text-white shadow-md border-b border-emerald-900 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center font-black text-xl text-white shadow-inner">
+          X
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight flex items-center gap-2">
+            Excel Visual Learning Lab
+            <span class="text-[10px] bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 px-2 py-0.5 rounded-full font-medium">Interactive Guide</span>
+          </h1>
+          <p class="text-xs text-emerald-100/80">Interactive mental models for formulas, coordinate locking & lab data analysis</p>
+        </div>
+      </div>
+
+      <!-- Navigation Page Tabs -->
+      <nav class="flex items-center p-1 bg-emerald-900/70 border border-emerald-700/60 rounded-xl space-x-1 text-xs font-semibold">
+        <button id="nav-tab-refs" data-page="page-refs" class="nav-page-btn px-3 py-1.5 rounded-lg transition bg-white text-emerald-900 shadow-sm flex items-center gap-1.5">
+          <span>🔒</span> Cell References ($)
+        </button>
+        <button id="nav-tab-math" data-page="page-math" class="nav-page-btn px-3 py-1.5 rounded-lg transition text-emerald-100 hover:text-white hover:bg-emerald-800/80 flex items-center gap-1.5">
+          <span>∑</span> Quick Math & Totals
+        </button>
+        <button id="nav-tab-stats" data-page="page-stats" class="nav-page-btn px-3 py-1.5 rounded-lg transition text-emerald-100 hover:text-white hover:bg-emerald-800/80 flex items-center gap-1.5">
+          <span>📈</span> Statistics & Lab Data
+        </button>
+      </nav>
+    </div>
+  </header>
+            <div class="flex-1 flex flex-col gap-5 pb-6">
+<!-- ================================================================= -->
+    <!-- PAGE 1: CELL REFERENCES ($) VISUALIZER                            -->
+    <!-- ================================================================= -->
+    <div id="page-refs" class="page-content flex flex-col gap-5">
+      <!-- Reference Controls Section -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+          
+          <!-- Reference Mode Selector -->
+          <div class="lg:col-span-7 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Reference Anchor Mode (Cycle with <kbd class="px-1 bg-slate-100 border border-slate-300 rounded text-slate-700 font-mono">F4</kbd>)
+              </label>
+              <div class="flex gap-1.5 text-[11px]">
+                <button id="preset-tax" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Tax ($B$1)</button>
+                <button id="preset-running" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Relative (A1)</button>
+                <button id="preset-mult-table" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-emerald-700 border border-slate-200 font-medium">Mixed (B$1)</button>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button data-mode="relative" class="ref-mode-btn p-2.5 rounded-lg border-2 text-left transition flex flex-col border-emerald-600 bg-emerald-50 text-emerald-950 font-medium">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-mono-code font-bold text-sm">B1</span>
+                  <span class="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">Relative</span>
+                </div>
+                <span class="text-xs text-slate-600 leading-tight">No locks. Drifts freely in all directions.</span>
+              </button>
+
+              <button data-mode="absolute" class="ref-mode-btn p-2.5 rounded-lg border-2 text-left transition flex flex-col border-slate-200 hover:border-slate-300 text-slate-700">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-mono-code font-bold text-sm text-blue-600">$B$1</span>
+                  <span class="text-[10px] uppercase font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">Absolute</span>
+                </div>
+                <span class="text-xs text-slate-500 leading-tight">Both Col & Row locked in place.</span>
+              </button>
+
+              <button data-mode="mixed-col" class="ref-mode-btn p-2.5 rounded-lg border-2 text-left transition flex flex-col border-slate-200 hover:border-slate-300 text-slate-700">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-mono-code font-bold text-sm text-amber-600">$B1</span>
+                  <span class="text-[10px] uppercase font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Mixed Col</span>
+                </div>
+                <span class="text-xs text-slate-500 leading-tight">Column B locked. Row moves freely.</span>
+              </button>
+
+              <button data-mode="mixed-row" class="ref-mode-btn p-2.5 rounded-lg border-2 text-left transition flex flex-col border-slate-200 hover:border-slate-300 text-slate-700">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-mono-code font-bold text-sm text-purple-600">B$1</span>
+                  <span class="text-[10px] uppercase font-bold text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">Mixed Row</span>
+                </div>
+                <span class="text-xs text-slate-500 leading-tight">Row 1 locked. Column moves freely.</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Formula Bar Simulation -->
+          <div class="lg:col-span-5 bg-slate-50 rounded-lg p-3.5 border border-slate-200 flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs text-slate-500 font-semibold">
+              <span>FORMULA BAR</span>
+              <span id="active-cell-indicator" class="font-mono-code text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">Active Cell: C2</span>
+            </div>
+            <div class="flex items-center bg-white border border-slate-300 rounded-md px-3 py-2 shadow-inner">
+              <span class="font-mono-code italic text-slate-400 font-bold mr-2 text-sm">fx</span>
+              <div id="formula-bar-display" class="font-mono-code text-sm font-semibold tracking-wide flex items-center gap-1 overflow-x-auto">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-500 flex items-center gap-2">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <span id="source-cell-tag">Target: <strong>B1</strong></span>
+              <span class="text-slate-300">|</span>
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span>Active Formula Cell</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        
+        <!-- Interactive Grid Workspace -->
+        <section class="lg:col-span-8 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col gap-4 overflow-hidden relative">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <span>Interactive Spreadsheet</span>
+                <span class="text-xs font-normal text-slate-500 hidden sm:inline">(Click cell to move or drag the bottom-right green fill handle)</span>
+              </h2>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <button id="copy-down-btn" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 font-medium text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                Fill Down (↓)
+              </button>
+              <button id="copy-right-btn" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 font-medium text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                Fill Right (→)
+              </button>
+              <button id="reset-grid-btn" class="px-2 py-1.5 rounded-md text-slate-500 hover:text-slate-800 transition">
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Spreadsheet Container with SVG Overlay -->
+          <div class="relative overflow-x-auto select-none rounded-lg border border-slate-300 bg-slate-200/60 p-0.5" id="grid-container">
+            <svg id="arrow-svg" class="absolute inset-0 w-full h-full pointer-events-none z-20">
+              <defs>
+                <marker id="arrowhead-blue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <polygon points="0 0, 8 4, 0 8" fill="#2563eb" />
+                </marker>
+                <marker id="arrowhead-red" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <polygon points="0 0, 8 4, 0 8" fill="#dc2626" />
+                </marker>
+                <filter id="glow-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.2"/>
+                </filter>
+              </defs>
+              <path id="connector-line" d="" fill="none" stroke="#2563eb" stroke-width="3" class="anim-dash" filter="url(#glow-shadow)"/>
+              <g id="vector-badge" class="transition-all duration-200">
+                <rect id="badge-bg" rx="6" ry="6" fill="#1e293b" x="0" y="0" width="120" height="24" filter="url(#glow-shadow)"/>
+                <text id="badge-text" x="0" y="0" fill="#ffffff" font-size="11" font-family="'JetBrains Mono', monospace" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+                  Offset: (0, 0)
+                </text>
+              </g>
+            </svg>
+
+            <!-- Table Structure -->
+            <table class="w-full border-collapse bg-white text-xs sm:text-sm font-sans" id="spreadsheet-table">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 font-semibold border-b border-slate-300 text-center">
+                  <th class="w-10 sm:w-12 py-2 px-1 border-r border-slate-300 bg-slate-200 text-slate-600 font-mono-code text-[11px]"></th>
+                  <th data-col="A" class="col-header py-2 px-3 border-r border-slate-300 relative transition">
+                    <span class="col-lock-badge hidden absolute top-0.5 right-1 text-[9px] text-amber-600 font-bold">🔒</span>
+                    A
+                  </th>
+                  <th data-col="B" class="col-header py-2 px-3 border-r border-slate-300 relative transition">
+                    <span class="col-lock-badge hidden absolute top-0.5 right-1 text-[9px] text-amber-600 font-bold">🔒</span>
+                    B
+                  </th>
+                  <th data-col="C" class="col-header py-2 px-3 border-r border-slate-300 relative transition">
+                    <span class="col-lock-badge hidden absolute top-0.5 right-1 text-[9px] text-amber-600 font-bold">🔒</span>
+                    C
+                  </th>
+                  <th data-col="D" class="col-header py-2 px-3 border-r border-slate-300 relative transition">
+                    <span class="col-lock-badge hidden absolute top-0.5 right-1 text-[9px] text-amber-600 font-bold">🔒</span>
+                    D
+                  </th>
+                  <th data-col="E" class="col-header py-2 px-3 border-r border-slate-300 relative transition">
+                    <span class="col-lock-badge hidden absolute top-0.5 right-1 text-[9px] text-amber-600 font-bold">🔒</span>
+                    E
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="table-body">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Legend -->
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+            <div class="flex items-center gap-4 flex-wrap">
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded bg-blue-100 border border-blue-500"></span>
+                Referenced Target Cell
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded bg-emerald-100 border-2 border-emerald-600"></span>
+                Active Formula Cell
+              </span>
+            </div>
+            <span class="text-slate-500 font-medium">💡 Drag the green corner handle to inspect copied offset behavior</span>
+          </div>
+        </section>
+
+        <!-- Right Side: Deep Explanation & Coordinate Inspector -->
+        <section class="lg:col-span-4 flex flex-col gap-4">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <span class="text-emerald-600 text-lg font-black">⚙️</span>
+                Reference Inspector
+              </h3>
+              <span id="badge-lock-summary" class="text-xs px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600">
+                Unlocked
+              </span>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+                <div class="flex justify-between items-center text-slate-500">
+                  <span>Formula in cell <strong id="insp-formula-cell" class="text-emerald-700">C2</strong>:</span>
+                  <span id="insp-raw-formula" class="font-mono-code font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">=B1</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-500">
+                  <span>Resolves to Target:</span>
+                  <strong id="insp-resolved-cell" class="font-mono-code text-blue-600 font-bold bg-white px-2 py-0.5 rounded border border-slate-200">B1</strong>
+                </div>
+                <div class="flex justify-between items-center text-slate-500">
+                  <span>Value Retrieved:</span>
+                  <strong id="insp-cell-value" class="font-mono-code text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">100</strong>
+                </div>
+              </div>
+
+              <div class="border border-blue-100 bg-blue-50/70 rounded-lg p-3 space-y-1.5">
+                <div class="font-bold text-blue-900 text-xs flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                  The "Mental Model" Direction Vector:
+                </div>
+                <p id="insp-vector-desc" class="text-slate-700 leading-relaxed font-medium">
+                  "Look <strong>1 column left</strong> and <strong>1 row up</strong>."
+                </p>
+                <p id="insp-behavior-desc" class="text-slate-500 text-[11px] leading-relaxed pt-1 border-t border-blue-200/60">
+                  If you copy this formula to another cell, the reference adjusts to maintain the same relative distance.
+                </p>
+              </div>
+
+              <div class="space-y-2 pt-1">
+                <span class="font-bold text-slate-700 text-xs block">Coordinate Locks Breakdown:</span>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <div id="col-status-box" class="p-2 rounded bg-slate-50 border border-slate-200 flex flex-col gap-0.5">
+                    <span class="text-slate-500 font-medium">Column Axis (X)</span>
+                    <span id="col-status-text" class="font-bold text-slate-700">Relative (Moves)</span>
+                  </div>
+                  <div id="row-status-box" class="p-2 rounded bg-slate-50 border border-slate-200 flex flex-col gap-0.5">
+                    <span class="text-slate-500 font-medium">Row Axis (Y)</span>
+                    <span id="row-status-text" class="font-bold text-slate-700">Relative (Moves)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl shadow-sm p-4 text-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-400 uppercase tracking-wide text-[11px]">Quick Memory Trick</span>
+              <span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px] font-mono">F4 key</span>
+            </div>
+            <p class="text-slate-300 leading-relaxed">
+              The <strong class="text-amber-400 font-mono">$</strong> acts like a physical clamp:
+            </p>
+            <div class="space-y-1.5 font-mono text-[11px]">
+              <div class="flex items-center justify-between bg-slate-800/80 p-1.5 rounded border border-slate-700">
+                <span class="text-emerald-300 font-bold">A1</span>
+                <span class="text-slate-400">Everything slips & slides</span>
+              </div>
+              <div class="flex items-center justify-between bg-slate-800/80 p-1.5 rounded border border-slate-700">
+                <span class="text-blue-300 font-bold">$A$1</span>
+                <span class="text-slate-400">Pinned to the wall with 2 nails</span>
+              </div>
+              <div class="flex items-center justify-between bg-slate-800/80 p-1.5 rounded border border-slate-700">
+                <span class="text-amber-300 font-bold">$A1</span>
+                <span class="text-slate-400">Column stuck; slides vertically</span>
+              </div>
+              <div class="flex items-center justify-between bg-slate-800/80 p-1.5 rounded border border-slate-700">
+                <span class="text-purple-300 font-bold">A$1</span>
+                <span class="text-slate-400">Row stuck; slides horizontally</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- PAGE 2: QUICK MATH, TOTALS & ROUNDING                             -->
+    <!-- ================================================================= -->
+    <div id="page-math" class="page-content hidden flex-col gap-5">
+      <!-- Function Cards Header Bar -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <span>Quick Math & Lab Totals</span>
+              <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">SUM, AVERAGE, ROUND</span>
+            </h2>
+            <p class="text-xs text-slate-500">Calculate totals, mean lab values, and control scientific precision.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-500 font-medium">Select Function:</span>
+            <div class="flex rounded-lg bg-slate-100 p-1 border border-slate-200 gap-1 text-xs">
+              <button id="math-mode-sum" class="math-tool-btn px-3 py-1 rounded-md font-bold transition bg-emerald-600 text-white shadow-sm">SUM</button>
+              <button id="math-mode-avg" class="math-tool-btn px-3 py-1 rounded-md font-medium transition text-slate-600 hover:text-slate-900">AVERAGE</button>
+              <button id="math-mode-round" class="math-tool-btn px-3 py-1 rounded-md font-medium transition text-slate-600 hover:text-slate-900">ROUND</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Function Explainer Callout -->
+        <div id="math-explainer-banner" class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-950 flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">➕</span>
+            <div>
+              <strong class="font-mono-code text-emerald-900 text-sm">=SUM(range)</strong>
+              <span class="text-slate-600 ml-1">— Adds all numerical values in the selected bounding box together.</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-emerald-800 font-mono bg-white/70 px-2 py-1 rounded border border-emerald-300">
+            Example: <code class="font-bold">=SUM(B2:B8)</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Lab Experiment Workspace -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <!-- Interactive Table on the left -->
+        <div class="lg:col-span-7 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                🧪 Chemistry Lab: Reaction Volume Titration Data
+              </h3>
+              <p class="text-xs text-slate-500">Click & drag or click checkboxes to customize the calculated range</p>
+            </div>
+            <div class="flex gap-2 text-xs">
+              <button id="math-select-all" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Select All (B2:B8)</button>
+              <button id="math-select-first4" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">First 4 Trials (B2:B5)</button>
+            </div>
+          </div>
+
+          <!-- Formula Bar for Math -->
+          <div class="flex items-center bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs shadow-inner">
+            <span class="font-mono-code italic text-slate-400 font-bold mr-2 text-sm">fx</span>
+            <div id="math-formula-display" class="font-mono-code font-bold text-emerald-700 text-sm">
+              =SUM(B2:B8)
+            </div>
+          </div>
+
+          <!-- The Lab Table -->
+          <div class="overflow-x-auto rounded-lg border border-slate-300">
+            <table class="w-full text-xs font-sans text-left border-collapse" id="lab-math-table">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-300 text-center">
+                  <th class="w-10 py-2 border-r border-slate-300 bg-slate-200 font-mono-code"></th>
+                  <th class="py-2 px-3 border-r border-slate-300 text-left">A (Trial ID)</th>
+                  <th class="py-2 px-3 border-r border-slate-300 text-right">B (Volume mL)</th>
+                  <th class="py-2 px-3 text-center">Include in Range</th>
+                </tr>
+              </thead>
+              <tbody id="lab-math-tbody">
+                <!-- Filled via JS with 7 trials -->
+              </tbody>
+              <tfoot>
+                <tr class="bg-emerald-50/80 font-bold text-emerald-950 border-t-2 border-emerald-600">
+                  <td class="py-2.5 text-center font-mono-code bg-emerald-100 border-r border-emerald-300">9</td>
+                  <td class="py-2.5 px-3 border-r border-emerald-200 text-emerald-900" id="math-output-label">RESULT (=SUM)</td>
+                  <td class="py-2.5 px-3 border-r border-emerald-200 text-right font-mono-code text-sm text-emerald-900" id="math-output-value">176.45</td>
+                  <td class="py-2.5 px-3 text-center text-xs text-emerald-700">Calculated in Cell B9</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Math Visual Step-by-Step Inspector & ROUND slider -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+          <!-- Live Breakdown Inspector -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <span class="text-blue-600 text-base">🔍</span>
+                Visual Breakdown & Calculation
+              </h4>
+              <span id="math-item-count" class="text-[11px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">7 values</span>
+            </div>
+
+            <!-- Mathematical breakdown step view -->
+            <div id="math-steps-container" class="space-y-2 text-xs">
+              <!-- Dynamically populated calculation steps -->
+            </div>
+
+            <!-- Interactive Rounding Precision Controller (Shown for all or focused on ROUND) -->
+            <div class="mt-2 pt-3 border-t border-slate-200 flex flex-col gap-2 bg-slate-50 p-3 rounded-lg">
+              <div class="flex items-center justify-between">
+                <label for="round-slider" class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                  <span>🎯</span>
+                  <span>ROUND Decimal Precision: <code class="font-mono text-emerald-700 font-bold" id="round-slider-label">num_digits = 2</code></span>
+                </label>
+              </div>
+              <input type="range" id="round-slider" min="0" max="4" value="2" class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                <span>0 (Integer)</span>
+                <span>1 (0.1)</span>
+                <span>2 (0.01)</span>
+                <span>3 (0.001)</span>
+                <span>4 (0.0001)</span>
+              </div>
+              <div class="text-[11px] text-slate-600 bg-white p-2 rounded border border-slate-200 font-mono-code" id="round-demo-box">
+                =ROUND(176.4528, 2) ➔ <strong class="text-emerald-700 text-sm">176.45</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formula Best Practices Lab Card -->
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl shadow-sm p-4 text-xs space-y-2.5">
+            <span class="font-bold text-amber-400 uppercase tracking-wide text-[11px]">Lab Pro-Tip</span>
+            <p class="text-slate-300 leading-relaxed">
+              Never write <code class="text-amber-300 font-mono">=B2+B3+B4+B5...</code>!
+            </p>
+            <ul class="space-y-1 text-slate-300 list-disc list-inside">
+              <li><code class="text-emerald-400 font-mono">=SUM(B2:B8)</code> automatically skips text labels and doesn't break if you insert new trial rows later.</li>
+              <li>Combine them: <code class="text-emerald-400 font-mono">=ROUND(AVERAGE(B2:B8), 2)</code> calculates the mean and immediately clamps to lab significant figures!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- PAGE 3: STATISTICS & DATA ANALYSIS                                -->
+    <!-- ================================================================= -->
+    <div id="page-stats" class="page-content hidden flex-col gap-5">
+      <!-- Statistics Header Card -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <span>📈 Statistics & Data Analysis</span>
+              <span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-semibold">COUNT vs COUNTA, MAX, MIN, MEDIAN</span>
+            </h2>
+            <p class="text-xs text-slate-500">Perfect for survey analysis, lab sample distributions, and tracking outliers.</p>
+          </div>
+          <!-- Quick Stat Filters -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button data-stat="COUNT" class="stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-bold transition border border-slate-200 bg-emerald-600 text-white shadow-sm">COUNT</button>
+            <button data-stat="COUNTA" class="stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">COUNTA</button>
+            <button data-stat="MAX" class="stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">MAX</button>
+            <button data-stat="MIN" class="stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">MIN</button>
+            <button data-stat="MEDIAN" class="stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">MEDIAN</button>
+          </div>
+        </div>
+
+        <!-- Highlight Explanation Bar -->
+        <div id="stat-explainer-banner" class="p-3 bg-purple-50 border border-purple-200 rounded-lg text-xs text-purple-950 flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg" id="stat-banner-icon">🔢</span>
+            <div>
+              <strong class="font-mono-code text-purple-900 text-sm" id="stat-banner-title">=COUNT(range)</strong>
+              <span class="text-slate-600 ml-1" id="stat-banner-desc">— Counts cells that contain NUMBERS ONLY. Completely ignores text and blank cells.</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-purple-900 font-mono bg-white/70 px-2 py-1 rounded border border-purple-300" id="stat-banner-example">
+            Counted: 6 numeric cells
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Statistics Grid & Comparator -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        
+        <!-- Science Survey / Test Score Dataset -->
+        <div class="lg:col-span-7 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                <span>📋 Biology Field Survey & Specimen Counts</span>
+              </h3>
+              <p class="text-xs text-slate-500">Notice cells with numbers, missing logs (blanks), and text notes like "Damaged"</p>
+            </div>
+            <button id="stats-reset-btn" class="text-xs px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+              Reset Values
+            </button>
+          </div>
+
+          <div class="overflow-x-auto rounded-lg border border-slate-300">
+            <table class="w-full text-xs font-sans text-left border-collapse" id="stats-table">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-300 text-center">
+                  <th class="w-10 py-2 border-r border-slate-300 bg-slate-200 font-mono-code"></th>
+                  <th class="py-2 px-3 border-r border-slate-300 text-left">A (Sample Spot)</th>
+                  <th class="py-2 px-3 border-r border-slate-300 text-center">B (Specimen Count)</th>
+                  <th class="py-2 px-3 text-left">Cell Type & Status</th>
+                </tr>
+              </thead>
+              <tbody id="stats-tbody">
+                <!-- Dynamically generated with 8 rows of realistic mixed survey data -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Highlight Legend for the active stat -->
+          <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600">
+            <div class="flex items-center gap-3 flex-wrap" id="stat-legend-indicators">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-600 inline-block"></span> Counted Cell</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Ignored Cell</span>
+            </div>
+            <span class="text-slate-400 font-medium">Range: B2:B9</span>
+          </div>
+        </div>
+
+        <!-- Right Side: Deep Statistical Comparison & Visual Median Sorter -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+          
+          <!-- Key Metrics Dashboard Card -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">All Statistical Metrics (Range B2:B9)</h4>
+              <span class="text-[10px] text-slate-400 font-mono">Live Computed</span>
+            </div>
+
+            <!-- Quick Metrics Grid -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div id="card-stat-count" class="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex flex-col transition">
+                <span class="text-slate-500 font-medium text-[11px]">=COUNT</span>
+                <span class="text-lg font-black text-slate-900 font-mono-code" id="val-count">6</span>
+                <span class="text-[10px] text-slate-400">Numbers only</span>
+              </div>
+
+              <div id="card-stat-counta" class="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex flex-col transition">
+                <span class="text-slate-500 font-medium text-[11px]">=COUNTA</span>
+                <span class="text-lg font-black text-slate-900 font-mono-code" id="val-counta">7</span>
+                <span class="text-[10px] text-slate-400">All non-blank</span>
+              </div>
+
+              <div id="card-stat-max" class="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex flex-col transition">
+                <span class="text-slate-500 font-medium text-[11px]">=MAX</span>
+                <span class="text-lg font-black text-amber-600 font-mono-code" id="val-max">84</span>
+                <span class="text-[10px] text-slate-400">Highest peak</span>
+              </div>
+
+              <div id="card-stat-min" class="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex flex-col transition">
+                <span class="text-slate-500 font-medium text-[11px]">=MIN</span>
+                <span class="text-lg font-black text-blue-600 font-mono-code" id="val-min">12</span>
+                <span class="text-[10px] text-slate-400">Lowest trough</span>
+              </div>
+
+              <div id="card-stat-median" class="col-span-2 p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex justify-between items-center transition">
+                <div>
+                  <span class="text-slate-500 font-medium text-[11px] block">=MEDIAN</span>
+                  <span class="text-[10px] text-slate-400">Exact middle value when sorted</span>
+                </div>
+                <span class="text-xl font-black text-purple-700 font-mono-code" id="val-median">38.5</span>
+              </div>
+            </div>
+
+            <!-- Deep Dive Interactive Box for Median or COUNT vs COUNTA -->
+            <div id="stat-deepdive-box" class="mt-2 p-3 bg-purple-50/70 border border-purple-200 rounded-lg text-xs space-y-2">
+              <!-- Dynamically populated based on active pill -->
+            </div>
+          </div>
+
+          <!-- Crucial Difference Cheat Sheet Card -->
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl shadow-sm p-4 text-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-400 uppercase tracking-wide text-[11px]">The Golden Rule</span>
+              <span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px] font-mono">COUNT vs COUNTA</span>
+            </div>
+            <div class="space-y-2 text-slate-300 leading-relaxed">
+              <p>
+                <strong class="text-emerald-300 font-mono">COUNT</strong> ignores text. If a student wrote <em>"N/A"</em>, <em>"Absent"</em>, or <em>"Lost"</em>, COUNT skips it entirely!
+              </p>
+              <p>
+                <strong class="text-purple-300 font-mono">COUNTA</strong> stands for <em>"Count All"</em>. It counts any cell that is not completely blank (numbers, words, symbols, errors).
+              </p>
+              <div class="p-2 rounded bg-slate-800/80 border border-slate-700 font-mono text-[11px] text-amber-200">
+                Formula: =COUNTA(range) - COUNT(range)<br>
+                ➔ Returns exact count of text-only notes!
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
             const slides = document.querySelectorAll('.slide-container');
             const totalSlides = slides.length;
             let currentSlideIndex = 0;
@@ -1852,6 +2516,1030 @@
             };
 
 
+            
+        
+        // ==========================================
+        // --- Slide 17 Logic (Excel Visual Learning Lab) ---
+        // ==========================================
+
+    /* =========================================================================
+       PAGE 1: CELL REFERENCES STATE & LOGIC
+       ========================================================================= */
+    const refState = {
+      formulaCell: { col: 'C', row: 2 },
+      mode: 'relative',
+      initialFormulaCell: { col: 'C', row: 2 },
+      initialTargetCell: { col: 'B', row: 1 },
+      gridData: {
+        'A1': 'Item', 'B1': '100', 'C1': 'Price', 'D1': 'Tax', 'E1': 'Total',
+        'A2': 'Apples', 'B2': '10', 'C2': '', 'D2': '', 'E2': '',
+        'A3': 'Bananas', 'B3': '15', 'C3': '', 'D3': '', 'E3': '',
+        'A4': 'Cherries', 'B4': '25', 'C4': '', 'D4': '', 'E4': '',
+        'A5': 'Dates', 'B5': '40', 'C5': '', 'D5': ''
+      },
+      copiedCells: new Set()
+    };
+
+    const COLS = ['A', 'B', 'C', 'D', 'E'];
+    const ROWS = [1, 2, 3, 4, 5];
+
+    function colToIndex(c) { return COLS.indexOf(c); }
+    function indexToCol(idx) { return COLS[Math.max(0, Math.min(COLS.length - 1, idx))]; }
+
+    function resolveSourceCell(formulaCol, formulaRow, mode) {
+      const origFormColIdx = colToIndex(refState.initialFormulaCell.col);
+      const origFormRow = refState.initialFormulaCell.row;
+
+      const origTargetColIdx = colToIndex(refState.initialTargetCell.col);
+      const origTargetRow = refState.initialTargetCell.row;
+
+      const deltaCol = origTargetColIdx - origFormColIdx;
+      const deltaRow = origTargetRow - origFormRow;
+
+      const curFormColIdx = colToIndex(formulaCol);
+      const curFormRow = formulaRow;
+
+      let resolvedColIdx;
+      let resolvedRow;
+
+      switch (mode) {
+        case 'relative':
+          resolvedColIdx = curFormColIdx + deltaCol;
+          resolvedRow = curFormRow + deltaRow;
+          break;
+        case 'absolute':
+          resolvedColIdx = origTargetColIdx;
+          resolvedRow = origTargetRow;
+          break;
+        case 'mixed-col':
+          resolvedColIdx = origTargetColIdx;
+          resolvedRow = curFormRow + deltaRow;
+          break;
+        case 'mixed-row':
+          resolvedColIdx = curFormColIdx + deltaCol;
+          resolvedRow = origTargetRow;
+          break;
+      }
+
+      const isColOutOfBounds = resolvedColIdx < 0 || resolvedColIdx >= COLS.length;
+      const isRowOutOfBounds = resolvedRow < 1 || resolvedRow > ROWS.length;
+
+      return {
+        col: indexToCol(resolvedColIdx),
+        row: Math.max(1, Math.min(ROWS.length, resolvedRow)),
+        rawColIdx: resolvedColIdx,
+        rawRow: resolvedRow,
+        outOfBounds: isColOutOfBounds || isRowOutOfBounds
+      };
+    }
+
+    function initializeRefTable() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      ROWS.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-200';
+
+        const thRow = document.createElement('th');
+        thRow.className = 'row-header py-2.5 px-2 border-r border-slate-300 bg-slate-100 text-slate-600 font-mono-code text-xs text-center relative';
+        thRow.dataset.row = r;
+        thRow.innerHTML = `
+          <span>${r}</span>
+          <span class="row-lock-badge hidden absolute bottom-0.5 right-1 text-[9px] text-amber-600 font-bold">🔒</span>
+        `;
+        tr.appendChild(thRow);
+
+        COLS.forEach(c => {
+          const td = document.createElement('td');
+          const cellKey = `${c}${r}`;
+          td.className = 'grid-cell h-12 px-3 py-1 border-r border-slate-200 relative cursor-pointer font-mono-code text-xs transition';
+          td.dataset.col = c;
+          td.dataset.row = r;
+          td.dataset.cell = cellKey;
+
+          td.innerHTML = `
+            <div class="cell-content flex items-center justify-between w-full h-full">
+              <span class="cell-value text-slate-800 font-semibold">${refState.gridData[cellKey] || ''}</span>
+              <span class="cell-badge text-[10px] text-slate-400 font-normal"></span>
+            </div>
+          `;
+
+          td.addEventListener('click', (e) => {
+            if (e.target.classList.contains('fill-handle')) return;
+            setActiveFormulaCell(c, r);
+          });
+
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderRefGridState() {
+      const target = resolveSourceCell(refState.formulaCell.col, refState.formulaCell.row, refState.mode);
+      const formulaKey = `${refState.formulaCell.col}${refState.formulaCell.row}`;
+      const targetKey = `${target.col}${target.row}`;
+
+      document.querySelectorAll('#table-body .grid-cell').forEach(td => {
+        td.classList.remove(
+          'bg-emerald-100', 'border-emerald-600', 'border-2', 'z-30',
+          'bg-blue-100/70', 'border-blue-500', 'source-cell-glow',
+          'bg-red-50', 'border-red-400'
+        );
+        const handle = td.querySelector('.fill-handle');
+        if (handle) handle.remove();
+
+        const badge = td.querySelector('.cell-badge');
+        if (badge) badge.textContent = '';
+      });
+
+      updateHeaderLockVisuals(target);
+
+      const targetTd = document.querySelector(`td[data-cell="${targetKey}"]`);
+      if (targetTd && !target.outOfBounds) {
+        targetTd.classList.add('bg-blue-100/70', 'border-blue-500', 'border-2', 'source-cell-glow');
+        const badge = targetTd.querySelector('.cell-badge');
+        if (badge) badge.innerHTML = `<span class="text-blue-600 font-bold">SOURCE</span>`;
+      }
+
+      const formulaTd = document.querySelector(`td[data-cell="${formulaKey}"]`);
+      if (formulaTd) {
+        formulaTd.classList.add('bg-emerald-100', 'border-emerald-600', 'border-2', 'z-20');
+        const badge = formulaTd.querySelector('.cell-badge');
+        if (badge) badge.innerHTML = `<span class="text-emerald-700 font-bold">FORMULA</span>`;
+
+        const handle = document.createElement('div');
+        handle.className = 'fill-handle rounded-sm shadow-sm';
+        handle.title = 'Drag or click arrows to fill';
+        initFillHandleDrag(handle);
+        formulaTd.appendChild(handle);
+      }
+
+      refState.copiedCells.forEach(cellKey => {
+        if (cellKey !== formulaKey) {
+          const td = document.querySelector(`td[data-cell="${cellKey}"]`);
+          if (td) td.classList.add('bg-emerald-50/70');
+        }
+      });
+
+      drawVectorArrow(formulaTd, targetTd, target.outOfBounds);
+      updateFormulaBarAndInspector(target);
+    }
+
+    function drawVectorArrow(fromElem, toElem, isOutOfBounds) {
+      const svg = document.getElementById('arrow-svg');
+      const line = document.getElementById('connector-line');
+      const badge = document.getElementById('vector-badge');
+      const badgeBg = document.getElementById('badge-bg');
+      const badgeText = document.getElementById('badge-text');
+
+      if (!fromElem || document.getElementById('page-refs').classList.contains('hidden')) {
+        line.setAttribute('d', '');
+        badge.style.display = 'none';
+        return;
+      }
+
+      const svgRect = svg.getBoundingClientRect();
+      const fromRect = fromElem.getBoundingClientRect();
+
+      const startX = (fromRect.left + fromRect.width / 2) - svgRect.left;
+      const startY = (fromRect.top + fromRect.height / 2) - svgRect.top;
+
+      let endX, endY;
+
+      if (toElem && !isOutOfBounds) {
+        const toRect = toElem.getBoundingClientRect();
+        endX = (toRect.left + toRect.width / 2) - svgRect.left;
+        endY = (toRect.top + toRect.height / 2) - svgRect.top;
+        line.setAttribute('marker-end', 'url(#arrowhead-blue)');
+        line.setAttribute('stroke', '#2563eb');
+      } else {
+        endX = Math.max(10, Math.min(svgRect.width - 10, startX - 140));
+        endY = Math.max(10, Math.min(svgRect.height - 10, startY - 90));
+        line.setAttribute('marker-end', 'url(#arrowhead-red)');
+        line.setAttribute('stroke', '#dc2626');
+      }
+
+      const dx = endX - startX;
+      const dy = endY - startY;
+      const cx = (startX + endX) / 2 - (dy * 0.15);
+      const cy = (startY + endY) / 2 + (dx * 0.15);
+
+      const pathData = `M ${startX} ${startY} Q ${cx} ${cy} ${endX} ${endY}`;
+      line.setAttribute('d', pathData);
+
+      badge.style.display = 'block';
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+
+      let badgeLabel = "";
+      if (isOutOfBounds) {
+        badgeLabel = "#REF! Off Grid";
+        badgeBg.setAttribute('fill', '#991b1b');
+      } else if (refState.mode === 'absolute') {
+        badgeLabel = "📌 Locked Anchor";
+        badgeBg.setAttribute('fill', '#1e3a8a');
+      } else if (refState.mode === 'relative') {
+        const deltaCol = colToIndex(refState.formulaCell.col) - colToIndex(resolveSourceCell(refState.formulaCell.col, refState.formulaCell.row, refState.mode).col);
+        const deltaRow = refState.formulaCell.row - resolveSourceCell(refState.formulaCell.col, refState.formulaCell.row, refState.mode).row;
+        badgeLabel = `Δ (${deltaCol > 0 ? '←' + deltaCol : (deltaCol < 0 ? '→' + Math.abs(deltaCol) : '0')}, ${deltaRow > 0 ? '↑' + deltaRow : (deltaRow < 0 ? '↓' + Math.abs(deltaRow) : '0')})`;
+        badgeBg.setAttribute('fill', '#1e293b');
+      } else if (refState.mode === 'mixed-col') {
+        badgeLabel = "🔒 Col Locked, Row Slides";
+        badgeBg.setAttribute('fill', '#854d0e');
+      } else {
+        badgeLabel = "🔒 Row Locked, Col Slides";
+        badgeBg.setAttribute('fill', '#6b21a8');
+      }
+
+      const textWidth = Math.max(105, badgeLabel.length * 8.5 + 20);
+      badgeBg.setAttribute('width', textWidth);
+      badgeBg.setAttribute('x', midX - textWidth / 2);
+      badgeBg.setAttribute('y', midY - 14);
+
+      badgeText.setAttribute('x', midX);
+      badgeText.setAttribute('y', midY - 2);
+      badgeText.textContent = badgeLabel;
+    }
+
+    function updateHeaderLockVisuals(target) {
+      const isColLocked = refState.mode === 'absolute' || refState.mode === 'mixed-col';
+      const isRowLocked = refState.mode === 'absolute' || refState.mode === 'mixed-row';
+
+      document.querySelectorAll('#page-refs .col-header').forEach(th => {
+        th.classList.remove('bg-amber-100', 'text-amber-900', 'font-black');
+        th.querySelector('.col-lock-badge').classList.add('hidden');
+      });
+      document.querySelectorAll('#page-refs .row-header').forEach(th => {
+        th.classList.remove('bg-amber-100', 'text-amber-900', 'font-black');
+        th.querySelector('.row-lock-badge').classList.add('hidden');
+      });
+
+      if (isColLocked) {
+        const colHeader = document.querySelector(`.col-header[data-col="${target.col}"]`);
+        if (colHeader) {
+          colHeader.classList.add('bg-amber-100', 'text-amber-900', 'font-black');
+          colHeader.querySelector('.col-lock-badge').classList.remove('hidden');
+        }
+      }
+
+      if (isRowLocked) {
+        const rowHeader = document.querySelector(`.row-header[data-row="${target.row}"]`);
+        if (rowHeader) {
+          rowHeader.classList.add('bg-amber-100', 'text-amber-900', 'font-black');
+          rowHeader.querySelector('.row-lock-badge').classList.remove('hidden');
+        }
+      }
+    }
+
+    function getFormulaString(col, row, mode) {
+      switch (mode) {
+        case 'relative': return `=${col}${row}`;
+        case 'absolute': return `=$${col}$${row}`;
+        case 'mixed-col': return `=$${col}${row}`;
+        case 'mixed-row': return `=${col}$${row}`;
+      }
+    }
+
+    function updateFormulaBarAndInspector(target) {
+      const formulaCellKey = `${refState.formulaCell.col}${refState.formulaCell.row}`;
+      const formulaStr = getFormulaString(target.col, target.row, refState.mode);
+
+      document.getElementById('active-cell-indicator').textContent = `Active Cell: ${formulaCellKey}`;
+      document.getElementById('formula-bar-display').innerHTML = `
+        <span class="text-slate-400">=</span>
+        <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold border border-blue-200">
+          ${formulaStr.replace('=', '')}
+        </span>
+        <span class="text-slate-400 font-normal ml-1">× 1.15</span>
+      `;
+
+      document.getElementById('source-cell-tag').innerHTML = `Target: <strong class="text-blue-600">${target.col}${target.row}</strong>`;
+      document.getElementById('insp-formula-cell').textContent = formulaCellKey;
+      document.getElementById('insp-raw-formula').textContent = formulaStr;
+      document.getElementById('insp-resolved-cell').textContent = `${target.col}${target.row}`;
+      
+      const val = refState.gridData[`${target.col}${target.row}`];
+      document.getElementById('insp-cell-value').textContent = val !== undefined && val !== '' ? `"${val}"` : '0 (Empty)';
+
+      const vectorDesc = document.getElementById('insp-vector-desc');
+      const behavDesc = document.getElementById('insp-behavior-desc');
+      const badgeSummary = document.getElementById('badge-lock-summary');
+      const colBox = document.getElementById('col-status-box');
+      const colText = document.getElementById('col-status-text');
+      const rowBox = document.getElementById('row-status-box');
+      const rowText = document.getElementById('row-status-text');
+
+      if (refState.mode === 'relative') {
+        badgeSummary.textContent = "Fully Relative (A1)";
+        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+        const dCol = colToIndex(refState.formulaCell.col) - colToIndex(target.col);
+        const dRow = refState.formulaCell.row - target.row;
+        vectorDesc.innerHTML = `Direction vector: <strong>${Math.abs(dCol)} col ${dCol >= 0 ? 'left' : 'right'}</strong>, <strong>${Math.abs(dRow)} row ${dRow >= 0 ? 'up' : 'down'}</strong>.`;
+        behavDesc.textContent = "Copying this cell keeps the vector arrow identical in shape and length.";
+        colText.textContent = "Relative (Slides)";
+        colBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
+        rowText.textContent = "Relative (Slides)";
+        rowBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
+      } else if (refState.mode === 'absolute') {
+        badgeSummary.textContent = "Fully Absolute ($A$1)";
+        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-800";
+        vectorDesc.innerHTML = `Pinned directly to coordinate <strong>$${refState.initialTargetCell.col}$${refState.initialTargetCell.row}</strong>.`;
+        behavDesc.textContent = "No matter where you drag or copy, this formula always pulls from this exact coordinate.";
+        colText.textContent = "Locked ($)";
+        colBox.className = "p-2 rounded bg-blue-50 border border-blue-200 flex flex-col text-blue-900";
+        rowText.textContent = "Locked ($)";
+        rowBox.className = "p-2 rounded bg-blue-50 border border-blue-200 flex flex-col text-blue-900";
+      } else if (refState.mode === 'mixed-col') {
+        badgeSummary.textContent = "Mixed Reference ($A1)";
+        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800";
+        vectorDesc.innerHTML = `Column <strong>$${refState.initialTargetCell.col}</strong> is locked. Row shifts with movement.`;
+        behavDesc.textContent = "Copying horizontally maintains column. Copying vertically shifts row numbers.";
+        colText.textContent = "Locked ($)";
+        colBox.className = "p-2 rounded bg-amber-50 border border-amber-200 flex flex-col text-amber-900";
+        rowText.textContent = "Relative (Slides)";
+        rowBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
+      } else if (refState.mode === 'mixed-row') {
+        badgeSummary.textContent = "Mixed Reference (A$1)";
+        badgeSummary.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-purple-100 text-purple-800";
+        vectorDesc.innerHTML = `Row <strong>$${refState.initialTargetCell.row}</strong> is locked. Column shifts with movement.`;
+        behavDesc.textContent = "Copying vertically keeps row fixed. Copying horizontally shifts column letters.";
+        colText.textContent = "Relative (Slides)";
+        colBox.className = "p-2 rounded bg-slate-50 border border-slate-200 flex flex-col";
+        rowText.textContent = "Locked ($)";
+        rowBox.className = "p-2 rounded bg-purple-50 border border-purple-200 flex flex-col text-purple-900";
+      }
+    }
+
+    function setActiveFormulaCell(col, row) {
+      refState.formulaCell = { col, row };
+      refState.copiedCells.add(`${col}${row}`);
+      renderRefGridState();
+    }
+
+    function setReferenceMode(newMode) {
+      refState.mode = newMode;
+      document.querySelectorAll('.ref-mode-btn').forEach(btn => {
+        if (btn.dataset.mode === newMode) {
+          btn.className = "ref-mode-btn p-2.5 rounded-lg border-2 text-left transition flex flex-col border-emerald-600 bg-emerald-50 text-emerald-950 font-medium shadow-sm";
+        } else {
+          btn.className = "ref-mode-btn p-2.5 rounded-lg border-2 text-left transition flex flex-col border-slate-200 hover:border-slate-300 text-slate-700";
+        }
+      });
+      renderRefGridState();
+    }
+
+    function initFillHandleDrag(handleElem) {
+      let isDragging = false;
+      const onMouseDown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        isDragging = true;
+        document.body.style.cursor = 'crosshair';
+
+        const onMouseMove = (moveEvent) => {
+          if (!isDragging) return;
+          const elemUnder = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
+          const td = elemUnder ? elemUnder.closest('.grid-cell') : null;
+          if (td && !td.classList.contains('is-header')) {
+            const c = td.dataset.col;
+            const r = parseInt(td.dataset.row, 10);
+            if (c !== refState.formulaCell.col || r !== refState.formulaCell.row) {
+              setActiveFormulaCell(c, r);
+            }
+          }
+        };
+
+        const onMouseUp = () => {
+          isDragging = false;
+          document.body.style.cursor = 'default';
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      };
+
+      handleElem.addEventListener('mousedown', onMouseDown);
+      handleElem.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', { clientX: touch.clientX, clientY: touch.clientY });
+        handleElem.dispatchEvent(mouseEvent);
+      }, { passive: true });
+    }
+
+    /* =========================================================================
+       PAGE 2: QUICK MATH (SUM, AVERAGE, ROUND) LOGIC
+       ========================================================================= */
+    const labData = [
+      { id: 'Trial 1 (Acid Sol)', val: 24.125 },
+      { id: 'Trial 2 (Titration)', val: 25.350 },
+      { id: 'Trial 3 (Buffered)', val: 23.980 },
+      { id: 'Trial 4 (Catalyst)', val: 26.415 },
+      { id: 'Trial 5 (Distilled)', val: 25.100 },
+      { id: 'Trial 6 (Heated 50C)', val: 24.880 },
+      { id: 'Trial 7 (Control)', val: 26.600 }
+    ];
+
+    let mathMode = 'SUM'; // 'SUM', 'AVERAGE', 'ROUND'
+    let selectedIndices = new Set([0, 1, 2, 3, 4, 5, 6]);
+    let roundDigits = 2;
+
+    function initMathTable() {
+      const tbody = document.getElementById('lab-math-tbody');
+      tbody.innerHTML = '';
+
+      labData.forEach((row, idx) => {
+        const rowNum = idx + 2; // Rows B2 to B8
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-200 transition hover:bg-slate-50 cursor-pointer';
+        tr.dataset.idx = idx;
+
+        const isChecked = selectedIndices.has(idx);
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-2 text-center font-mono-code text-slate-500 bg-slate-100 border-r border-slate-300 font-semibold">${rowNum}</td>
+          <td class="py-2.5 px-3 border-r border-slate-200 font-medium text-slate-700">${row.id}</td>
+          <td class="py-2.5 px-3 border-r border-slate-200 text-right font-mono-code font-bold text-slate-900 cell-val">${row.val.toFixed(3)}</td>
+          <td class="py-2.5 px-3 text-center">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 cursor-pointer row-chk">
+          </td>
+        `;
+
+        tr.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'INPUT') {
+            const chk = tr.querySelector('.row-chk');
+            chk.checked = !chk.checked;
+          }
+          if (tr.querySelector('.row-chk').checked) {
+            selectedIndices.add(idx);
+          } else {
+            selectedIndices.delete(idx);
+          }
+          renderMathCalculations();
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderMathCalculations() {
+      const selectedVals = Array.from(selectedIndices)
+        .sort((a, b) => a - b)
+        .map(i => labData[i].val);
+
+      // Highlight active rows
+      document.querySelectorAll('#lab-math-tbody tr').forEach((tr, idx) => {
+        const isSel = selectedIndices.has(idx);
+        const cellVal = tr.querySelector('.cell-val');
+        if (isSel) {
+          tr.classList.remove('bg-white', 'opacity-40');
+          tr.classList.add('bg-emerald-50/50');
+          cellVal.classList.add('text-emerald-700');
+        } else {
+          tr.classList.remove('bg-emerald-50/50');
+          tr.classList.add('opacity-40');
+          cellVal.classList.remove('text-emerald-700');
+        }
+      });
+
+      // Range description string
+      const minRow = selectedIndices.size > 0 ? Math.min(...Array.from(selectedIndices)) + 2 : 2;
+      const maxRow = selectedIndices.size > 0 ? Math.max(...Array.from(selectedIndices)) + 2 : 2;
+      const rangeStr = selectedIndices.size === 7 ? 'B2:B8' : (selectedIndices.size === 0 ? 'Empty' : `B${minRow}:B${maxRow}`);
+
+      const sum = selectedVals.reduce((acc, curr) => acc + curr, 0);
+      const avg = selectedVals.length > 0 ? (sum / selectedVals.length) : 0;
+
+      const formulaDisp = document.getElementById('math-formula-display');
+      const outLabel = document.getElementById('math-output-label');
+      const outVal = document.getElementById('math-output-value');
+      const stepsContainer = document.getElementById('math-steps-container');
+      const itemCount = document.getElementById('math-item-count');
+
+      itemCount.textContent = `${selectedVals.length} cells selected`;
+
+      if (mathMode === 'SUM') {
+        const roundedSum = Number(sum.toFixed(roundDigits));
+        formulaDisp.innerHTML = `=SUM(${rangeStr})`;
+        outLabel.textContent = `RESULT (=SUM in B9)`;
+        outVal.textContent = roundedSum.toLocaleString(undefined, { minimumFractionDigits: roundDigits, maximumFractionDigits: roundDigits });
+
+        stepsContainer.innerHTML = `
+          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+            <span class="text-slate-500 font-semibold block mb-1">Addition Expansion:</span>
+            <div class="font-mono-code text-[11px] text-slate-800 break-all leading-relaxed">
+              ${selectedVals.length > 0 ? selectedVals.map(v => v.toFixed(3)).join(' + ') : '0'}
+            </div>
+          </div>
+          <div class="flex justify-between items-center bg-emerald-50 p-2.5 rounded border border-emerald-200">
+            <span class="text-emerald-900 font-semibold">Raw Exact Total:</span>
+            <span class="font-mono-code font-bold text-emerald-800">${sum.toFixed(4)}</span>
+          </div>
+        `;
+      } else if (mathMode === 'AVERAGE') {
+        const roundedAvg = Number(avg.toFixed(roundDigits));
+        formulaDisp.innerHTML = `=AVERAGE(${rangeStr})`;
+        outLabel.textContent = `RESULT (=AVERAGE in B9)`;
+        outVal.textContent = roundedAvg.toLocaleString(undefined, { minimumFractionDigits: roundDigits, maximumFractionDigits: roundDigits });
+
+        stepsContainer.innerHTML = `
+          <div class="p-2.5 rounded bg-slate-50 border border-slate-200 space-y-1">
+            <span class="text-slate-500 font-semibold block">Arithmetic Mean Formula:</span>
+            <div class="font-mono-code text-xs text-slate-700 bg-white p-2 rounded border border-slate-200 text-center font-bold">
+              Mean = Total Sum (${sum.toFixed(2)}) ÷ Count (${selectedVals.length})
+            </div>
+          </div>
+          <div class="flex justify-between items-center bg-blue-50 p-2.5 rounded border border-blue-200">
+            <span class="text-blue-900 font-semibold">Continuous Floating Mean:</span>
+            <span class="font-mono-code font-bold text-blue-800">${avg.toFixed(5)} mL</span>
+          </div>
+        `;
+      } else if (mathMode === 'ROUND') {
+        const targetVal = avg;
+        const roundedVal = Number(targetVal.toFixed(roundDigits));
+        formulaDisp.innerHTML = `=ROUND(AVERAGE(${rangeStr}), ${roundDigits})`;
+        outLabel.textContent = `RESULT (=ROUND in B9)`;
+        outVal.textContent = roundedVal.toLocaleString(undefined, { minimumFractionDigits: roundDigits, maximumFractionDigits: roundDigits });
+
+        stepsContainer.innerHTML = `
+          <div class="p-2.5 rounded bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex justify-between">
+              <span class="text-slate-500">Unrounded Mean Input:</span>
+              <span class="font-mono-code font-bold text-slate-800">${avg.toFixed(6)}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Target Decimal Places:</span>
+              <span class="font-mono-code font-bold text-emerald-700">${roundDigits} place(s)</span>
+            </div>
+          </div>
+          <div class="p-2.5 rounded bg-purple-50 border border-purple-200 text-purple-900 text-[11px] leading-relaxed">
+            Checks digit at position ${roundDigits + 1}. If ≥ 5, rounds upward; otherwise truncates.
+          </div>
+        `;
+      }
+
+      // Update round demo box
+      const sampleVal = 176.4528;
+      const demoRounded = sampleVal.toFixed(roundDigits);
+      document.getElementById('round-demo-box').innerHTML = `
+        =ROUND(176.4528, <span class="text-emerald-700 font-bold">${roundDigits}</span>) ➔ <strong class="text-emerald-700 text-sm">${demoRounded}</strong>
+      `;
+    }
+
+    /* =========================================================================
+       PAGE 3: STATISTICS (COUNT, COUNTA, MAX, MIN, MEDIAN) LOGIC
+       ========================================================================= */
+    const rawSurveyDataset = [
+      { id: 'Site 1 (North Forest)', val: 42, type: 'number' },
+      { id: 'Site 2 (River Basin)', val: 68, type: 'number' },
+      { id: 'Site 3 (Ridge Peak)', val: 'Cloud Cover (No Data)', type: 'text' },
+      { id: 'Site 4 (Wetlands)', val: 12, type: 'number' },
+      { id: 'Site 5 (Meadow)', val: '', type: 'blank' },
+      { id: 'Site 6 (Cave Entrance)', val: 84, type: 'number' },
+      { id: 'Site 7 (Shoreline)', val: 'Equipment Fault', type: 'text' },
+      { id: 'Site 8 (Deep Valley)', val: 35, type: 'number' }
+    ];
+
+    let activeStat = 'COUNT';
+
+    function initStatsTable() {
+      const tbody = document.getElementById('stats-tbody');
+      tbody.innerHTML = '';
+
+      rawSurveyDataset.forEach((item, idx) => {
+        const rowNum = idx + 2; // B2 to B9
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-200 transition font-mono-code text-xs';
+        tr.dataset.idx = idx;
+
+        let displayVal = item.val;
+        let badgeHtml = '';
+
+        if (item.type === 'blank') {
+          displayVal = '<span class="text-slate-300 italic font-normal">[Empty Cell]</span>';
+          badgeHtml = '<span class="px-1.5 py-0.5 rounded text-[10px] font-sans font-bold bg-slate-100 text-slate-500">Blank</span>';
+        } else if (item.type === 'text') {
+          displayVal = `<span class="text-slate-600 font-medium italic">"${item.val}"</span>`;
+          badgeHtml = '<span class="px-1.5 py-0.5 rounded text-[10px] font-sans font-bold bg-amber-100 text-amber-800">Text Label</span>';
+        } else {
+          displayVal = `<span class="font-bold text-slate-900">${item.val}</span>`;
+          badgeHtml = '<span class="px-1.5 py-0.5 rounded text-[10px] font-sans font-bold bg-blue-100 text-blue-800">Number</span>';
+        }
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-2 text-center text-slate-400 bg-slate-100 border-r border-slate-300 font-semibold">${rowNum}</td>
+          <td class="py-2.5 px-3 border-r border-slate-200 font-sans font-medium text-slate-700">${item.id}</td>
+          <td class="py-2.5 px-3 border-r border-slate-200 text-center cell-stat-val">${displayVal}</td>
+          <td class="py-2.5 px-3 flex items-center justify-between">
+            ${badgeHtml}
+            <span class="stat-cell-flag text-[11px] font-bold"></span>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      computeAllStats();
+      renderStatsView();
+    }
+
+    function computeAllStats() {
+      const numbers = rawSurveyDataset
+        .filter(d => d.type === 'number')
+        .map(d => d.val);
+
+      const nonBlanks = rawSurveyDataset
+        .filter(d => d.type !== 'blank');
+
+      const countNum = numbers.length;
+      const countAll = nonBlanks.length;
+      const maxVal = Math.max(...numbers);
+      const minVal = Math.min(...numbers);
+
+      // Median computation
+      const sorted = [...numbers].sort((a, b) => a - b);
+      let medianVal;
+      const mid = Math.floor(sorted.length / 2);
+      if (sorted.length % 2 !== 0) {
+        medianVal = sorted[mid];
+      } else {
+        medianVal = (sorted[mid - 1] + sorted[mid]) / 2;
+      }
+
+      document.getElementById('val-count').textContent = countNum;
+      document.getElementById('val-counta').textContent = countAll;
+      document.getElementById('val-max').textContent = maxVal;
+      document.getElementById('val-min').textContent = minVal;
+      document.getElementById('val-median').textContent = medianVal;
+
+      return { numbers, nonBlanks, countNum, countAll, maxVal, minVal, medianVal, sorted };
+    }
+
+    function renderStatsView() {
+      const stats = computeAllStats();
+      const bannerIcon = document.getElementById('stat-banner-icon');
+      const bannerTitle = document.getElementById('stat-banner-title');
+      const bannerDesc = document.getElementById('stat-banner-desc');
+      const bannerExample = document.getElementById('stat-banner-example');
+      const deepdive = document.getElementById('stat-deepdive-box');
+
+      // Update Card highlights
+      ['count', 'counta', 'max', 'min', 'median'].forEach(s => {
+        const el = document.getElementById(`card-stat-${s}`);
+        if (s.toUpperCase() === activeStat) {
+          el.className = 'p-2.5 rounded-lg border-2 border-purple-600 bg-purple-50 shadow-sm flex flex-col transition';
+        } else {
+          el.className = 'p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex flex-col transition';
+        }
+      });
+
+      // Reset Table rows
+      document.querySelectorAll('#stats-tbody tr').forEach((tr, idx) => {
+        const item = rawSurveyDataset[idx];
+        const flag = tr.querySelector('.stat-cell-flag');
+        tr.classList.remove('bg-emerald-50', 'bg-purple-50', 'bg-amber-50', 'bg-blue-50', 'opacity-30', 'font-black');
+        flag.innerHTML = '';
+
+        if (activeStat === 'COUNT') {
+          if (item.type === 'number') {
+            tr.classList.add('bg-emerald-50');
+            flag.innerHTML = '<span class="text-emerald-700">✓ Counted</span>';
+          } else {
+            tr.classList.add('opacity-35');
+            flag.innerHTML = '<span class="text-slate-400">✕ Ignored</span>';
+          }
+        } else if (activeStat === 'COUNTA') {
+          if (item.type !== 'blank') {
+            tr.classList.add('bg-purple-50');
+            flag.innerHTML = '<span class="text-purple-700">✓ Non-Empty</span>';
+          } else {
+            tr.classList.add('opacity-30');
+            flag.innerHTML = '<span class="text-red-500">✕ Blank</span>';
+          }
+        } else if (activeStat === 'MAX') {
+          if (item.val === stats.maxVal) {
+            tr.classList.add('bg-amber-100');
+            flag.innerHTML = '<span class="text-amber-800 font-black">★ HIGHEST (MAX)</span>';
+          } else {
+            tr.classList.add('opacity-40');
+          }
+        } else if (activeStat === 'MIN') {
+          if (item.val === stats.minVal) {
+            tr.classList.add('bg-blue-100');
+            flag.innerHTML = '<span class="text-blue-800 font-black">▼ LOWEST (MIN)</span>';
+          } else {
+            tr.classList.add('opacity-40');
+          }
+        } else if (activeStat === 'MEDIAN') {
+          if (item.type === 'number') {
+            tr.classList.add('bg-purple-50');
+            flag.innerHTML = `<span class="text-purple-700">Part of sorted set</span>`;
+          } else {
+            tr.classList.add('opacity-30');
+            flag.innerHTML = '<span class="text-slate-400">Excluded (Non-numeric)</span>';
+          }
+        }
+      });
+
+      // Update Banner Descriptions & Deep Dives
+      if (activeStat === 'COUNT') {
+        bannerIcon.textContent = '🔢';
+        bannerTitle.textContent = '=COUNT(B2:B9)';
+        bannerDesc.textContent = '— Counts cells containing NUMBERS ONLY. Completely ignores words, text logs, and blank cells.';
+        bannerExample.textContent = `Result: ${stats.countNum} numeric entries`;
+
+        deepdive.innerHTML = `
+          <strong class="font-bold text-slate-800 block">Why did cell B4 ("Cloud Cover") get skipped?</strong>
+          <p class="text-slate-600 leading-relaxed">
+            Excel's <code class="font-mono text-emerald-700">=COUNT</code> strictly verifies data types. Even if a cell has characters typed into it, if it cannot be interpreted as a raw numerical value, it is discarded from the counter.
+          </p>
+        `;
+      } else if (activeStat === 'COUNTA') {
+        bannerIcon.textContent = '📝';
+        bannerTitle.textContent = '=COUNTA(B2:B9)';
+        bannerDesc.textContent = '— Counts ALL non-empty cells (numbers, words, symbols). Only completely empty cells are skipped.';
+        bannerExample.textContent = `Result: ${stats.countAll} active logs`;
+
+        deepdive.innerHTML = `
+          <strong class="font-bold text-slate-800 block">The Difference In Action:</strong>
+          <p class="text-slate-600 leading-relaxed">
+            Out of 8 total rows, only row 6 (Meadow) is blank. Thus, <code class="font-mono text-purple-700">=COUNTA</code> returns <strong>7</strong>. It is the best function for counting attendance, names, or completed survey forms.
+          </p>
+        `;
+      } else if (activeStat === 'MAX') {
+        bannerIcon.textContent = '🏔️';
+        bannerTitle.textContent = '=MAX(B2:B9)';
+        bannerDesc.textContent = '— Scans the range and extracts the highest numerical value, ignoring any text notes.';
+        bannerExample.textContent = `Peak Value: ${stats.maxVal}`;
+
+        deepdive.innerHTML = `
+          <strong class="font-bold text-slate-800 block">Outlier Detection:</strong>
+          <p class="text-slate-600 leading-relaxed">
+            Cell B7 contains <strong>84</strong> specimens at the Cave Entrance, easily picked out from the dataset without having to sort the rows manually.
+          </p>
+        `;
+      } else if (activeStat === 'MIN') {
+        bannerIcon.textContent = '📉';
+        bannerTitle.textContent = '=MIN(B2:B9)';
+        bannerDesc.textContent = '— Scans the range and identifies the lowest numerical quantity.';
+        bannerExample.textContent = `Trough Value: ${stats.minVal}`;
+
+        deepdive.innerHTML = `
+          <strong class="font-bold text-slate-800 block">Lowest Bound:</strong>
+          <p class="text-slate-600 leading-relaxed">
+            The minimum count is <strong>12</strong> at Wetlands (B5). Like MAX, text cells are completely ignored so they never trigger error flags.
+          </p>
+        `;
+      } else if (activeStat === 'MEDIAN') {
+        bannerIcon.textContent = '⚖️';
+        bannerTitle.textContent = '=MEDIAN(B2:B9)';
+        bannerDesc.textContent = '— Finds the exact physical midpoint of sorted numerical observations.';
+        bannerExample.textContent = `Median: ${stats.medianVal}`;
+
+        deepdive.innerHTML = `
+          <strong class="font-bold text-slate-800 block">Step-by-Step Median Walkthrough:</strong>
+          <div class="space-y-1 pt-1 font-mono text-[11px]">
+            <div>1. Extract numbers: [42, 68, 12, 84, 35]</div>
+            <div>2. Sort low to high: <span class="bg-white px-1.5 py-0.5 rounded border border-purple-200">[${stats.sorted.join(', ')}]</span></div>
+            <div>3. Middle position: With 5 values, the 3rd item is exactly <strong>${stats.medianVal}</strong>.</div>
+          </div>
+        `;
+      }
+    }
+
+    /* =========================================================================
+       EVENT LISTENERS & TAB ROUTING
+       ========================================================================= */
+    function setupTabNavigation() {
+      const tabs = [
+        { btn: 'nav-tab-refs', page: 'page-refs' },
+        { btn: 'nav-tab-math', page: 'page-math' },
+        { btn: 'nav-tab-stats', page: 'page-stats' }
+      ];
+
+      tabs.forEach(t => {
+        document.getElementById(t.btn).addEventListener('click', () => {
+          tabs.forEach(other => {
+            const btnEl = document.getElementById(other.btn);
+            const pageEl = document.getElementById(other.page);
+            if (other.btn === t.btn) {
+              btnEl.className = "nav-page-btn px-3 py-1.5 rounded-lg transition bg-white text-emerald-900 shadow-sm flex items-center gap-1.5";
+              pageEl.classList.remove('hidden');
+              pageEl.classList.add('flex');
+            } else {
+              btnEl.className = "nav-page-btn px-3 py-1.5 rounded-lg transition text-emerald-100 hover:text-white hover:bg-emerald-800/80 flex items-center gap-1.5";
+              pageEl.classList.add('hidden');
+              pageEl.classList.remove('flex');
+            }
+          });
+
+          // Redraw vectors cleanly if switching back to references
+          if (t.page === 'page-refs') {
+            setTimeout(renderRefGridState, 20);
+          }
+        });
+      });
+    }
+
+    function setupReferenceInteractions() {
+      document.querySelectorAll('.ref-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => setReferenceMode(btn.dataset.mode));
+      });
+
+      document.getElementById('copy-down-btn').addEventListener('click', () => {
+        if (refState.formulaCell.row < ROWS.length) {
+          setActiveFormulaCell(refState.formulaCell.col, refState.formulaCell.row + 1);
+        }
+      });
+
+      document.getElementById('copy-right-btn').addEventListener('click', () => {
+        const curIdx = colToIndex(refState.formulaCell.col);
+        if (curIdx < COLS.length - 1) {
+          setActiveFormulaCell(indexToCol(curIdx + 1), refState.formulaCell.row);
+        }
+      });
+
+      document.getElementById('reset-grid-btn').addEventListener('click', () => {
+        refState.copiedCells.clear();
+        refState.formulaCell = { col: 'C', row: 2 };
+        refState.mode = 'relative';
+        setReferenceMode('relative');
+        setActiveFormulaCell('C', 2);
+      });
+
+      document.getElementById('preset-tax').addEventListener('click', () => {
+        refState.copiedCells.clear();
+        refState.initialTargetCell = { col: 'B', row: 1 };
+        refState.initialFormulaCell = { col: 'C', row: 2 };
+        setReferenceMode('absolute');
+        setActiveFormulaCell('C', 2);
+      });
+
+      document.getElementById('preset-running').addEventListener('click', () => {
+        refState.copiedCells.clear();
+        refState.initialTargetCell = { col: 'B', row: 2 };
+        refState.initialFormulaCell = { col: 'C', row: 2 };
+        setReferenceMode('relative');
+        setActiveFormulaCell('C', 2);
+      });
+
+      document.getElementById('preset-mult-table').addEventListener('click', () => {
+        refState.copiedCells.clear();
+        refState.initialTargetCell = { col: 'B', row: 1 };
+        refState.initialFormulaCell = { col: 'B', row: 2 };
+        setReferenceMode('mixed-row');
+        setActiveFormulaCell('B', 2);
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'F4' && typeof currentSlideIndex !== 'undefined' && currentSlideIndex === 16 && !document.getElementById('page-refs').classList.contains('hidden')) {
+          e.preventDefault();
+          const modes = ['relative', 'absolute', 'mixed-row', 'mixed-col'];
+          const nextIndex = (modes.indexOf(refState.mode) + 1) % modes.length;
+          setReferenceMode(modes[nextIndex]);
+        }
+      });
+    }
+
+    function setupMathInteractions() {
+      const modeButtons = {
+        'SUM': document.getElementById('math-mode-sum'),
+        'AVERAGE': document.getElementById('math-mode-avg'),
+        'ROUND': document.getElementById('math-mode-round')
+      };
+
+      const explainerBanner = document.getElementById('math-explainer-banner');
+
+      Object.keys(modeButtons).forEach(m => {
+        modeButtons[m].addEventListener('click', () => {
+          mathMode = m;
+          Object.keys(modeButtons).forEach(other => {
+            if (other === m) {
+              modeButtons[other].className = "math-tool-btn px-3 py-1 rounded-md font-bold transition bg-emerald-600 text-white shadow-sm";
+            } else {
+              modeButtons[other].className = "math-tool-btn px-3 py-1 rounded-md font-medium transition text-slate-600 hover:text-slate-900";
+            }
+          });
+
+          if (m === 'SUM') {
+            explainerBanner.className = "p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-950 flex items-center justify-between flex-wrap gap-2";
+            explainerBanner.innerHTML = `
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">➕</span>
+                <div>
+                  <strong class="font-mono-code text-emerald-900 text-sm">=SUM(range)</strong>
+                  <span class="text-slate-600 ml-1">— Adds all numerical values in the selected bounding box together.</span>
+                </div>
+              </div>
+              <div class="text-[11px] text-emerald-800 font-mono bg-white/70 px-2 py-1 rounded border border-emerald-300">
+                Example: <code class="font-bold">=SUM(B2:B8)</code>
+              </div>
+            `;
+          } else if (m === 'AVERAGE') {
+            explainerBanner.className = "p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-950 flex items-center justify-between flex-wrap gap-2";
+            explainerBanner.innerHTML = `
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">📊</span>
+                <div>
+                  <strong class="font-mono-code text-blue-900 text-sm">=AVERAGE(range)</strong>
+                  <span class="text-slate-600 ml-1">— Calculates the central arithmetic mean (Sum ÷ Count) for lab samples.</span>
+                </div>
+              </div>
+              <div class="text-[11px] text-blue-800 font-mono bg-white/70 px-2 py-1 rounded border border-blue-300">
+                Example: <code class="font-bold">=AVERAGE(B2:B8)</code>
+              </div>
+            `;
+          } else if (m === 'ROUND') {
+            explainerBanner.className = "p-3 bg-purple-50 border border-purple-200 rounded-lg text-xs text-purple-950 flex items-center justify-between flex-wrap gap-2";
+            explainerBanner.innerHTML = `
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">🎯</span>
+                <div>
+                  <strong class="font-mono-code text-purple-900 text-sm">=ROUND(number, num_digits)</strong>
+                  <span class="text-slate-600 ml-1">— Rounds floating point data to exact lab significant decimal places.</span>
+                </div>
+              </div>
+              <div class="text-[11px] text-purple-800 font-mono bg-white/70 px-2 py-1 rounded border border-purple-300">
+                Example: <code class="font-bold">=ROUND(A1, 2)</code>
+              </div>
+            `;
+          }
+
+          renderMathCalculations();
+        });
+      });
+
+      document.getElementById('math-select-all').addEventListener('click', () => {
+        selectedIndices = new Set([0, 1, 2, 3, 4, 5, 6]);
+        document.querySelectorAll('#lab-math-tbody .row-chk').forEach(c => c.checked = true);
+        renderMathCalculations();
+      });
+
+      document.getElementById('math-select-first4').addEventListener('click', () => {
+        selectedIndices = new Set([0, 1, 2, 3]);
+        document.querySelectorAll('#lab-math-tbody .row-chk').forEach((c, i) => c.checked = i < 4);
+        renderMathCalculations();
+      });
+
+      const roundSlider = document.getElementById('round-slider');
+      roundSlider.addEventListener('input', (e) => {
+        roundDigits = parseInt(e.target.value, 10);
+        document.getElementById('round-slider-label').textContent = `num_digits = ${roundDigits}`;
+        renderMathCalculations();
+      });
+    }
+
+    function setupStatsInteractions() {
+      document.querySelectorAll('.stat-pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeStat = btn.dataset.stat;
+          document.querySelectorAll('.stat-pill-btn').forEach(b => {
+            if (b.dataset.stat === activeStat) {
+              b.className = "stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-bold transition border border-slate-200 bg-emerald-600 text-white shadow-sm";
+            } else {
+              b.className = "stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50";
+            }
+          });
+          renderStatsView();
+        });
+      });
+
+      document.getElementById('stats-reset-btn').addEventListener('click', () => {
+        activeStat = 'COUNT';
+        document.querySelectorAll('.stat-pill-btn').forEach(b => {
+          b.className = b.dataset.stat === 'COUNT' 
+            ? "stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-bold transition border border-slate-200 bg-emerald-600 text-white shadow-sm"
+            : "stat-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50";
+        });
+        renderStatsView();
+      });
+    }
+
+    function initSlide17VisualLab() {
+      setupTabNavigation();
+      initializeRefTable();
+      setupReferenceInteractions();
+      renderRefGridState();
+
+      initMathTable();
+      setupMathInteractions();
+      renderMathCalculations();
+
+      initStatsTable();
+      setupStatsInteractions();
+      window.renderRefGridState = renderRefGridState;
+
+      window.addEventListener('resize', () => {
+        if (typeof currentSlideIndex !== 'undefined' && currentSlideIndex === 16 && !document.getElementById('page-refs').classList.contains('hidden')) {
+          renderRefGridState();
+        }
+      });
+    };
+
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
             const currentNumSpan = document.getElementById('current-slide-num');
@@ -1869,6 +3557,7 @@
             buildSlide14Grid();
             buildSlide15Grid();
             buildSlide16Grid();
+            initSlide17VisualLab();
             
             // Automatically sync total slide display with actual DOM elements
             document.getElementById('total-slide-num').textContent = totalSlides;
@@ -1896,6 +3585,7 @@
                 if (currentSlideIndex === 2) {
                     setTimeout(animateIntersection, 500);
                 }
+                if (currentSlideIndex === 16 && window.renderRefGridState) { setTimeout(window.renderRefGridState, 100); }
             }
 
             function nextSlide() {
@@ -1918,7 +3608,7 @@
 
             document.addEventListener('keydown', (e) => {
                 // Prevent slide navigation when typing in inputs
-                if (e.target.tagName === 'INPUT') return;
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
 
                 if (e.key === 'ArrowRight') nextSlide();
                 if (e.key === 'ArrowLeft') prevSlide();
@@ -2906,81 +4596,76 @@
     </script>
 
     <!-- MERGED SANDBOX -->
-    <div id="sandbox-wrapper" class="absolute top-0 left-0 w-full h-full z-50 bg-[#0f172a] flex-col" style="display: none;">
+    <div id="sandbox-wrapper" class="absolute top-0 left-0 w-full h-full z-50 bg-slate-100 flex-col" style="display: none;">
         <!-- Top Navigation -->
-        <header class="bg-slate-900 border-b border-slate-700 py-3 px-6 flex justify-between items-center z-10">
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
-                <button onclick="document.getElementById('sandbox-wrapper').style.display = 'none';" class="text-slate-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Lesson
-                </button>
-                <div class="h-6 w-px bg-slate-700 mx-2"></div>
-                <div class="text-emerald-400 font-bold text-xl flex items-center gap-2">
-                    <i class="fa-solid fa-flask"></i> Interactive Sandbox
+                <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-white shadow-sm">
+                    <i class="fa-solid fa-table-cells"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-slate-800">Mission 1 Sandbox: Building the Coffee Shop Budget</h1>
+                    <div class="text-xs text-slate-500">Interactive Spreadsheet Practice</div>
                 </div>
             </div>
-            <div class="text-slate-400 text-sm">
-                W3Schools Style Practice
-            </div>
+            <button onclick="closeSandbox()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition border border-slate-200 flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Return to Slides
+            </button>
         </header>
 
-        <!-- Split Pane Container -->
+        <!-- Main Layout -->
         <div class="layout-container">
-            <!-- Left Pane: Instructions -->
-            <div class="instructions-pane flex flex-col">
-                <h1 class="text-3xl font-bold text-white mb-2">Exercise: Revenue Total</h1>
-                <p class="text-slate-400 mb-8 leading-relaxed">
-                    Use the grid on the right to calculate the total revenue for our fruit stand. Remember to start all formulas with an equals sign (<code class="text-emerald-400 bg-slate-800 px-1 rounded">=</code>).
-                </p>
+            <!-- Left Pane: Tasks -->
+            <div class="instructions-pane">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-emerald-600"></i> Your Objectives
+                </h2>
+                
+                <ul class="space-y-4 text-sm">
+                    <li id="task-1" class="task-item flex items-start gap-3 text-slate-600">
+                        <i class="fa-regular fa-circle text-slate-400 mt-1"></i>
+                        <div>
+                            <strong>1. Coffee Revenue:</strong> Click cell <span class="bg-slate-200 px-1 rounded font-mono text-xs text-slate-800 font-bold">D2</span>. Type <span class="bg-slate-200 px-1 rounded font-mono text-xs text-slate-800 font-bold">=B2*C2</span> and press Enter.
+                        </div>
+                    </li>
+                    <li id="task-2" class="task-item flex items-start gap-3 text-slate-600">
+                        <i class="fa-regular fa-circle text-slate-400 mt-1"></i>
+                        <div>
+                            <strong>2. Muffin Revenue:</strong> Click cell <span class="bg-slate-200 px-1 rounded font-mono text-xs text-slate-800 font-bold">D4</span>. Type <span class="bg-slate-200 px-1 rounded font-mono text-xs text-slate-800 font-bold">=B4*C4</span> and press Enter.
+                        </div>
+                    </li>
+                    <li id="task-3" class="task-item flex items-start gap-3 text-slate-600">
+                        <i class="fa-regular fa-circle text-slate-400 mt-1"></i>
+                        <div>
+                            <strong>3. Calculate Grand Total:</strong> Click cell <span class="bg-slate-200 px-1 rounded font-mono text-xs text-slate-800 font-bold">D5</span>. Type <span class="bg-slate-200 px-1 rounded font-mono text-xs text-slate-800 font-bold">=SUM(D2:D4)</span> to sum all totals!
+                        </div>
+                    </li>
+                </ul>
 
-                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700 mb-8 flex-1">
-                    <h2 class="text-lg font-semibold text-white mb-4 uppercase tracking-wider text-sm">Your Tasks:</h2>
-                    <ul class="space-y-4">
-                        <li id="task-1" class="task-item flex items-start gap-3 text-slate-300">
-                            <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
-                            <div>
-                                <strong>Apples Total:</strong> In cell <code>D2</code>, multiply the Quantity (B2) by the Price (C2).
-                                <div class="text-sm text-slate-500 mt-1">Hint: Type =B2*C2</div>
-                            </div>
-                        </li>
-                        <li id="task-2" class="task-item flex items-start gap-3 text-slate-300">
-                            <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
-                            <div>
-                                <strong>Oranges Total:</strong> In cell <code>D4</code>, multiply the Quantity (B4) by the Price (C4).
-                            </div>
-                        </li>
-                        <li id="task-3" class="task-item flex items-start gap-3 text-slate-300">
-                            <i class="fa-regular fa-circle mt-1 text-slate-500"></i>
-                            <div>
-                                <strong>Grand Total:</strong> In cell <code>D5</code>, use the SUM function to add up all the totals in column D.
-                                <div class="text-sm text-slate-500 mt-1">Hint: Type =SUM(D2:D4)</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Success Message -->
-                <div id="success-banner" class="bg-emerald-900/40 border border-emerald-500 rounded-xl p-6 text-center transform scale-95 opacity-0 transition-all duration-500 hidden">
-                    <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-[0_0_20px_rgba(16,185,129,0.5)]">
-                        <i class="fa-solid fa-check"></i>
+                <!-- Success Banner -->
+                <div id="success-banner" class="mt-8 p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-800 hidden transition-all duration-500 opacity-0 transform scale-95 shadow-sm">
+                    <div class="flex items-center gap-2 font-bold mb-1">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> Mission Accomplished!
                     </div>
-                    <h3 class="text-2xl font-bold text-emerald-400 mb-2">Excellent Work!</h3>
-                    <p class="text-slate-300 mb-6">You've successfully mastered cell references, math operators, and functions.</p>
-                    <button class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-2 rounded-lg font-bold transition-colors w-full" onclick="document.getElementById('sandbox-wrapper').style.display = 'none';">
-                        Return to Lesson <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
+                    <div class="text-xs text-emerald-700">
+                        You have mastered Excel formulas, arithmetic multiplication, and cell ranges!
+                    </div>
                 </div>
             </div>
 
-            <!-- Right Pane: Spreadsheet -->
+            <!-- Right Pane: Interactive Spreadsheet -->
             <div class="spreadsheet-pane">
+                <!-- Formula Bar -->
                 <div class="formula-bar-container">
-                    <div id="active-cell-label" class="active-cell-indicator">A1</div>
-                    <div class="text-slate-500 font-mono italic px-2">fx</div>
-                    <input type="text" id="main-formula-input" class="formula-input" placeholder="Select a cell to start typing...">
+                    <div class="active-cell-indicator" id="active-cell-name">A1</div>
+                    <div class="font-mono text-slate-400 font-bold italic">fx</div>
+                    <input type="text" class="formula-input" id="formula-bar" placeholder="Enter a value or formula (e.g. =B2*C2)">
                 </div>
+
+                <!-- Grid -->
                 <div class="grid-wrapper">
-                    <div id="grid-container" class="spreadsheet">
-                        <!-- JS will generate -->
+                    <div class="spreadsheet" id="spreadsheet-grid">
+                        <!-- Javascript will dynamically build grid here -->
                     </div>
                 </div>
             </div>
@@ -2988,6 +4673,7 @@
     </div>
 
     <script>
+
     /* Sandbox JS */
     document.addEventListener('DOMContentLoaded', () => {
         const COLS = ['A', 'B', 'C', 'D', 'E'];
@@ -3237,6 +4923,7 @@
             }
         });
     });
+    
     </script>
 </body>
 </html>

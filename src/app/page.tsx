@@ -248,11 +248,11 @@ export default function Home() {
       <div className="bg-blob bg-blob-1" />
       <div className="bg-blob bg-blob-2" />
 
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, width: '100%', background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, width: '100%', background: 'rgba(255, 255, 255, 0.88)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid var(--glass-border)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onDoubleClick={() => { setTempPcId(localStorage.getItem('pc_id') || ''); setShowPcIdModal(true); }}>
             <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '32px', objectFit: 'contain' }} title="Double click to configure PC ID" />
-            <span style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', color: '#f5f5f7' }}>{t('header.brand')}</span>
+            <span style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--text-main)' }}>{t('header.brand')}</span>
           </div>
 
           <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -273,8 +273,8 @@ export default function Home() {
       {/* Hero Section */}
       <section className="scroll-focus-section is-visible" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px 60px', position: 'relative', textAlign: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '850px' }} className="animate-fade-in-up">
-          <div style={{ padding: '6px 16px', borderRadius: '980px', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '28px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#2997ff', fontWeight: 500, fontSize: '0.85rem', letterSpacing: '0.02em' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2997ff', display: 'inline-block' }} />
+          <div style={{ padding: '6px 16px', borderRadius: '980px', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '28px', background: 'rgba(2, 132, 199, 0.08)', border: '1px solid rgba(2, 132, 199, 0.2)', color: '#0284c7', fontWeight: 500, fontSize: '0.85rem', letterSpacing: '0.02em' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#0284c7', display: 'inline-block' }} />
             {t('hero.badge')}
           </div>
           
@@ -283,7 +283,7 @@ export default function Home() {
             <span className="apple-color-gradient">Reimagined.</span>
           </h1>
           
-          <p style={{ fontSize: '1.25rem', color: '#86868b', marginBottom: '36px', maxWidth: '640px', lineHeight: 1.5, fontWeight: 400, letterSpacing: '-0.01em' }}>
+          <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '36px', maxWidth: '640px', lineHeight: 1.5, fontWeight: 400, letterSpacing: '-0.01em' }}>
             {t('hero.subtitle')}
           </p>
           
@@ -301,13 +301,13 @@ export default function Home() {
       {/* Interactive Whiteboard Brands Marquee Section */}
       <section className="scroll-focus-section" style={{ width: '100%', padding: '40px 0 20px', position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0284c7', marginBottom: '8px' }}>
             HARDWARE ECOSYSTEM
           </div>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', marginBottom: '10px' }}>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-main)', marginBottom: '10px' }}>
             {t('brands.title')}
           </h2>
-          <p style={{ color: '#86868b', fontSize: '1.05rem', maxWidth: '640px', margin: '0 auto', lineHeight: 1.5 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', maxWidth: '640px', margin: '0 auto', lineHeight: 1.5 }}>
             {t('brands.subtitle')}
           </p>
         </div>
@@ -361,13 +361,13 @@ export default function Home() {
       {/* Compatible Devices & Operating Systems Grid */}
       <section className="scroll-focus-section" style={{ maxWidth: '1200px', margin: '60px auto 20px', padding: '0 24px', width: '100%', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0284c7', marginBottom: '8px' }}>
             CROSS-PLATFORM INTEGRATION
           </div>
-          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-main)', marginBottom: '12px' }}>
             {t('devices.title')}
           </h2>
-          <p style={{ color: '#86868b', fontSize: '1.1rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.5 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.5 }}>
             {t('devices.subtitle')}
           </p>
         </div>
@@ -375,7 +375,7 @@ export default function Home() {
         <div className="devices-grid">
           {[
             {
-              logo: <AppleLogo height={26} fill="#F5F5F7" />,
+              logo: <AppleLogo height={26} fill="var(--text-main)" />,
               os: 'Apple iPadOS',
               badge: 'Safari & Chrome',
               desc: 'iPad Pro / Air, Apple Pencil low-latency ink & 120Hz ProMotion'
@@ -393,7 +393,7 @@ export default function Home() {
               desc: 'Interactive touch TVs, Surface Hub, AIO touch monitors & PCs'
             },
             {
-              logo: <AppleLogo height={26} fill="#F5F5F7" />,
+              logo: <AppleLogo height={26} fill="var(--text-main)" />,
               os: 'Apple macOS',
               badge: 'macOS Monterey+',
               desc: 'MacBook, iMac, dual-display teacher control & staging'
@@ -409,11 +409,11 @@ export default function Home() {
               <div key={idx} className="device-badge-full">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '260px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>{device.logo}</div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#f5f5f7', margin: 0, letterSpacing: '-0.02em' }}>{device.os}</h3>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.02em' }}>{device.os}</h3>
                 </div>
                 <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
-                  <p style={{ fontSize: '0.92rem', color: '#86868b', lineHeight: 1.5, margin: 0 }}>{device.desc}</p>
-                  <span style={{ fontSize: '0.72rem', padding: '4px 12px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.08)', color: '#2997ff', fontWeight: 500, border: '1px solid rgba(41, 151, 255, 0.25)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>{device.desc}</p>
+                  <span style={{ fontSize: '0.72rem', padding: '4px 12px', borderRadius: '980px', background: 'rgba(2, 132, 199, 0.08)', color: '#0284c7', fontWeight: 500, border: '1px solid rgba(2, 132, 199, 0.25)', whiteSpace: 'nowrap', flexShrink: 0 }}>
                     {device.badge}
                   </span>
                 </div>
@@ -422,12 +422,12 @@ export default function Home() {
               <div key={idx} className="device-badge">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>{device.logo}</div>
-                  <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '980px', background: 'rgba(255, 255, 255, 0.08)', color: '#2997ff', fontWeight: 500, border: '1px solid rgba(41, 151, 255, 0.25)' }}>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '980px', background: 'rgba(2, 132, 199, 0.08)', color: '#0284c7', fontWeight: 500, border: '1px solid rgba(2, 132, 199, 0.25)' }}>
                     {device.badge}
                   </span>
                 </div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#f5f5f7', margin: '6px 0 0', letterSpacing: '-0.02em' }}>{device.os}</h3>
-                <p style={{ fontSize: '0.9rem', color: '#86868b', lineHeight: 1.5, margin: 0 }}>{device.desc}</p>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)', margin: '6px 0 0', letterSpacing: '-0.02em' }}>{device.os}</h3>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>{device.desc}</p>
               </div>
             )
           ))}
@@ -437,13 +437,13 @@ export default function Home() {
       {/* Feature Highlights & Technology Introductions (Big 1 Card Per Row Bento) */}
       <section className="scroll-focus-section" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', width: '100%', position: 'relative', zIndex: 10 }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#2997ff', marginBottom: '8px' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0284c7', marginBottom: '8px' }}>
             ENGINEERED CAPABILITIES
           </div>
-          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: '#f5f5f7', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-main)', marginBottom: '12px' }}>
             {t('features.title')}
           </h2>
-          <p style={{ color: '#86868b', fontSize: '1.1rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.5 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.5 }}>
             {t('features.subtitle')}
           </p>
         </div>
@@ -452,50 +452,50 @@ export default function Home() {
           {[
             {
               icon: (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2997ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
                 </svg>
               ),
               titleKey: 'features.sync.title',
               descKey: 'features.sync.desc',
               tag: '< 50ms Latency',
-              color: '#2997ff',
+              color: '#0284c7',
               metric: '0.05s Sync Speed'
             },
             {
               icon: (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#30d158" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
                 </svg>
               ),
               titleKey: 'features.touch.title',
               descKey: 'features.touch.desc',
               tag: 'Multi-Touch & Stylus',
-              color: '#30d158',
+              color: '#10b981',
               metric: '4096 Levels Pressure'
             },
             {
               icon: (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                 </svg>
               ),
               titleKey: 'features.hardware.title',
               descKey: 'features.hardware.desc',
               tag: '100% Web-Based',
-              color: '#ff9f0a',
+              color: '#f59e0b',
               metric: 'Zero Driver Setup'
             },
             {
               icon: (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#bf5af2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
               ),
               titleKey: 'features.presence.title',
               descKey: 'features.presence.desc',
               tag: 'Live Telemetry',
-              color: '#bf5af2',
+              color: '#a855f7',
               metric: 'Real-Time Roster'
             }
           ].map((feat, idx) => (
@@ -510,13 +510,13 @@ export default function Home() {
                       {feat.tag}
                     </span>
                   </div>
-                  <h3 style={{ fontSize: 'clamp(1.25rem, 2vw, 1.55rem)', fontWeight: 700, color: '#f5f5f7', margin: 0, letterSpacing: '-0.025em' }}>
+                  <h3 style={{ fontSize: 'clamp(1.25rem, 2vw, 1.55rem)', fontWeight: 700, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.025em' }}>
                     {t(feat.titleKey)}
                   </h3>
                 </div>
               </div>
-              <div style={{ flex: 1, borderLeft: '1px solid rgba(255, 255, 255, 0.08)', paddingLeft: '32px' }}>
-                <p style={{ fontSize: '1.02rem', color: '#86868b', lineHeight: 1.6, margin: 0 }}>
+              <div style={{ flex: 1, borderLeft: '1px solid var(--glass-border)', paddingLeft: '32px' }}>
+                <p style={{ fontSize: '1.02rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
                   {t(feat.descKey)}
                 </p>
               </div>
@@ -531,16 +531,16 @@ export default function Home() {
       {showAuthModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
+          background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
         }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '40px', position: 'relative' }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '420px', padding: '40px', position: 'relative', background: '#ffffff', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.15)' }}>
             <button 
               onClick={() => setShowAuthModal(false)}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}
             >✕</button>
             
-            <h3 style={{ fontSize: '1.8rem', marginBottom: '20px', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '1.8rem', marginBottom: '20px', textAlign: 'center', color: 'var(--text-main)' }}>
               {isForgotPasswordMode ? 'Reset Password' : (isLoginMode ? 'Welcome Back' : 'Create Account')}
             </h3>
 
@@ -550,9 +550,9 @@ export default function Home() {
               {!isLoginMode && step === 1 && (
                 <>
                   <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} required
-                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a' }} />
                   
-                  <select value={role} onChange={e => setRole(e.target.value)} style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: '#1e293b', color: '#fff' }}>
+                  <select value={role} onChange={e => setRole(e.target.value)} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a' }}>
                     <option value="LEARNER">I am a Student (Learner)</option>
                     <option value="EDUCATOR">I am a Teacher (Educator)</option>
                   </select>
@@ -563,17 +563,17 @@ export default function Home() {
               {((isLoginMode || (!isLoginMode && step === 1)) && !isForgotPasswordMode) && (
                 <>
                   <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required
-                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a' }} />
 
                   <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required
-                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a' }} />
                 </>
               )}
 
               {/* Forgot Password Field */}
               {isForgotPasswordMode && (
                 <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required
-                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} />
+                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a' }} />
               )}
 
               {/* Verification Code - Step 2 */}
@@ -581,27 +581,27 @@ export default function Home() {
                 <div className="animate-fade-in-up">
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '10px' }}>Enter the 6-digit code sent to {email}</p>
                   <input type="text" placeholder="Verification Code" value={verificationCode} onChange={e => setVerificationCode(e.target.value)} required
-                    style={{ padding: '12px', width: '100%', borderRadius: '8px', border: '1px solid var(--primary)', background: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '4px' }} maxLength={6} />
+                    style={{ padding: '12px', width: '100%', borderRadius: '8px', border: '2px solid var(--primary)', background: '#f8fafc', color: '#0f172a', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '4px' }} maxLength={6} />
                 </div>
               )}
 
               {/* Legal Terms Checkbox - Step 1 Register */}
               {!isLoginMode && step === 1 && !isForgotPasswordMode && (
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.82rem', color: '#a1a1a6', cursor: 'pointer', lineHeight: 1.45, marginTop: '2px', padding: '0 2px' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.82rem', color: 'var(--text-muted)', cursor: 'pointer', lineHeight: 1.45, marginTop: '2px', padding: '0 2px' }}>
                   <input 
                     type="checkbox" 
                     checked={hasAgreedToTerms} 
                     onChange={e => setHasAgreedToTerms(e.target.checked)} 
                     required
-                    style={{ marginTop: '3px', accentColor: '#2997ff', cursor: 'pointer' }}
+                    style={{ marginTop: '3px', accentColor: '#0284c7', cursor: 'pointer' }}
                   />
                   <span>
                     {language === 'en' ? (
-                      <>I have read and agree to the <Link href="/user-agreement" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>User Agreement</Link>, <Link href="/privacy-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>Privacy Policy</Link>, and <Link href="/refund-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>Refund Policy</Link>.</>
+                      <>I have read and agree to the <Link href="/user-agreement" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>User Agreement</Link>, <Link href="/privacy-policy" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>Privacy Policy</Link>, and <Link href="/refund-policy" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>Refund Policy</Link>.</>
                     ) : (language === 'zh-TW' ? (
-                      <>我已閱讀並同意遵守 <Link href="/user-agreement" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《用戶服務協議》</Link>、<Link href="/privacy-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《隱私政策》</Link> 及 <Link href="/refund-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《退款政策》</Link>。</>
+                      <>我已閱讀並同意遵守 <Link href="/user-agreement" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>《用戶服務協議》</Link>、<Link href="/privacy-policy" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>《隱私政策》</Link> 及 <Link href="/refund-policy" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>《退款政策》</Link>。</>
                     ) : (
-                      <>我已阅读并同意遵守 <Link href="/user-agreement" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《用户服务协议》</Link>、<Link href="/privacy-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《隐私政策》</Link> 及 <Link href="/refund-policy" target="_blank" style={{ color: '#2997ff', textDecoration: 'underline' }}>《退款政策》</Link>。</>
+                      <>我已阅读并同意遵守 <Link href="/user-agreement" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>《用户服务协议》</Link>、<Link href="/privacy-policy" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>《隐私政策》</Link> 及 <Link href="/refund-policy" target="_blank" style={{ color: '#0284c7', textDecoration: 'underline' }}>《退款政策》</Link>。</>
                     ))}
                   </span>
                 </label>
@@ -630,21 +630,21 @@ export default function Home() {
       {showPcIdModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
+          background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
         }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '40px', position: 'relative' }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '40px', position: 'relative', background: '#ffffff', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.15)' }}>
             <button 
               onClick={() => setShowPcIdModal(false)}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}
             >✕</button>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '20px', textAlign: 'center' }}>Set PC ID</h3>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '20px', textAlign: 'center', color: 'var(--text-main)' }}>Set PC ID</h3>
             <input 
               type="text" 
               placeholder="Enter PC ID" 
               value={tempPcId} 
               onChange={e => setTempPcId(e.target.value)} 
-              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff', marginBottom: '20px' }} 
+              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', marginBottom: '20px' }} 
             />
             <button 
               className="btn-primary" 

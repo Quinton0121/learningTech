@@ -422,13 +422,13 @@ export default function EducatorDashboard() {
       <div className="bg-blob bg-blob-2" style={{ opacity: 0.2, right: '20%' }} />
 
       {/* Mobile Top Nav (Hidden on Desktop) */}
-      <div className="mobile-dashboard-nav" style={{ padding: '16px 24px', display: 'none', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--glass-border)', position: 'sticky', top: 0, zIndex: 100 }}>
+      <div className="mobile-dashboard-nav" style={{ padding: '16px 24px', display: 'none', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--glass-border)', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img src="/edusphere.png" alt="Interlectic Logo" style={{ height: '32px', objectFit: 'contain' }} />
           <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--primary)' }}>{t('header.brand')}</h2>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.8rem', cursor: 'pointer', padding: 0 }}>
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '1.8rem', cursor: 'pointer', padding: 0 }}>
             {isMobileMenuOpen ? '✕' : '☰'}
           </button>
         </div>
@@ -536,15 +536,15 @@ export default function EducatorDashboard() {
                   justifyContent: 'space-between', 
                   alignItems: 'center', 
                   transition: 'all 0.2s', 
-                  border: expandedCourseId === course.id ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.05)',
+                  border: expandedCourseId === course.id ? '2px solid #0284c7' : '1px solid var(--glass-border)',
                   background: expandedCourseId === course.id ? 'rgba(56, 189, 248, 0.1)' : 'var(--glass-bg)'
                 }}
                 onClick={() => setExpandedCourseId(expandedCourseId === course.id ? null : course.id)}
               >
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: course.isArchived ? 'var(--text-muted)' : 'white', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: course.isArchived ? 'var(--text-muted)' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   {course.title}
                 </h3>
-                <span style={{ color: expandedCourseId === course.id ? '#38bdf8' : 'var(--text-muted)' }}>
+                <span style={{ color: expandedCourseId === course.id ? '#0284c7' : 'var(--text-muted)' }}>
                   {expandedCourseId === course.id ? '▶' : '▼'}
                 </span>
               </div>
@@ -664,7 +664,7 @@ export default function EducatorDashboard() {
                           placeholder={t('dashboard.studentEmail')}
                           value={inviteEmail[course.id] || ''} 
                           onChange={e => setInviteEmail({ ...inviteEmail, [course.id]: e.target.value })}
-                          style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff' }} 
+                          style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)' }} 
                           disabled={course.isArchived}
                         />
                         <button 
@@ -685,7 +685,7 @@ export default function EducatorDashboard() {
                           style={{
                             background: 'rgba(56, 189, 248, 0.12)',
                             border: '1px solid rgba(56, 189, 248, 0.35)',
-                            color: '#38bdf8',
+                            color: '#0284c7',
                             fontSize: '0.75rem',
                             padding: '4px 10px',
                             borderRadius: '6px',
@@ -707,7 +707,7 @@ export default function EducatorDashboard() {
                           type="file" 
                           accept=".csv"
                           onChange={e => setCsvFile({ ...csvFile, [course.id]: e.target.files ? e.target.files[0] : null })}
-                          style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: '0.8rem' }} 
+                          style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)', fontSize: '0.8rem' }} 
                           disabled={course.isArchived}
                         />
                         <button 
@@ -790,12 +790,12 @@ export default function EducatorDashboard() {
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                           <thead>
                             <tr style={{ borderBottom: '1px solid var(--glass-border)', textAlign: 'left', color: 'var(--text-muted)' }}>
-                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colName')}</th>
-                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colEmail')}</th>
-                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colPcId')}</th>
-                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>Status</th>
-                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>Slide 16 Score</th>
-                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.9)' }}>{t('dashboard.colActions')}</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: '#f8fafc', color: 'var(--text-main)' }}>{t('dashboard.colName')}</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: '#f8fafc', color: 'var(--text-main)' }}>{t('dashboard.colEmail')}</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: '#f8fafc', color: 'var(--text-main)' }}>{t('dashboard.colPcId')}</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: '#f8fafc', color: 'var(--text-main)' }}>Status</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: '#f8fafc', color: 'var(--text-main)' }}>Slide 16 Score</th>
+                              <th style={{ padding: '8px', position: 'sticky', top: 0, background: '#f8fafc', color: 'var(--text-main)' }}>{t('dashboard.colActions')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -877,41 +877,41 @@ export default function EducatorDashboard() {
             </div>
           ))}
 
-          <div onClick={() => setShowCreateModal(true)} className="glass-panel hover-glow" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', border: '2px dashed var(--glass-border)' }}>
-            <span style={{ fontSize: '1.5rem', color: 'var(--text-muted)' }}>+</span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-muted)' }}>Create New Course</h3>
+          <div onClick={() => setShowCreateModal(true)} className="glass-panel hover-glow" style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', border: '2px dashed var(--glass-border)', background: 'var(--surface)' }}>
+            <span style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>+</span>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)', fontWeight: 600 }}>Create New Course</h3>
           </div>
         </div>
         </main>
       </div>
 
       {showCreateModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
-          <div className="glass-panel animate-fade-in-up" style={{ width: '500px', padding: '32px', background: 'var(--surface)' }}>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '24px', color: 'var(--text-main)' }}>Create New Course (Template Builder)</h2>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
+          <div className="glass-panel animate-fade-in-up" style={{ width: '500px', padding: '32px', background: 'var(--surface)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '24px', color: 'var(--text-main)', fontWeight: 700 }}>Create New Course (Template Builder)</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Course Title</label>
-                <input type="text" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="E.g. Advanced Excel Tips" />
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>Course Title</label>
+                <input type="text" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)' }} placeholder="E.g. Advanced Excel Tips" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Course Description</label>
-                <input type="text" value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="What is this course about?" />
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>Course Description</label>
+                <input type="text" value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)' }} placeholder="What is this course about?" />
               </div>
               <hr style={{ borderColor: 'var(--glass-border)', margin: '8px 0' }} />
-              <h3 style={{ fontSize: '1.1rem', color: '#38bdf8' }}>Option A: Build from Template</h3>
+              <h3 style={{ fontSize: '1.1rem', color: '#0284c7', fontWeight: 600 }}>Option A: Build from Template</h3>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Slide Title</label>
-                <input type="text" value={newCourse.slideTitle} onChange={e => setNewCourse({...newCourse, slideTitle: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="E.g. Introduction to Formulas" disabled={!!newCourse.htmlFile} />
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>Slide Title</label>
+                <input type="text" value={newCourse.slideTitle} onChange={e => setNewCourse({...newCourse, slideTitle: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)' }} placeholder="E.g. Introduction to Formulas" disabled={!!newCourse.htmlFile} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Bullet Points (One per line)</label>
-                <textarea rows={4} value={newCourse.slideBullets} onChange={e => setNewCourse({...newCourse, slideBullets: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="Point 1...\nPoint 2..." disabled={!!newCourse.htmlFile} />
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>Bullet Points (One per line)</label>
+                <textarea rows={4} value={newCourse.slideBullets} onChange={e => setNewCourse({...newCourse, slideBullets: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)' }} placeholder="Point 1...\nPoint 2..." disabled={!!newCourse.htmlFile} />
               </div>
-              <h3 style={{ fontSize: '1.1rem', color: '#38bdf8', marginTop: '16px' }}>Option B: Upload Custom HTML</h3>
+              <h3 style={{ fontSize: '1.1rem', color: '#0284c7', marginTop: '16px', fontWeight: 600 }}>Option B: Upload Custom HTML</h3>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Upload an HTML file (Pending approval)</label>
-                <input type="file" accept=".html" onChange={e => setNewCourse({...newCourse, htmlFile: e.target.files ? e.target.files[0] : null})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }} />
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>Upload an HTML file (Pending approval)</label>
+                <input type="file" accept=".html" onChange={e => setNewCourse({...newCourse, htmlFile: e.target.files ? e.target.files[0] : null})} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)' }} />
               </div>
             </div>
             <div style={{ display: 'flex', gap: '16px', marginTop: '32px' }}>
@@ -923,22 +923,22 @@ export default function EducatorDashboard() {
       )}
 
       {showInbox && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
-          <div className="glass-panel animate-fade-in-up" style={{ width: '900px', height: '70vh', display: 'flex', background: 'var(--surface)', overflow: 'hidden', padding: 0 }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
+          <div className="glass-panel animate-fade-in-up" style={{ width: '900px', height: '70vh', display: 'flex', background: 'var(--surface)', overflow: 'hidden', padding: 0, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}>
             
             {/* Left Sidebar (Contacts) */}
-            <div style={{ width: '280px', borderRight: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ width: '280px', borderRight: '1px solid var(--glass-border)', background: 'var(--surface)', display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#f59e0b' }}>Contacts</h3>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0284c7', fontWeight: 700 }}>Contacts</h3>
               </div>
               <div style={{ flex: 1, overflowY: 'auto' }}>
                 {contacts.map(contact => (
                   <div 
                     key={contact.id} 
                     onClick={() => setSelectedContactId(contact.id)}
-                    style={{ padding: '16px 20px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', background: selectedContactId === contact.id ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderLeft: selectedContactId === contact.id ? '4px solid #38bdf8' : '4px solid transparent' }}
+                    style={{ padding: '16px 20px', cursor: 'pointer', borderBottom: '1px solid var(--glass-border)', background: selectedContactId === contact.id ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderLeft: selectedContactId === contact.id ? '4px solid #0284c7' : '4px solid transparent' }}
                   >
-                    <div style={{ fontWeight: 600, color: contact.role === 'ADMIN' ? '#f59e0b' : '#38bdf8' }}>
+                    <div style={{ fontWeight: 600, color: contact.role === 'ADMIN' ? '#d97706' : '#0284c7' }}>
                       {contact.name}
                     </div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -950,12 +950,12 @@ export default function EducatorDashboard() {
             </div>
 
             {/* Right Main Area (Messages) */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--surface)' }}>
               <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '1.2rem', color: '#38bdf8', margin: 0 }}>
+                <h2 style={{ fontSize: '1.2rem', color: '#0284c7', margin: 0, fontWeight: 700 }}>
                   Chat with {contacts.find(c => c.id === selectedContactId)?.name}
                 </h2>
-                <button onClick={() => setShowInbox(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+                <button onClick={() => setShowInbox(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
               </div>
               
               <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -967,11 +967,11 @@ export default function EducatorDashboard() {
                   selectedContactMessages.map(msg => {
                     const isMyMsg = msg.senderId === user?.id;
                     return (
-                      <div key={msg.id} style={{ alignSelf: isMyMsg ? 'flex-end' : 'flex-start', maxWidth: '80%', background: isMyMsg ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                      <div key={msg.id} style={{ alignSelf: isMyMsg ? 'flex-end' : 'flex-start', maxWidth: '80%', background: isMyMsg ? 'rgba(16, 185, 129, 0.12)' : 'rgba(0, 0, 0, 0.03)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
                           {isMyMsg ? 'You' : (msg.sender?.role === 'ADMIN' ? 'Admin Support' : (msg.sender?.name || msg.sender?.email))} • {new Date(msg.createdAt).toLocaleString()}
                         </div>
-                        <div style={{ whiteSpace: 'pre-wrap', color: 'white' }}>{msg.content}</div>
+                        <div style={{ whiteSpace: 'pre-wrap', color: 'var(--text-main)' }}>{msg.content}</div>
                       </div>
                     );
                   }).reverse()
@@ -979,19 +979,19 @@ export default function EducatorDashboard() {
               </div>
 
               {/* Reply Box */}
-              <div style={{ padding: '20px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '12px', background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ padding: '20px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '12px', background: 'var(--surface)' }}>
                 <input 
                   type="text" 
                   placeholder="Type a message..." 
                   value={replyText} 
                   onChange={e => setReplyText(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                  style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white' }} 
+                  style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--surface)', color: 'var(--text-main)' }} 
                 />
                 <button 
                   onClick={handleSendMessage}
                   className="btn-primary" 
-                  style={{ padding: '12px 24px', background: '#38bdf8' }}
+                  style={{ padding: '12px 24px' }}
                   disabled={isSendingMessage}
                 >
                   {isSendingMessage ? 'Sending...' : 'Send'}

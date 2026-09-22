@@ -13,7 +13,7 @@ export default function Footer() {
       width: '100%',
       marginTop: 'auto',
       borderTop: '1px solid var(--glass-border)',
-      background: 'rgba(15, 23, 42, 0.85)',
+      background: 'rgba(255, 255, 255, 0.9)',
       backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
       zIndex: 50,
@@ -94,7 +94,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          borderTop: '1px solid var(--glass-border)',
           paddingTop: '24px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -109,11 +109,11 @@ export default function Footer() {
             <Link href="/user-agreement" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none' }}>
               {t('footer.userAgreement')}
             </Link>
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
+            <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>•</span>
             <Link href="/refund-policy" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none' }}>
               {t('footer.refundPolicy')}
             </Link>
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
+            <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>•</span>
             <Link href="/privacy-policy" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none' }}>
               {t('footer.privacyPolicy')}
             </Link>

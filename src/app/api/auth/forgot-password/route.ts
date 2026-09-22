@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { Resend } from 'resend';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-development-key-change-in-production';
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
@@ -35,6 +34,7 @@ export async function POST(request: Request) {
 
     if (process.env.RESEND_API_KEY) {
       try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
         const { error } = await resend.emails.send({
           from: 'Interlectic <onboarding@resend.dev>',
           to: email,
