@@ -411,6 +411,40 @@
             z-index: 30;
             border: 1px solid white;
         }
+    
+        /* =========================================================================
+           SLIDE 18 & 19 FULL APPLICATION VIEWPORT STYLES
+           ========================================================================= */
+        .slide-container.app-slide {
+            padding: 0 !important;
+            justify-content: flex-start !important;
+            align-items: stretch !important;
+            overflow: hidden !important;
+        }
+
+        .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+        .shadow-xs { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+
+        /* Compact worksheet treatment for MAX/MIN/LARGE/SMALL */
+        #view-max .max-w-\[14rem\], #view-min .max-w-\[14rem\], #view-large .max-w-\[14rem\], #view-small .max-w-\[14rem\] { max-width: 14rem; }
+        #view-max .func-view, #view-min .func-view, #view-large .func-view, #view-small .func-view { gap: 1rem; }
+
+        /* Slide 19 Alert Pulse & Scrollbar */
+        @keyframes alertPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+        }
+        .animate-alert {
+          animation: alertPulse 2s infinite ease-in-out;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 selection:bg-emerald-200">
@@ -426,7 +460,7 @@
             <i class="fa-solid fa-chevron-left text-xl"></i>
         </button>
         <div class="text-slate-600 font-mono text-sm tracking-widest font-semibold">
-            <span id="current-slide-num">1</span> / <span id="total-slide-num">17</span>
+            <span id="current-slide-num">1</span> / <span id="total-slide-num">19</span>
         </div>
         <button id="next-btn" class="text-emerald-600 hover:text-emerald-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
             <i class="fa-solid fa-chevron-right text-xl"></i>
@@ -1791,6 +1825,1815 @@
             </div>
         </div>
     </div>
+
+    
+    <!-- Slide 18: Excel Core Functions Studio -->
+    <div class="slide-container app-slide" id="slide-18">
+        <div class="w-full h-full bg-slate-100 text-slate-800 flex flex-col antialiased selection:bg-indigo-200 overflow-hidden">
+            <!-- Top App Bar -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+<div class="flex items-center space-x-3">
+<button class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5 shadow-xs" id="sidebar-toggle-btn" onclick="toggleSidebar()">
+<svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="hidden sm:inline">Functions Menu</span>
+</button>
+<div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-black text-sm text-white shadow-xs">
+          ƒx
+        </div>
+<div>
+<h1 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            Excel Core Functions Studio
+            <span class="text-[11px] font-mono-code bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full font-bold" id="active-func-header-pill">=SUM</span>
+</h1>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="flex items-center space-x-2">
+<button class="px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 text-xs font-bold transition flex items-center gap-1.5 shadow-xs" id="header-context-btn" onclick="toggleTable4Card()">
+<span id="header-context-icon">📖</span> <span id="header-context-label">Table 4 (A1:A5)</span> <span id="header-context-arrow">▾</span>
+</button>
+<div class="h-4 w-px bg-slate-200 mx-1"></div>
+<button class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition flex items-center gap-1" id="prev-func-top" onclick="navigateStep(-1)">
+<span>←</span> <span class="hidden sm:inline">Prev</span>
+</button>
+<span class="font-mono-code text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1.5 rounded-lg border border-indigo-100" id="func-counter-badge">
+          1 / 15
+        </span>
+<button class="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-xs font-semibold text-white hover:bg-indigo-700 transition flex items-center gap-1 shadow-xs" id="next-func-top" onclick="navigateStep(1)">
+<span class="hidden sm:inline">Next</span> <span>→</span>
+</button>
+</div>
+</div>
+</header>
+<div class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+<!-- Sidebar Navigation Drawer -->
+<aside class="hidden lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col gap-4" id="function-sidebar">
+<div class="flex items-center justify-between pb-3 border-b border-slate-100">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-400">Select Function</span>
+<div class="flex items-center gap-2">
+<span class="text-[11px] text-slate-500 font-medium">15 Essentials</span>
+<button class="text-slate-400 hover:text-slate-700 text-xs px-1.5 py-0.5 rounded hover:bg-slate-100 font-bold" onclick="toggleSidebar()" title="Close sidebar">✕</button>
+</div>
+</div>
+<!-- Category 1: Math & Rounding -->
+<div class="space-y-1">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">Math &amp; Rounding</span>
+<div class="space-y-0.5">
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition active" data-id="sum" onclick="selectFunction('sum')">
+<span class="font-mono-code font-bold">=SUM</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Accumulate</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="round" onclick="selectFunction('round')">
+<span class="font-mono-code font-bold">=ROUND</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">5/4 Rule</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="roundup" onclick="selectFunction('roundup')">
+<span class="font-mono-code font-bold">=ROUNDUP</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Ceiling</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="rounddown" onclick="selectFunction('rounddown')">
+<span class="font-mono-code font-bold">=ROUNDDOWN</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Floor</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="mod" onclick="selectFunction('mod')">
+<span class="font-mono-code font-bold">=MOD</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Remainder</span>
+</button>
+</div>
+</div>
+<!-- Category 2: Stats & Extremes -->
+<div class="space-y-1 pt-2 border-t border-slate-100">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">Stats &amp; Extremes</span>
+<div class="space-y-0.5">
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="average" onclick="selectFunction('average')">
+<span class="font-mono-code font-bold">=AVERAGE</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Mean</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="max" onclick="selectFunction('max')">
+<span class="font-mono-code font-bold">=MAX</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Top 1</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="min" onclick="selectFunction('min')">
+<span class="font-mono-code font-bold">=MIN</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Lowest 1</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="large" onclick="selectFunction('large')">
+<span class="font-mono-code font-bold">=LARGE</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">k-th Top</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="small" onclick="selectFunction('small')">
+<span class="font-mono-code font-bold">=SMALL</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">k-th Bottom</span>
+</button>
+</div>
+</div>
+<!-- Category 3: Text & Strings -->
+<div class="space-y-1 pt-2 border-t border-slate-100">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">Text &amp; Strings</span>
+<div class="space-y-0.5">
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="mid" onclick="selectFunction('mid')">
+<span class="font-mono-code font-bold">=MID</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Slice Chars</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="concatenate" onclick="selectFunction('concatenate')">
+<span class="font-mono-code font-bold">=CONCAT / &amp;</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Join Text</span>
+</button>
+</div>
+</div>
+<!-- Category 4: Smart Counting -->
+<div class="space-y-1 pt-2 border-t border-slate-100">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">Smart Counting</span>
+<div class="space-y-0.5">
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="count" onclick="selectFunction('count')">
+<span class="font-mono-code font-bold">=COUNT</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Numbers Only</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="counta" onclick="selectFunction('counta')">
+<span class="font-mono-code font-bold">=COUNTA</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">All Non-Empty</span>
+</button>
+<button class="func-nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 transition" data-id="countif" onclick="selectFunction('countif')">
+<span class="font-mono-code font-bold">=COUNTIF</span>
+<span class="badge-pill text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-sans">Criteria Filter</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:col-span-12 flex flex-col gap-5 relative" id="main-content-area">
+<!-- ========================================================================= -->
+<!-- FLOATING TABLE 4 POPUP WINDOW (PAGES 1-5: A1:A5)                           -->
+<!-- ========================================================================= -->
+<div class="hidden absolute top-0 left-0 z-50 w-full max-w-sm sm:max-w-md bg-white border-2 border-purple-400 rounded-2xl shadow-2xl overflow-hidden transition-all" id="table4-popup-card">
+<!-- Floating Window Header -->
+<div class="bg-gradient-to-r from-purple-900 to-indigo-900 px-3.5 py-2.5 flex items-center justify-between text-white select-none">
+<div class="flex items-center space-x-2">
+<span class="w-6 h-6 rounded-md bg-purple-500/30 border border-purple-400/40 flex items-center justify-center text-xs">
+              📊
+            </span>
+<div>
+<h3 class="text-xs font-bold tracking-wide">Textbook Data Table (Page 47 • Col A)</h3>
+<p class="text-[10px] text-purple-200/80">Input values for worked textbook formulas</p>
+</div>
+</div>
+<button class="w-6 h-6 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs font-bold text-white transition" onclick="toggleTable4Card(false)" title="Close window">✕</button>
+</div>
+<!-- Floating Window Content: Compact Page 47 Table -->
+<div class="p-3 bg-slate-50/90 text-xs">
+<div class="overflow-x-auto rounded-xl border border-purple-200 bg-white shadow-xs">
+<table class="w-full text-left border-collapse text-[11px]">
+<thead>
+<tr class="bg-purple-100/80 text-purple-950 font-bold border-b border-purple-200">
+<th class="py-1.5 px-2 text-center font-mono-code bg-purple-200/50 border-r border-purple-200 w-10">Cell</th>
+<th class="py-1.5 px-2.5 text-right font-mono-code border-r border-purple-200 w-16">A</th>
+<th class="py-1.5 px-2.5 font-sans">Used In Example</th>
+<th class="py-1.5 px-2 text-center w-14">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-purple-100 font-mono-code">
+<!-- Row 1 -->
+<tr class="hover:bg-purple-50/60 transition">
+<td class="py-1.5 px-2 text-center font-bold text-indigo-700 bg-slate-50 border-r border-purple-100">A1</td>
+<td class="py-1.5 px-2.5 text-right font-black text-indigo-900 border-r border-purple-100">1.234</td>
+<td class="py-1.5 px-2.5 font-sans text-slate-700">
+<div>ROUNDUP <strong class="text-emerald-700 font-bold">➔ 1.24</strong></div>
+<div>ROUNDDOWN <strong class="text-rose-700 font-bold">➔ 1.23</strong></div>
+</td>
+<td class="py-1.5 px-2 text-center">
+<button class="px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 font-bold text-[10px] transition" onclick="loadTable4Example('roundup')">Test →</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-purple-50/60 transition">
+<td class="py-1.5 px-2 text-center font-bold text-blue-700 bg-slate-50 border-r border-purple-100">A2</td>
+<td class="py-1.5 px-2.5 text-right font-black text-blue-900 border-r border-purple-100">56.78</td>
+<td class="py-1.5 px-2.5 font-sans text-slate-700">
+                    ROUND(A2, 1) <strong class="text-blue-700 font-bold">➔ 56.8</strong>
+</td>
+<td class="py-1.5 px-2 text-center">
+<button class="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200 font-bold text-[10px] transition" onclick="loadTable4Example('round')">Test →</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-purple-50/60 transition">
+<td class="py-1.5 px-2 text-center font-bold text-purple-700 bg-slate-50 border-r border-purple-100">A3</td>
+<td class="py-1.5 px-2.5 text-right font-black text-purple-900 border-r border-purple-100">204.6</td>
+<td class="py-1.5 px-2.5 font-sans text-slate-700">
+                    SUM(A1:A3) <strong class="text-indigo-700 font-bold">➔ 262.614</strong>
+</td>
+<td class="py-1.5 px-2 text-center">
+<button class="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 font-bold text-[10px] transition" onclick="loadTable4Example('sum')">Test →</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-purple-50/60 transition opacity-70">
+<td class="py-1.5 px-2 text-center font-bold text-slate-500 bg-slate-50 border-r border-purple-100">A4</td>
+<td class="py-1.5 px-2.5 text-right font-bold text-slate-700 border-r border-purple-100">19.84</td>
+<td class="py-1.5 px-2.5 font-sans text-slate-400 italic">Data block row</td>
+<td class="py-1.5 px-2 text-center text-slate-400">—</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-purple-50/60 transition">
+<td class="py-1.5 px-2 text-center font-bold text-amber-700 bg-slate-50 border-r border-purple-100">A5</td>
+<td class="py-1.5 px-2.5 text-right font-black text-amber-900 border-r border-purple-100">1357</td>
+<td class="py-1.5 px-2.5 font-sans text-slate-700">
+                    MOD(A5, 2) <strong class="text-amber-700 font-bold">➔ 1</strong>
+</td>
+<td class="py-1.5 px-2 text-center">
+<button class="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-800 border border-amber-200 font-bold text-[10px] transition" onclick="loadTable4Example('mod')">Test →</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+<span>Click any <strong>Test →</strong> to auto-load preset</span>
+<button class="text-purple-700 hover:text-purple-900 font-bold" onclick="toggleTable4Card(false)">Close [✕]</button>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- FLOATING STATS DATASET POPUP WINDOW (PAGES 6-10: A1:A12)                   -->
+<!-- ========================================================================= -->
+<div class="hidden absolute top-0 left-0 z-50 w-full max-w-sm sm:max-w-md bg-white border-2 border-blue-400 rounded-2xl shadow-2xl overflow-hidden transition-all" id="stats-popup-card">
+<!-- Floating Window Header -->
+<div class="bg-gradient-to-r from-blue-900 to-indigo-900 px-3.5 py-2.5 flex items-center justify-between text-white select-none">
+<div class="flex items-center space-x-2">
+<span class="w-6 h-6 rounded-md bg-blue-500/30 border border-blue-400/40 flex items-center justify-center text-xs">
+              📈
+            </span>
+<div>
+<h3 class="text-xs font-bold tracking-wide">Textbook Dataset (Page 48 • Col A)</h3>
+<p class="text-[10px] text-blue-200/80">Input values for AVERAGE, MAX, MIN, LARGE, SMALL</p>
+</div>
+</div>
+<button class="w-6 h-6 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs font-bold text-white transition" onclick="toggleTable4Card(false)" title="Close window">✕</button>
+</div>
+<!-- Floating Window Content: Compact Page 48 Table -->
+<div class="p-3 bg-slate-50/90 text-xs">
+<div class="max-h-60 overflow-y-auto rounded-xl border border-blue-200 bg-white shadow-xs">
+<table class="w-full text-left border-collapse text-[11px]">
+<thead class="sticky top-0 z-10">
+<tr class="bg-blue-100/90 text-blue-950 font-bold border-b border-blue-200">
+<th class="py-1.5 px-2 text-center font-mono-code bg-blue-200/60 border-r border-blue-200 w-10">Cell</th>
+<th class="py-1.5 px-2.5 text-right font-mono-code border-r border-blue-200 w-16">A</th>
+<th class="py-1.5 px-2.5 font-sans">Textbook Role</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-blue-100 font-mono-code">
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A1</td><td class="py-1 px-2.5 text-right font-black text-blue-900 border-r">50</td><td class="py-1 px-2.5 font-sans text-teal-700 font-semibold">=MIN (Lowest)</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A2</td><td class="py-1 px-2.5 text-right font-bold text-slate-800 border-r">55</td><td class="py-1 px-2.5 font-sans text-slate-500">Data Row</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A3</td><td class="py-1 px-2.5 text-right font-bold text-slate-800 border-r">58</td><td class="py-1 px-2.5 font-sans text-slate-500">Data Row</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A4</td><td class="py-1 px-2.5 text-right font-bold text-slate-800 border-r">57</td><td class="py-1 px-2.5 font-sans text-slate-500">Data Row</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A5</td><td class="py-1 px-2.5 text-right font-black text-indigo-900 border-r">62</td><td class="py-1 px-2.5 font-sans text-indigo-700 font-semibold">=LARGE k=2</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A6</td><td class="py-1 px-2.5 text-right font-black text-amber-900 border-r">65</td><td class="py-1 px-2.5 font-sans text-amber-700 font-semibold">=MAX (Peak)</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A7</td><td class="py-1 px-2.5 text-right font-black text-indigo-900 border-r">61</td><td class="py-1 px-2.5 font-sans text-indigo-700 font-semibold">=LARGE k=3</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A8</td><td class="py-1 px-2.5 text-right font-bold text-slate-800 border-r">59</td><td class="py-1 px-2.5 font-sans text-slate-500">Data Row</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A9</td><td class="py-1 px-2.5 text-right font-bold text-slate-800 border-r">55</td><td class="py-1 px-2.5 font-sans text-slate-500">Data Row</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A10</td><td class="py-1 px-2.5 text-right font-bold text-slate-800 border-r">53</td><td class="py-1 px-2.5 font-sans text-slate-500">Data Row</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A11</td><td class="py-1 px-2.5 text-right font-black text-teal-900 border-r">54</td><td class="py-1 px-2.5 font-sans text-teal-700 font-semibold">=SMALL k=3</td></tr>
+<tr class="hover:bg-blue-50/60"><td class="py-1 px-2 text-center font-bold text-slate-600 bg-slate-50 border-r">A12</td><td class="py-1 px-2.5 text-right font-black text-teal-900 border-r">52</td><td class="py-1 px-2.5 font-sans text-teal-700 font-semibold">=SMALL k=2</td></tr>
+</tbody>
+</table>
+</div>
+<div class="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+<span>Range: <strong>A1:A12</strong> • Sum: <strong>691</strong></span>
+<button class="text-blue-700 hover:text-blue-900 font-bold" onclick="toggleTable4Card(false)">Close [✕]</button>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- VIEW 1: SUM                                                               -->
+<!-- ========================================================================= -->
+<section class="func-view bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-sum">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-700 font-mono-code font-bold text-xs">Table 4 &amp; Page 46</span>
+<h2 class="text-xl font-bold text-slate-900">=SUM(number1, [number2], ...)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Calculates the total mathematical sum of all numeric cells within specified ranges.</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition" onclick="loadSumPreset()">
+              Load Textbook Preset (A1:A3)
+            </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-4">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Interactive Cells (A1 to A5)</span>
+<div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-xs font-mono-code text-xs">
+<table class="w-full">
+<thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+<tr>
+<th class="w-12 py-2 text-center bg-slate-100">Cell</th>
+<th class="py-2 px-3 text-left">Value</th>
+<th class="py-2 px-3 text-center">Include in Sum</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100" id="sum-table-body">
+<!-- Generated via JS -->
+</tbody>
+</table>
+</div>
+<!-- AutoSum Hint from Page 47 Fig. 74 -->
+<div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-950 text-xs space-y-1">
+<div class="font-bold flex items-center gap-1.5 text-amber-900">
+<span>💡</span> Textbook Hint: AutoSum (Fig. 74)
+              </div>
+<p class="text-slate-600 text-[11px] leading-relaxed">
+                Click below your data and press the <strong class="text-amber-900">∑ AutoSum</strong> ribbon button. Excel detects the continuous range of numbers automatically!
+              </p>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-indigo-800 tracking-wider block">Formula Execution</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="sum-formula-display">=SUM(A1:A3)</span>
+</div>
+<div class="text-right">
+<span class="font-mono-code font-black text-3xl text-indigo-700 bg-white px-3.5 py-1 rounded-xl border border-indigo-200 shadow-xs block" id="sum-result-display">
+                  262.614
+                </span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+<span class="font-bold text-slate-800 uppercase tracking-wider text-[11px] block">Arithmetic Step-by-Step</span>
+<div class="font-mono-code text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200 break-all leading-relaxed" id="sum-step-by-step">
+                1.234 + 56.78 + 204.6 = 262.614
+              </div>
+<p class="text-slate-500 text-[11px]">
+                Textbook verification: On Page 47, `=SUM(A1:A3)` precisely yields <strong>262.614</strong>.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 2: ROUND                                                             -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-round">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-700 font-mono-code font-bold text-xs">Table 4 &amp; Page 47</span>
+<h2 class="text-xl font-bold text-slate-900">=ROUND(number, num_digits)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Rounds a number to a specified number of digits using the standard mathematical 5/4 rule.</p>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs transition" onclick="setRoundPreset(56.78, 1)">
+            Page 47 Preset: =ROUND(A2, 1)
+          </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Target Number to Round:</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="round-input-num" oninput="updateRoundView()" step="any" type="number" value="56.78"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium text-slate-700">
+<span>Parameter <code class="font-mono text-blue-700 font-bold">num_digits</code>:</span>
+<span class="font-mono-code font-bold text-blue-600 bg-white px-2 py-0.5 rounded border border-slate-200" id="round-digits-badge">1</span>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" id="core-round-slider" max="3" min="0" oninput="updateRoundView()" type="range" value="1"/>
+<div class="flex justify-between text-[10px] text-slate-400 font-mono">
+<span>0 (Integer)</span>
+<span>1 (Tenths)</span>
+<span>2 (Hundredths)</span>
+<span>3 (Thousandths)</span>
+</div>
+</div>
+</div>
+<!-- Number Line Mental Model -->
+<div class="p-4 rounded-xl bg-blue-50/60 border border-blue-200 space-y-2 text-xs">
+<strong class="font-bold text-blue-900 block text-[11px] uppercase tracking-wide">The 5/4 Decision Boundary</strong>
+<p class="text-slate-600 text-[11px] leading-relaxed" id="round-boundary-text">
+                For 56.78 to 1 decimal: The next digit is <strong>8</strong>. Since 8 ≥ 5, it rounds up to <strong>56.8</strong>.
+              </p>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-blue-800 tracking-wider block">Result</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="round-formula-display">=ROUND(56.78, 1)</span>
+</div>
+<div class="font-mono-code font-black text-3xl text-blue-700 bg-white px-4 py-1.5 rounded-xl border border-blue-200 shadow-xs" id="round-result-val">
+                56.8
+              </div>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5 text-slate-600">
+<span class="font-bold text-slate-800 block">When to use =ROUND:</span>
+<p class="text-[11px] leading-relaxed">
+                Use standard ROUND for prices, tax calculations, and final averages where values should conform to standard scientific/commercial rounding rules.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 3: ROUNDUP                                                           -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-roundup">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-mono-code font-bold text-xs">Table 4 &amp; Page 47</span>
+<h2 class="text-xl font-bold text-slate-900">=ROUNDUP(number, num_digits)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Always pushes numbers UP (away from 0), regardless of whether the next digit is smaller than 5.</p>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition" onclick="setRoundUpPreset(1.234, 2)">
+            Page 47 Preset: =ROUNDUP(A1, 2)
+          </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Target Number:</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="roundup-input-num" oninput="updateRoundUpView()" step="any" type="number" value="1.234"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium text-slate-700">
+<span>Parameter <code class="font-mono text-emerald-700 font-bold">num_digits</code>:</span>
+<span class="font-mono-code font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-slate-200" id="roundup-digits-badge">2</span>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600" id="roundup-slider" max="3" min="0" oninput="updateRoundUpView()" type="range" value="2"/>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2 text-xs">
+<strong class="font-bold text-emerald-950 block text-[11px] uppercase tracking-wide">Why 1.234 Becomes 1.24 (Not 1.23)</strong>
+<p class="text-slate-600 text-[11px] leading-relaxed">
+                Even though the 3rd decimal digit is only <strong class="text-emerald-800">4</strong> (normally rounded down), <code class="font-mono text-emerald-700">=ROUNDUP</code> commands Excel: <em>"Any remaining fraction MUST push the boundary upward!"</em>
+</p>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">Ceiling Result</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="roundup-formula-display">=ROUNDUP(1.234, 2)</span>
+</div>
+<div class="font-mono-code font-black text-3xl text-emerald-700 bg-white px-4 py-1.5 rounded-xl border border-emerald-300 shadow-xs" id="roundup-result-val">
+                1.24
+              </div>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+<strong class="text-slate-800 block">Real-World Use Case:</strong>
+<p class="text-[11px] leading-relaxed">
+                If you have 4.1 boxes of supplies needed for a group, you cannot order 4 boxes; you need 5 full boxes! <code class="font-mono text-emerald-700">=ROUNDUP(4.1, 0) ➔ 5</code>.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 4: ROUNDDOWN                                                         -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-rounddown">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-800 font-mono-code font-bold text-xs">Table 4 &amp; Page 47</span>
+<h2 class="text-xl font-bold text-slate-900">=ROUNDDOWN(number, num_digits)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Always truncates leftover fractions toward zero (floor truncation).</p>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs transition" onclick="setRoundDownPreset(1.234, 2)">
+            Page 47 Preset: =ROUNDDOWN(A1, 2)
+          </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Target Number:</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="rounddown-input-num" oninput="updateRoundDownView()" step="any" type="number" value="1.239"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium text-slate-700">
+<span>Parameter <code class="font-mono text-rose-700 font-bold">num_digits</code>:</span>
+<span class="font-mono-code font-bold text-rose-700 bg-white px-2 py-0.5 rounded border border-slate-200" id="rounddown-digits-badge">2</span>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-600" id="rounddown-slider" max="3" min="0" oninput="updateRoundDownView()" type="range" value="2"/>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-2 text-xs">
+<strong class="font-bold text-rose-950 block text-[11px] uppercase tracking-wide">The Guillotine Metaphor</strong>
+<p class="text-slate-600 text-[11px] leading-relaxed">
+                Even if your number is <strong class="text-rose-900 font-mono">1.239999</strong>, <code class="font-mono text-rose-700">=ROUNDDOWN(..., 2)</code> cleanly chops off everything after the second decimal place, yielding <strong class="text-rose-900 font-mono">1.23</strong>.
+              </p>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-rose-50 border border-rose-300 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-rose-800 tracking-wider block">Floor Result</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="rounddown-formula-display">=ROUNDDOWN(1.239, 2)</span>
+</div>
+<div class="font-mono-code font-black text-3xl text-rose-700 bg-white px-4 py-1.5 rounded-xl border border-rose-300 shadow-xs" id="rounddown-result-val">
+                1.23
+              </div>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+<strong class="text-slate-800 block">Real-World Use Case:</strong>
+<p class="text-[11px] leading-relaxed">
+                Calculating completed full years of age or earned tokens. If a person is 17.9 years old, they have legally completed only 17 years.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 5: MOD                                                               -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-mod">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900 font-mono-code font-bold text-xs">Table 4 &amp; Page 47</span>
+<h2 class="text-xl font-bold text-slate-900">=MOD(number, divisor)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Calculates the leftover integer remainder after one number is divided by a divisor.</p>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs transition" onclick="setModPreset(1357, 2)">
+            Page 47 Preset: =MOD(A5, 2)
+          </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Numerator Number (Cell A5):</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="mod-num" oninput="updateModView()" type="number" value="1357"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Divisor (Divided by):</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="mod-div" max="100" min="1" oninput="updateModView()" type="number" value="2"/>
+</div>
+</div>
+<!-- Vertical Division Form with ÷ and Remainder -->
+<div class="p-4 rounded-xl bg-amber-50/80 border border-amber-200 space-y-3 text-xs">
+<div class="flex items-center justify-between">
+<strong class="font-bold text-amber-950 uppercase tracking-wide text-[11px]">Vertical Division Form</strong>
+<span class="text-[10px] bg-amber-200/70 text-amber-900 px-2 py-0.5 rounded font-mono-code font-bold">Divided by (÷)</span>
+</div>
+<!-- Clean Vertical Math Stack -->
+<div class="bg-white p-4 rounded-xl border border-amber-300 font-mono-code shadow-xs flex flex-col items-center">
+<div class="w-full max-w-[220px] space-y-1">
+<!-- Row 1: Number -->
+<div class="flex justify-between items-center text-sm py-1 border-b border-slate-200">
+<span class="text-slate-500 font-sans text-xs">Number:</span>
+<span class="font-black text-slate-900 text-base" id="mod-vert-num">1357</span>
+</div>
+<!-- Row 2: Divisor with ÷ -->
+<div class="flex justify-between items-center text-sm py-1 border-b-2 border-slate-800">
+<span class="text-slate-500 font-sans text-xs">Divided by:</span>
+<span class="font-bold text-amber-800 text-base flex items-center gap-1.5">
+<span class="text-amber-600 font-sans font-black text-lg">÷</span>
+<span id="mod-vert-div">2</span>
+</span>
+</div>
+<!-- Row 3: Whole Quotient -->
+<div class="flex justify-between items-center text-sm py-1">
+<span class="text-slate-500 font-sans text-xs">Whole Quotient:</span>
+<span class="font-bold text-slate-700" id="mod-vert-quot">678</span>
+</div>
+<!-- Row 4: Remainder (The MOD answer) -->
+<div class="flex justify-between items-center text-sm py-1.5 px-2 bg-amber-100/80 rounded-lg border border-amber-300">
+<span class="text-amber-900 font-bold font-sans text-xs flex items-center gap-1">
+<span>🎯</span> Remainder (=MOD):
+                    </span>
+<span class="font-black text-amber-900 text-lg" id="mod-vert-rem">1</span>
+</div>
+</div>
+</div>
+<!-- Clear Horizontal Division Expression -->
+<div class="p-2 bg-white/90 rounded-lg border border-amber-200 text-center font-mono-code font-bold text-amber-950 text-xs" id="mod-horiz-equation">
+                1357 ÷ 2 = 678 with Remainder 1
+              </div>
+<p class="text-slate-600 text-[11px] leading-relaxed" id="mod-desc-text">
+                When <strong>1357</strong> is divided by <strong>2</strong>, it fits <strong>678</strong> whole times with <strong class="text-amber-900 font-bold">1 leftover remainder</strong>. Excel's <code class="font-mono text-amber-800 font-bold">=MOD</code> returns only this remainder.
+              </p>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-amber-50 border border-amber-300 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-amber-800 tracking-wider block">Remainder Output</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="mod-formula-display">=MOD(1357, 2)</span>
+</div>
+<div class="font-mono-code font-black text-4xl text-amber-900 bg-white px-5 py-2 rounded-xl border border-amber-300 shadow-xs" id="mod-result-val">
+                1
+              </div>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+<strong class="text-slate-800 block">Pro Trick: Even / Odd Number Detection</strong>
+<p class="text-[11px] leading-relaxed">
+                Notice that <code class="font-mono text-amber-800">=MOD(number, 2)</code> returns <strong>0</strong> for even numbers and <strong>1</strong> for odd numbers!
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 6: AVERAGE                                                           -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-average">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-mono-code font-bold text-xs">Table 5 &amp; Page 48</span>
+<h2 class="text-xl font-bold text-slate-900">=AVERAGE(number1, [number2], ...)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Calculates the central arithmetic mean (Sum of all items ÷ Count of items).</p>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs transition" onclick="resetStatsDatasetToTextbook()">
+            Load Page 48 Dataset (A1:A12)
+          </button>
+</div>
+<div class="flex flex-col lg:flex-row items-start gap-6">
+<!-- Left: Compact 2-Column Excel Worksheet (No Empty Space, No Scroll) -->
+<div class="w-full lg:w-48 shrink-0 space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Range (A1:A12)</span>
+<span class="text-[11px] text-blue-600 font-mono">Editable</span>
+</div>
+<div class="rounded-xl border border-slate-300 overflow-hidden bg-white shadow-xs">
+<!-- Excel Formula Bar -->
+<div class="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 border-b border-slate-200 text-xs font-mono-code">
+<span class="font-bold text-slate-500 text-[10px] px-1 py-0.2 bg-white border border-slate-200 rounded">A1:A12</span>
+<span class="text-slate-400 font-serif italic text-xs font-bold">fx</span>
+<span class="text-slate-800 font-semibold text-[11px] truncate">=AVERAGE(A1:A12)</span>
+</div>
+<!-- Worksheet Grid: Exactly 2 Columns (Cell & A) with Zero Scroll -->
+<div>
+<table class="w-full text-xs font-mono-code border-collapse">
+<thead class="bg-slate-100 text-slate-600 border-b border-slate-300">
+<tr>
+<th class="w-12 py-1.5 text-center bg-slate-200 border-r border-slate-300 font-bold select-none text-[11px]">Cell</th>
+<th class="py-1.5 px-3 text-right font-bold">A</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200" id="average-excel-tbody">
+<!-- Populated dynamically via JS (2 clean columns) -->
+</tbody>
+</table>
+</div>
+<!-- Compact Excel Status Bar -->
+<div class="px-2.5 py-1 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-600 font-mono-code select-none">
+<span>Sum: <strong class="text-indigo-700" id="excel-status-sum">691</strong></span>
+<span>Avg: <strong class="text-blue-700" id="excel-status-avg">57.58</strong></span>
+</div>
+</div>
+</div>
+<!-- Right: Expanded Calculation Area (Takes all remaining width) -->
+<div class="flex-1 w-full flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-blue-800 tracking-wider block">Arithmetic Mean</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm sm:text-base">=AVERAGE(A1:A12)</span>
+</div>
+<div class="font-mono-code font-black text-3xl sm:text-4xl text-blue-700 bg-white px-5 py-2 rounded-xl border border-blue-200 shadow-xs" id="average-result-val">
+                57.5833
+              </div>
+</div>
+<div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+<strong class="font-bold text-slate-800 block text-xs uppercase tracking-wider">Mean Calculation Breakdown</strong>
+<div class="space-y-3 font-mono-code text-slate-700 text-xs" id="average-breakdown-text">
+<!-- Populated dynamically with the wide full equation -->
+</div>
+<p class="text-slate-500 text-[11px]">
+                Directly matches Page 48 textbook solution of <strong class="text-blue-700">57.58333</strong>.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 7: MAX                                                               -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-max">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800 font-mono-code font-bold text-xs">Table 5 &amp; Page 48</span>
+<h2 class="text-xl font-bold text-slate-900">=MAX(number1, [number2], ...)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Scans the range and returns the single highest numerical value (1st Place).</p>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-[minmax(13rem,15rem)_minmax(0,1fr)] gap-5 md:gap-7 items-stretch w-full"><div class="w-full max-w-[15rem] rounded-xl border bg-white shadow-sm overflow-hidden border-amber-200">
+<div class="px-2.5 py-1.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+<div><strong class="text-[11px] text-slate-700">Worksheet · A1:A12</strong></div>
+<span class="text-[10px] font-mono-code text-slate-500">A</span>
+</div>
+<table class="w-full text-[11px] font-mono-code border-collapse"><thead class="bg-slate-100 text-slate-600"><tr><th class="w-12 py-1.5 text-center bg-slate-200 border-r border-slate-300">Cell</th><th class="py-1.5 px-3 text-right">A</th></tr></thead><tbody class="divide-y divide-slate-200" id="max-excel-tbody"></tbody></table>
+<div class="px-2.5 py-1.5 bg-slate-50 border-t border-slate-200 text-[10px] text-slate-600 leading-snug">MAX checks every value in the range and returns only the largest number. The matching source cell lights up.</div>
+</div><div class="w-full flex flex-col gap-4">
+<div class="p-6 rounded-2xl flex items-center justify-between gap-4 min-h-[112px] bg-amber-50 border-2 border-amber-300">
+<div>
+<span class="text-[10px] uppercase font-bold text-amber-800 tracking-wider block">🏆 1st Highest Value</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm">=MAX(A1:A12)</span>
+</div>
+<div class="font-mono-code font-black text-5xl sm:text-6xl px-6 py-3 rounded-xl bg-white shadow-sm text-amber-900 border border-amber-300" id="max-result-val">
+                65
+              </div>
+</div>
+<div class="p-5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 space-y-2 leading-relaxed">
+<strong class="text-base font-bold text-slate-900 block">Found in Cell A6:</strong>
+<p class="text-sm leading-relaxed">
+                Out of all 12 items, the peak value is <strong class="text-base font-bold text-slate-900 block">65</strong>. Note that MAX only gives you the single top champion.
+              </p>
+</div>
+</div></div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 8: MIN                                                               -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-min">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-teal-100 text-teal-800 font-mono-code font-bold text-xs">Table 5 &amp; Page 48</span>
+<h2 class="text-xl font-bold text-slate-900">=MIN(number1, [number2], ...)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Scans the range and returns the single lowest numerical value.</p>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-[minmax(13rem,15rem)_minmax(0,1fr)] gap-5 md:gap-7 items-stretch w-full"><div class="w-full max-w-[15rem] rounded-xl border bg-white shadow-sm overflow-hidden border-teal-200">
+<div class="px-3 py-2 bg-teal-50 border-b border-teal-200 flex items-center justify-between">
+<div><strong class="text-xs text-teal-900">Excel worksheet • A1:A12</strong><p class="text-[10px] text-slate-600">The highlighted cell shows the value selected by this function.</p></div>
+<span class="text-[10px] font-mono-code font-bold text-teal-800">A1:A12</span>
+</div>
+<table class="w-full text-[11px] font-mono-code border-collapse"><thead class="bg-slate-100 text-slate-600"><tr><th class="w-14 py-1.5 border-r">Cell</th><th class="py-1.5 text-right pr-4">A — Value</th></tr></thead><tbody class="divide-y divide-slate-200" id="min-excel-tbody"></tbody></table>
+<div class="px-3 py-2 bg-teal-50/70 border-t border-teal-100 text-[11px] text-slate-700 leading-relaxed">MIN checks every value in the range and returns only the smallest number. The matching source cell lights up.</div>
+</div><div class="w-full flex flex-col gap-4">
+<div class="p-6 rounded-2xl flex items-center justify-between gap-4 min-h-[112px] bg-teal-50 border-2 border-teal-300">
+<div>
+<span class="text-[10px] uppercase font-bold text-teal-800 tracking-wider block">Lowest Value</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm">=MIN(A1:A12)</span>
+</div>
+<div class="font-mono-code font-black text-5xl sm:text-6xl px-6 py-3 rounded-xl bg-white shadow-sm text-teal-900 border border-teal-300" id="min-result-val">
+                50
+              </div>
+</div>
+<div class="p-5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 space-y-2 leading-relaxed">
+<strong class="text-base font-bold text-slate-900 block">Found in Cell A1:</strong>
+<p class="text-sm leading-relaxed">
+                The minimum observation is <strong class="text-base font-bold text-slate-900 block">50</strong>. Matches textbook Page 48: <code class="font-mono">=MIN(A1:A12) ➔ 50</code>.
+              </p>
+</div>
+</div></div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 9: LARGE                                                             -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-large">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800 font-mono-code font-bold text-xs">Table 5 &amp; Page 48</span>
+<h2 class="text-xl font-bold text-slate-900">=LARGE(array, k)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Returns the $k$-th largest value in a data set (e.g. 2nd highest, 3rd highest).</p>
+</div>
+<div class="flex gap-2">
+<button class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs" onclick="setLargeK(2)">k=2 (Textbook Table)</button>
+<button class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs" onclick="setLargeK(3)">k=3 (Page 48 Example)</button>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-[minmax(13rem,15rem)_minmax(0,1fr)] gap-5 md:gap-7 items-stretch w-full"><div class="w-full max-w-[15rem] rounded-xl border bg-white shadow-sm overflow-hidden border-indigo-200">
+<div class="px-3 py-2 bg-indigo-50 border-b border-indigo-200 flex items-center justify-between">
+<div><strong class="text-xs text-indigo-900">Excel worksheet • A1:A12</strong><p class="text-[10px] text-slate-600">The highlighted cell shows the value selected by this function.</p></div>
+<span class="text-[10px] font-mono-code font-bold text-indigo-800">A1:A12</span>
+</div>
+<table class="w-full text-[11px] font-mono-code border-collapse"><thead class="bg-slate-100 text-slate-600"><tr><th class="w-14 py-1.5 border-r">Cell</th><th class="py-1.5 text-right pr-4">A — Value</th></tr></thead><tbody class="divide-y divide-slate-200" id="large-excel-tbody"></tbody></table>
+<div class="px-3 py-2 bg-indigo-50/70 border-t border-indigo-100 text-[11px] text-slate-700 leading-relaxed">LARGE ranks the values from highest to lowest. Change k to select the 1st, 2nd, 3rd, or another ranked value; its original cell lights up.</div>
+</div><div class="w-full flex flex-col gap-4">
+<div class="p-6 rounded-2xl flex items-center justify-between gap-4 min-h-[112px] bg-indigo-50 border-2 border-indigo-300">
+<div>
+<span class="text-[10px] uppercase font-bold text-indigo-800 tracking-wider block" id="large-rank-title">2nd Largest Value</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="large-formula-str">=LARGE(A1:A12, 2)</span>
+</div>
+<div class="font-mono-code font-black text-5xl sm:text-6xl px-6 py-3 rounded-xl bg-white shadow-sm text-indigo-800 border border-indigo-300" id="large-result-val">
+                62
+              </div>
+</div>
+<div class="p-5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 space-y-2 leading-relaxed">
+<strong class="text-base font-bold text-slate-900 block">Why LARGE is better than MAX:</strong>
+<p class="text-sm leading-relaxed">
+                MAX can only retrieve the gold medal (1st place). With <code class="font-mono text-indigo-700">=LARGE(range, 2)</code> or <code class="font-mono text-indigo-700">=LARGE(range, 3)</code>, you can extract silver and bronze medalists with zero hassle!
+              </p>
+</div>
+</div></div><div class="w-full flex flex-col gap-4 mt-1"><div class="w-full flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+<div class="flex justify-between text-xs font-semibold text-slate-700">
+<span>Select Target Rank Position <code class="font-mono text-indigo-700">k</code>:</span>
+<span class="font-mono-code font-bold text-indigo-600 bg-white px-2 py-0.5 rounded border border-slate-300" id="large-k-badge">k = 2</span>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" id="large-k-slider" max="12" min="1" oninput="updateLargeView()" type="range" value="2"/>
+<div class="flex justify-between text-[10px] text-slate-400 font-mono">
+<span>1 (Max)</span>
+<span>2 (2nd)</span>
+<span>3 (3rd)</span>
+<span>6 (Mid)</span>
+<span>12 (Last)</span>
+</div>
+</div>
+<!-- Sorted Array Ladder -->
+<div class="space-y-1.5">
+<span class="text-xs font-bold text-slate-600 block">Sorted Descending Under the Hood:</span>
+<div class="flex flex-wrap gap-1.5 font-mono-code text-xs" id="large-ladder-container">
+<!-- Rendered dynamically -->
+</div>
+</div>
+</div></div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 10: SMALL                                                            -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-small">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-teal-100 text-teal-800 font-mono-code font-bold text-xs">Table 5 &amp; Page 48</span>
+<h2 class="text-xl font-bold text-slate-900">=SMALL(array, k)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Returns the $k$-th smallest value in a data set (counting upward from the bottom).</p>
+</div>
+<div class="flex gap-2">
+<button class="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs" onclick="setSmallK(2)">k=2 (Table 5)</button>
+<button class="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs" onclick="setSmallK(3)">k=3 (Page 48 Example)</button>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-[minmax(13rem,15rem)_minmax(0,1fr)] gap-5 md:gap-7 items-stretch w-full"><div class="w-full max-w-[15rem] rounded-xl border bg-white shadow-sm overflow-hidden border-teal-200">
+<div class="px-3 py-2 bg-teal-50 border-b border-teal-200 flex items-center justify-between">
+<div><strong class="text-xs text-teal-900">Excel worksheet • A1:A12</strong><p class="text-[10px] text-slate-600">The highlighted cell shows the value selected by this function.</p></div>
+<span class="text-[10px] font-mono-code font-bold text-teal-800">A1:A12</span>
+</div>
+<table class="w-full text-[11px] font-mono-code border-collapse"><thead class="bg-slate-100 text-slate-600"><tr><th class="w-14 py-1.5 border-r">Cell</th><th class="py-1.5 text-right pr-4">A — Value</th></tr></thead><tbody class="divide-y divide-slate-200" id="small-excel-tbody"></tbody></table>
+<div class="px-3 py-2 bg-teal-50/70 border-t border-teal-100 text-[11px] text-slate-700 leading-relaxed">SMALL ranks the values from lowest to highest. Change k to select the 1st, 2nd, 3rd, or another ranked value; its original cell lights up.</div>
+</div><div class="w-full flex flex-col gap-4">
+<div class="p-6 rounded-2xl flex items-center justify-between gap-4 min-h-[112px] bg-teal-50 border-2 border-teal-300">
+<div>
+<span class="text-[10px] uppercase font-bold text-teal-800 tracking-wider block" id="small-rank-title">2nd Smallest Value</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="small-formula-str">=SMALL(A1:A12, 2)</span>
+</div>
+<div class="font-mono-code font-black text-5xl sm:text-6xl px-6 py-3 rounded-xl bg-white shadow-sm text-teal-900 border border-teal-300" id="small-result-val">
+                52
+              </div>
+</div>
+<div class="p-5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 space-y-2 leading-relaxed">
+<strong class="text-base font-bold text-slate-900 block">Textbook Verification:</strong>
+<p class="text-sm leading-relaxed">
+                Page 48 Example shows `=SMALL(A1:A12, 3) ➔ 54`. When $k=3$, the three lowest are 50, 52, and <strong class="text-base font-bold text-slate-900 block">54</strong>.
+              </p>
+</div>
+</div></div><div class="w-full flex flex-col gap-4 mt-1"><div class="w-full flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+<div class="flex justify-between text-xs font-semibold text-slate-700">
+<span>Select Target Rank Position <code class="font-mono text-teal-700">k</code>:</span>
+<span class="font-mono-code font-bold text-teal-700 bg-white px-2 py-0.5 rounded border border-slate-300" id="small-k-badge">k = 2</span>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600" id="small-k-slider" max="12" min="1" oninput="updateSmallView()" type="range" value="2"/>
+</div>
+<div class="space-y-1.5">
+<span class="text-xs font-bold text-slate-600 block">Sorted Ascending Under the Hood:</span>
+<div class="flex flex-wrap gap-1.5 font-mono-code text-xs" id="small-ladder-container">
+<!-- Rendered dynamically -->
+</div>
+</div>
+</div></div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 11: MID                                                              -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-mid">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-800 font-mono-code font-bold text-xs">Table 6 &amp; Fig. 75</span>
+<h2 class="text-xl font-bold text-slate-900">=MID(text, start_num, num_chars)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Extracts a specific number of characters from a text string starting at an assigned 1-based index.</p>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold text-xs transition" onclick="setMidTextbookPreset()">
+            Fig. 75 Preset: "Profit and loss"
+          </button>
+</div>
+<div class="space-y-5">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+<div class="md:col-span-6 space-y-3">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Source Text String (Cell A1):</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="mid-source-str" oninput="updateMidView()" type="text" value="Profit and loss"/>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium text-slate-700">
+<span><code class="font-mono text-purple-700 font-bold">start_num</code>:</span>
+<span class="font-mono-code font-bold text-purple-700" id="mid-start-badge">2</span>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600" id="mid-start-slider" max="15" min="1" oninput="updateMidView()" type="range" value="2"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-medium text-slate-700">
+<span><code class="font-mono text-purple-700 font-bold">num_chars</code>:</span>
+<span class="font-mono-code font-bold text-purple-700" id="mid-len-badge">3</span>
+</div>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600" id="mid-len-slider" max="15" min="1" oninput="updateMidView()" type="range" value="3"/>
+</div>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col justify-center">
+<div class="p-5 rounded-2xl bg-purple-50 border-2 border-purple-300 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-purple-800 tracking-wider block">Extracted Slice</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="mid-formula-display">=MID(A1, 2, 3)</span>
+</div>
+<div class="font-mono-code font-black text-3xl text-purple-800 bg-white px-4 py-1.5 rounded-xl border border-purple-300 shadow-xs" id="mid-result-display">
+                  "rof"
+                </div>
+</div>
+</div>
+</div>
+<!-- Character Position Index Ruler -->
+<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+<span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">Interactive Character Position Ruler (1-Based Excel Indexing)</span>
+<div class="flex flex-wrap gap-1 font-mono-code text-xs select-none" id="mid-ruler-cells">
+<!-- Rendered via JS -->
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 12: CONCATENATE & & OPERATOR                                         -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-concatenate">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800 font-mono-code font-bold text-xs">Table 6 &amp; Fig. 76</span>
+<h2 class="text-xl font-bold text-slate-900">=CONCATENATE(...) vs &amp; Operator</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Joins two or more text strings into one continuous string.</p>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition" onclick="setConcatTextbookPreset()">
+            Fig. 76 Preset: "Chan Siu Ming"
+          </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-4">
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Cell A2 (Last Name):</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="concat-last" oninput="updateConcatView()" type="text" value="Chan"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Cell B2 (First Name):</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="concat-first" oninput="updateConcatView()" type="text" value="Siu Ming"/>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1">Joining Separator / Delimiter:</label>
+<div class="grid grid-cols-3 gap-2 text-xs font-mono-code">
+<button class="p-2 rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-900 font-bold text-center" id="concat-sep-space" onclick="setConcatSep(' ')">Space (" ")</button>
+<button class="p-2 rounded-lg border-2 border-slate-200 bg-white text-slate-700 text-center" id="concat-sep-comma" onclick="setConcatSep(', ')">Comma (", ")</button>
+<button class="p-2 rounded-lg border-2 border-slate-200 bg-white text-slate-700 text-center" id="concat-sep-none" onclick="setConcatSep('')">None ("")</button>
+</div>
+</div>
+<div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-950 space-y-1">
+<strong class="text-amber-900 block font-bold">Page 49 "Broader Perspective":</strong>
+<p class="text-[11px] leading-relaxed">
+                Typing <code class="font-mono">CONCATENATE</code> is long and cumbersome. Excel provides the ampersand symbol <code class="font-mono font-bold text-amber-900">&amp;</code> as a handy shortcut! Both produce 100% identical outputs.
+              </p>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-white border border-slate-200 space-y-1 shadow-xs">
+<div class="flex justify-between items-center text-xs">
+<span class="font-bold text-slate-500 uppercase tracking-wide">Method 1: Formula</span>
+<span class="font-mono-code text-[11px] text-slate-400">=CONCATENATE</span>
+</div>
+<div class="font-mono-code text-xs text-indigo-700 font-semibold" id="concat-formula-1">=CONCATENATE(A2, " ", B2)</div>
+<div class="font-mono-code text-lg font-bold text-slate-900 pt-1" id="concat-res-1">Chan Siu Ming</div>
+</div>
+<div class="p-4 rounded-xl bg-indigo-50 border-2 border-indigo-200 space-y-1 shadow-xs">
+<div class="flex justify-between items-center text-xs">
+<span class="font-bold text-indigo-900 uppercase tracking-wide">Method 2: Ampersand (&amp;) Shortcut</span>
+<span class="font-mono-code text-[11px] text-indigo-600 font-bold">Recommended</span>
+</div>
+<div class="font-mono-code text-xs text-indigo-800 font-semibold" id="concat-formula-2">=A2 &amp; " " &amp; B2</div>
+<div class="font-mono-code text-xl font-black text-indigo-700 pt-1" id="concat-res-2">Chan Siu Ming</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 13: COUNT                                                            -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-count">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-mono-code font-bold text-xs">Page 50 &amp; Fig. 77</span>
+<h2 class="text-xl font-bold text-slate-900">=COUNT(range)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Counts the number of cells that contain <strong>NUMBERS ONLY</strong>. Completely skips text, symbols, and blanks.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-3">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Fig. 77 Data Table (Range A1:A7)</span>
+<div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-xs font-mono-code text-xs">
+<table class="w-full">
+<thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+<tr>
+<th class="w-10 py-2 text-center bg-slate-100">Cell</th>
+<th class="py-2 px-3 text-left">Content</th>
+<th class="py-2 px-3 text-left">Data Type</th>
+<th class="py-2 px-3 text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100" id="count-table-body">
+<!-- Rendered via JS -->
+</tbody>
+</table>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-5 rounded-2xl bg-blue-50 border-2 border-blue-300 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-blue-800 tracking-wider block">Numeric Cell Count</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm">=COUNT(A1:A7)</span>
+</div>
+<div class="font-mono-code font-black text-4xl text-blue-700 bg-white px-5 py-2 rounded-xl border border-blue-300 shadow-xs" id="count-result-val">
+                3
+              </div>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+<strong class="text-slate-800 block">Fig. 77 Explanation:</strong>
+<p class="text-[11px] leading-relaxed">
+                Even though cells A4, A5, and A6 contain "hi", "Bonjour", and "?", <code class="font-mono text-blue-700">=COUNT</code> strictly counts rows with numerical quantities (1, 2, and 2). Result = <strong>3</strong>.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 14: COUNTA                                                           -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-counta">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-800 font-mono-code font-bold text-xs">Page 50 &amp; Fig. 78</span>
+<h2 class="text-xl font-bold text-slate-900">=COUNTA(range)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Counts the number of cells that are <strong>NOT EMPTY</strong> (counts both numbers and text; only skips empty blanks).</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-3">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Fig. 78 Data Table (Range A1:A7)</span>
+<div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-xs font-mono-code text-xs">
+<table class="w-full">
+<thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+<tr>
+<th class="w-10 py-2 text-center bg-slate-100">Cell</th>
+<th class="py-2 px-3 text-left">Content</th>
+<th class="py-2 px-3 text-left">Data Type</th>
+<th class="py-2 px-3 text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100" id="counta-table-body">
+<!-- Rendered via JS -->
+</tbody>
+</table>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-5 rounded-2xl bg-purple-50 border-2 border-purple-300 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-purple-800 tracking-wider block">Non-Empty Cell Count</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm">=COUNTA(A1:A7)</span>
+</div>
+<div class="font-mono-code font-black text-4xl text-purple-700 bg-white px-5 py-2 rounded-xl border border-purple-300 shadow-xs" id="counta-result-val">
+                6
+              </div>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+<strong class="text-slate-800 block">Fig. 78 Explanation:</strong>
+<p class="text-[11px] leading-relaxed">
+                Notice that only Cell A3 is completely blank. All other 6 cells contain either numbers, words, or punctuation marks. Hence <code class="font-mono text-purple-700">=COUNTA</code> outputs <strong>6</strong>.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 15: COUNTIF                                                          -->
+<!-- ========================================================================= -->
+<section class="func-view hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col gap-6" id="view-countif">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-mono-code font-bold text-xs">Page 51 &amp; Fig. 80</span>
+<h2 class="text-xl font-bold text-slate-900">=COUNTIF(range, criteria)</h2>
+</div>
+<p class="text-xs text-slate-500 mt-1">Counts the number of cells that match an assigned condition or exact text criterion.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs" onclick="setCountIfPreset('A')">Fig. 80 Preset: "A"</button>
+<button class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs" onclick="setCountIfPreset('B')">Preset: "B"</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-6 space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-500">Student Grade Records (A1:A7)</span>
+<span class="text-[11px] text-slate-400">Fig. 80 Dataset</span>
+</div>
+<div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-xs font-mono-code text-xs">
+<table class="w-full">
+<thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+<tr>
+<th class="w-10 py-2 text-center bg-slate-100">Cell</th>
+<th class="py-2 px-3 text-left">Grade Letter</th>
+<th class="py-2 px-3 text-center">Match Result</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100" id="countif-table-body">
+<!-- Rendered via JS -->
+</tbody>
+</table>
+</div>
+</div>
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+<label class="block text-xs font-bold text-slate-700">Target Search Criteria:</label>
+<div class="flex gap-2">
+<input class="w-full p-2 border border-slate-300 rounded-lg font-mono-code font-bold text-slate-900 bg-white" id="countif-criteria-input" oninput="updateCountIfView()" type="text" value="A"/>
+<button class="px-3 py-1 bg-white border border-slate-300 rounded font-mono-code font-bold text-xs text-emerald-700" onclick="setCountIfPreset('A')">"A"</button>
+<button class="px-3 py-1 bg-white border border-slate-300 rounded font-mono-code font-bold text-xs text-emerald-700" onclick="setCountIfPreset('B')">"B"</button>
+<button class="px-3 py-1 bg-white border border-slate-300 rounded font-mono-code font-bold text-xs text-emerald-700" onclick="setCountIfPreset('C')">"C"</button>
+</div>
+</div>
+<div class="p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex items-center justify-between">
+<div>
+<span class="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">Filtered Matching Cells</span>
+<span class="font-mono-code font-bold text-slate-800 text-sm" id="countif-formula-str">=COUNTIF(A1:A7, "A")</span>
+</div>
+<div class="font-mono-code font-black text-4xl text-emerald-700 bg-white px-5 py-2 rounded-xl border border-emerald-300 shadow-xs" id="countif-result-val">
+                2
+              </div>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+<strong class="text-slate-800 block">Fig. 80 Explanation:</strong>
+<p class="text-[11px] leading-relaxed">
+                Remember to wrap text values in double quotes <code class="font-mono text-emerald-700 font-bold">"A"</code>. Excel scans through all 7 rows and finds two "A" grades (cells A1 and A4).
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer Navigation Controls -->
+<footer class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-xs">
+<button class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5" id="prev-func-bottom" onclick="navigateStep(-1)">
+<span>← Previous Function</span>
+</button>
+<div class="text-xs text-slate-500 font-medium hidden sm:block">
+          Use the arrows or click any function on the left sidebar
+        </div>
+<button class="px-4 py-2 rounded-xl bg-indigo-600 text-xs font-bold text-white hover:bg-indigo-700 transition flex items-center gap-1.5 shadow-xs" id="next-func-bottom" onclick="navigateStep(1)">
+<span>Next Function →</span>
+</button>
+</footer>
+</main>
+</div>
+        </div>
+    </div>
+
+
+    <!-- Slide 19: Excel Errors Diagnostic Lab -->
+    <div class="slide-container app-slide" id="slide-19">
+        <div class="w-full h-full bg-slate-100 text-slate-800 flex flex-col antialiased selection:bg-rose-200 overflow-y-auto">
+            <header class="bg-slate-900 text-white shadow-md border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-inner">
+          !
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight flex items-center gap-2">
+            Excel Hash Errors Diagnostic Lab
+            <span class="text-[10px] bg-rose-950/80 border border-rose-500/50 text-rose-300 px-2 py-0.5 rounded-full font-semibold">Troubleshooting Suite</span>
+          </h1>
+          <p class="text-xs text-slate-400">Interactive visual mechanics, why formulas fail, and how to shield spreadsheets</p>
+        </div>
+      </div>
+
+      <!-- Quick Error Switcher Tabs -->
+      <nav class="flex items-center p-1 bg-slate-800 border border-slate-700 rounded-xl space-x-1 text-xs font-semibold overflow-x-auto">
+        <button data-target="hash-width" class="error-nav-btn px-3 py-1.5 rounded-lg transition bg-rose-600 text-white shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+          <span class="font-mono-code font-bold">####</span> Width Overflow
+        </button>
+        <button data-target="hash-div" class="error-nav-btn px-3 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5 whitespace-nowrap">
+          <span class="font-mono-code font-bold">#DIV/0!</span> Division
+        </button>
+        <button data-target="hash-value" class="error-nav-btn px-3 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5 whitespace-nowrap">
+          <span class="font-mono-code font-bold">#VALUE!</span> Data Type
+        </button>
+        <button data-target="hash-name" class="error-nav-btn px-3 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5 whitespace-nowrap">
+          <span class="font-mono-code font-bold">#NAME?</span> Syntax & Typo
+        </button>
+        <button data-target="hash-doctor" class="error-nav-btn px-3 py-1.5 rounded-lg transition text-amber-300 hover:text-amber-200 hover:bg-slate-700 flex items-center gap-1.5 whitespace-nowrap">
+          <span>🩺</span> Error Doctor
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 flex-1 flex flex-col gap-6">
+
+    <!-- Top Diagnostic Quick Reference Bar -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div onclick="switchErrorSection('hash-width')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-rose-400 transition group flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-mono-code font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded text-xs border border-rose-200">####</span>
+          <span class="text-[10px] text-slate-400 uppercase font-semibold">Display Only</span>
+        </div>
+        <p class="text-xs text-slate-600 font-medium">Cell column is too narrow to show full number/date.</p>
+      </div>
+
+      <div onclick="switchErrorSection('hash-div')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition group flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-mono-code font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded text-xs border border-amber-200">#DIV/0!</span>
+          <span class="text-[10px] text-slate-400 uppercase font-semibold">Math Fault</span>
+        </div>
+        <p class="text-xs text-slate-600 font-medium">Division by zero or pointing to a totally blank cell.</p>
+      </div>
+
+      <div onclick="switchErrorSection('hash-value')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition group flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-mono-code font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-xs border border-blue-200">#VALUE!</span>
+          <span class="text-[10px] text-slate-400 uppercase font-semibold">Type Clash</span>
+        </div>
+        <p class="text-xs text-slate-600 font-medium">Math operator used on text string (e.g. 50 + "Pending").</p>
+      </div>
+
+      <div onclick="switchErrorSection('hash-name')" class="cursor-pointer bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-purple-400 transition group flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-mono-code font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded text-xs border border-purple-200">#NAME?</span>
+          <span class="text-[10px] text-slate-400 uppercase font-semibold">Syntax Typo</span>
+        </div>
+        <p class="text-xs text-slate-600 font-medium">Function misspelled, missing quotes, or bad range syntax.</p>
+      </div>
+    </section>
+
+    <section id="section-hash-width" class="error-panel flex flex-col gap-5">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded bg-rose-100 text-rose-800 font-mono-code font-black text-sm border border-rose-300">####</span>
+              <h2 class="text-lg font-bold text-slate-800">Column Width Overflow</h2>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Excel replaces numerical values with hashes when the column width cannot display the entire number without truncation.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="width-autofit-btn" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-sm flex items-center gap-1.5">
+              <span>⚡</span> AutoFit Column (Simulate Double-Click)
+            </button>
+            <button id="width-squish-btn" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs transition border border-slate-200">
+              Squish Column
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Workbench Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5 items-start">
+          
+          <!-- Column Drag Simulator -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- Controls & Width Slider -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between text-xs">
+                <label for="col-width-slider" class="font-bold text-slate-700 flex items-center gap-1.5">
+                  <span>↔️</span> Column B Width: <span id="col-width-display" class="font-mono-code font-bold text-blue-600">80px</span>
+                </label>
+                <span class="text-[11px] text-slate-400">Drag to resize column in real-time</span>
+              </div>
+              <input type="range" id="col-width-slider" min="35" max="220" value="80" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                <span>35px (Severely Narrow)</span>
+                <span>80px (Threshold)</span>
+                <span>150px (Comfortable)</span>
+                <span>220px (Wide)</span>
+              </div>
+            </div>
+
+            <!-- Spreadsheet Grid Simulation -->
+            <div class="overflow-x-auto rounded-xl border border-slate-300 bg-white shadow-inner p-1">
+              <table class="border-collapse text-xs select-none">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-600 text-center font-semibold border-b border-slate-300">
+                    <th class="w-10 py-2 border-r border-slate-300 bg-slate-200 font-mono-code text-[11px]"></th>
+                    <th class="py-2 px-3 border-r border-slate-300 w-36">A (Category)</th>
+                    <!-- Dynamic column B header with drag boundary line -->
+                    <th id="th-col-b" class="py-2 px-2 border-r-2 border-r-blue-500 bg-blue-50 text-blue-900 relative transition-all" style="width: 80px; min-width: 35px;">
+                      <div class="flex items-center justify-between">
+                        <span>B (Revenue / Date)</span>
+                        <span class="text-[9px] bg-blue-200 text-blue-800 px-1 rounded font-mono">Resizable</span>
+                      </div>
+                    </th>
+                    <th class="py-2 px-3 border-r border-slate-300 w-28">C (Notes)</th>
+                  </tr>
+                </thead>
+                <tbody class="font-mono-code divide-y divide-slate-200">
+                  <tr>
+                    <td class="py-2.5 text-center bg-slate-100 text-slate-500 border-r border-slate-300 font-bold">1</td>
+                    <td class="px-3 py-2 border-r border-slate-200 font-sans text-slate-700">Q3 Enterprise Total</td>
+                    <td id="cell-overflow-num" class="px-2 py-2 border-r border-slate-200 text-right font-bold transition-all text-slate-900 overflow-hidden whitespace-nowrap">
+                      $1,489,520.00
+                    </td>
+                    <td class="px-3 py-2 border-r border-slate-200 font-sans text-slate-400 text-[11px]">Large Number</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 text-center bg-slate-100 text-slate-500 border-r border-slate-300 font-bold">2</td>
+                    <td class="px-3 py-2 border-r border-slate-200 font-sans text-slate-700">Audit Completion</td>
+                    <td id="cell-overflow-date" class="px-2 py-2 border-r border-slate-200 text-right font-semibold transition-all text-slate-900 overflow-hidden whitespace-nowrap">
+                      10/24/2026
+                    </td>
+                    <td class="px-3 py-2 border-r border-slate-200 font-sans text-slate-400 text-[11px]">Standard Date</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 text-center bg-slate-100 text-slate-500 border-r border-slate-300 font-bold">3</td>
+                    <td class="px-3 py-2 border-r border-slate-200 font-sans text-slate-700">Department Status</td>
+                    <td id="cell-overflow-text" class="px-2 py-2 border-r border-slate-200 text-left font-sans transition-all text-slate-600 overflow-hidden whitespace-nowrap">
+                      Approved and Fully Cleared
+                    </td>
+                    <td class="px-3 py-2 border-r border-slate-200 font-sans text-slate-400 text-[11px]">Notice text clips, doesn't hash</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex items-center justify-between">
+              <span>💡 Shortcut to auto-fit selected columns: <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono text-slate-800">Alt</kbd> + <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono text-slate-800">H</kbd> + <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono text-slate-800">O</kbd> + <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono text-slate-800">I</kbd></span>
+              <span class="text-blue-600 font-semibold cursor-pointer" onclick="document.getElementById('col-width-slider').value = 145; document.getElementById('col-width-slider').dispatchEvent(new Event('input'));">Reset to Fit</span>
+            </div>
+          </div>
+
+          <!-- Why Excel Does This Deep Dive -->
+          <div class="lg:col-span-5 flex flex-col gap-4">
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs space-y-2">
+              <div class="font-bold flex items-center gap-1.5 text-amber-900 text-sm">
+                <span>🛡️</span> The Safety Design Behind <code class="font-mono">####</code>
+              </div>
+              <p class="leading-relaxed">
+                Why doesn't Excel simply clip numbers the way it clips text labels?
+              </p>
+              <div class="p-2.5 bg-white rounded border border-amber-300 font-mono-code text-[11px] text-slate-700 space-y-1">
+                <div class="text-rose-600 font-bold">Suppose balance = $1,489,520</div>
+                <div class="text-slate-500">If clipped by column: reads as "$1,489"</div>
+                <div class="text-emerald-700 font-bold">Result: Catastrophic 1,000x financial misread!</div>
+              </div>
+              <p class="text-slate-600 leading-relaxed text-[11px]">
+                To protect accountants and scientists from misinterpreting a truncated number as an actual low figure, Excel enforces a strict safety protocol: <strong>Either show the whole number, or show hash symbols.</strong>
+              </p>
+            </div>
+
+            <!-- Negative Date / Negative Time Box -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+              <strong class="text-slate-800 block font-bold">Rare Secondary Cause: Negative Dates</strong>
+              <p class="text-slate-600 leading-relaxed text-[11px]">
+                If a date formula results in a negative timestamp (e.g. <code class="font-mono">=01/01/2026 - 1000000 days</code>), Excel cannot represent a date before year 1900 and fills the cell with permanent <code class="font-mono text-rose-600">####</code> regardless of column width.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="section-hash-div" class="error-panel hidden flex-col gap-5">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded bg-amber-100 text-amber-900 font-mono-code font-black text-sm border border-amber-300">#DIV/0!</span>
+              <h2 class="text-lg font-bold text-slate-800">Division by Zero or Empty Cell</h2>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Occurs whenever a formula attempts to divide a quantity by zero (0) or references a completely blank cell in the denominator.</p>
+          </div>
+          <!-- Quick Presets -->
+          <div class="flex items-center gap-1.5 text-xs">
+            <button onclick="setDivScenario(100, 0)" class="px-2.5 py-1 rounded bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 font-medium">Denominator = 0</button>
+            <button onclick="setDivScenario(100, null)" class="px-2.5 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 font-medium">Empty Cell</button>
+            <button onclick="setDivScenario(100, 4)" class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 font-medium">Valid (÷ 4)</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5 items-start">
+          
+          <!-- Live Interactive Division Calculator -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col gap-3">
+              <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>INTERACTIVE QUOTIENT TESTER</span>
+                <span class="font-mono-code text-slate-500">Formula: =A2 / B2</span>
+              </div>
+
+              <!-- Inputs row -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-500 mb-1">Numerator Cell A2 (Total Cost)</label>
+                  <input type="number" id="div-num-input" value="1200" class="w-full p-2 border border-slate-300 rounded-lg font-mono-code text-sm font-bold text-slate-800 bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-500 mb-1">Denominator Cell B2 (Units Sold)</label>
+                  <div class="relative">
+                    <input type="text" id="div-denom-input" value="0" placeholder="Type 0 or blank" class="w-full p-2 border border-slate-300 rounded-lg font-mono-code text-sm font-bold text-slate-800 bg-white">
+                    <span id="denom-type-badge" class="absolute right-2 top-2 text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">Zero</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Protection Wrapper Switcher -->
+              <div class="pt-2 border-t border-slate-200">
+                <span class="text-xs font-bold text-slate-700 block mb-2">Shield / Protection Strategy:</span>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                  <button id="div-wrap-none" onclick="setDivWrapper('none')" class="p-2 rounded-lg border-2 border-amber-600 bg-amber-50 text-amber-900 font-bold text-center transition">
+                    Unshielded (=A2/B2)
+                  </button>
+                  <button id="div-wrap-iferror" onclick="setDivWrapper('iferror')" class="p-2 rounded-lg border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-medium text-center transition">
+                    =IFERROR(A2/B2, 0)
+                  </button>
+                  <button id="div-wrap-if" onclick="setDivWrapper('if')" class="p-2 rounded-lg border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-medium text-center transition">
+                    =IF(B2=0, "-", A2/B2)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cell Output Card -->
+            <div id="div-result-card" class="p-4 rounded-xl border-2 border-rose-300 bg-rose-50 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide block">Computed Value in Cell C2:</span>
+                <span id="div-result-formula" class="font-mono-code text-xs text-slate-600 font-semibold">=A2 / B2</span>
+              </div>
+              <div id="div-result-value" class="font-mono-code font-black text-2xl text-rose-700 bg-white px-3 py-1.5 rounded-lg border border-rose-200 shadow-sm">
+                #DIV/0!
+              </div>
+            </div>
+
+            <!-- Excel Table Representation -->
+            <div class="overflow-x-auto rounded-lg border border-slate-300 bg-white text-xs">
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-600 text-center font-semibold border-b border-slate-300 font-mono-code">
+                    <th class="w-10 py-1.5 bg-slate-200 border-r border-slate-300"></th>
+                    <th class="py-1.5 px-3 border-r border-slate-300">A</th>
+                    <th class="py-1.5 px-3 border-r border-slate-300">B</th>
+                    <th class="py-1.5 px-3 bg-emerald-50 text-emerald-900">C</th>
+                  </tr>
+                </thead>
+                <tbody class="font-mono-code text-center">
+                  <tr class="border-b border-slate-200">
+                    <td class="py-2 bg-slate-100 text-slate-400 font-bold border-r border-slate-300">1</td>
+                    <td class="py-2 px-3 border-r border-slate-200 font-sans text-slate-500 font-semibold">Total Revenue</td>
+                    <td class="py-2 px-3 border-r border-slate-200 font-sans text-slate-500 font-semibold">Units Sold</td>
+                    <td class="py-2 px-3 bg-emerald-50/40 text-emerald-800 font-sans font-semibold">Unit Price</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 bg-slate-100 text-slate-400 font-bold border-r border-slate-300">2</td>
+                    <td class="py-2 px-3 border-r border-slate-200 font-bold text-slate-800" id="table-div-a">1200</td>
+                    <td class="py-2 px-3 border-r border-slate-200 font-bold text-slate-800" id="table-div-b">0</td>
+                    <td class="py-2 px-3 font-bold bg-amber-50 text-amber-700" id="table-div-c">#DIV/0!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <!-- Deep Explanation & Fix Guide -->
+          <div class="lg:col-span-5 flex flex-col gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-slate-900 text-white space-y-2.5">
+              <span class="text-amber-400 font-bold uppercase tracking-wider text-[11px] block">The Mathematical Cause</span>
+              <p class="text-slate-300 leading-relaxed">
+                In mathematics, dividing any number by zero is undefined ($x \div 0 = \text{Undefined}$).
+              </p>
+              <div class="p-2.5 bg-slate-800 rounded border border-slate-700 font-mono-code text-[11px] text-amber-300">
+                1200 ÷ 0 = 💥 #DIV/0!
+              </div>
+              <p class="text-slate-400 leading-relaxed text-[11px]">
+                In Excel, an <strong>empty cell</strong> evaluates to zero when used in an arithmetic equation. If row B2 has not been filled out yet by a surveyor or teammate, your calculation breaks instantly.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 space-y-2">
+              <span class="font-bold text-emerald-900 text-xs block">🛡️ Best Practice: Defensive Formulas</span>
+              <p class="text-slate-600 text-[11px] leading-relaxed">
+                Never leave raw division exposed in dashboards or executive client sheets! Wrap with:
+              </p>
+              <div class="space-y-1.5 font-mono-code text-[11px]">
+                <div class="p-2 bg-white rounded border border-emerald-300 text-slate-800">
+                  <strong class="text-emerald-700">=IFERROR(A2/B2, 0)</strong>
+                  <div class="text-[10px] text-slate-500 font-sans mt-0.5">Returns 0 instead of blowing up downstream charts.</div>
+                </div>
+                <div class="p-2 bg-white rounded border border-emerald-300 text-slate-800">
+                  <strong class="text-emerald-700">=IF(B2=0, "-", A2/B2)</strong>
+                  <div class="text-[10px] text-slate-500 font-sans mt-0.5">Displays a neat dash "-" when no denominator is present.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="section-hash-value" class="error-panel hidden flex-col gap-5">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded bg-blue-100 text-blue-900 font-mono-code font-black text-sm border border-blue-300">#VALUE!</span>
+              <h2 class="text-lg font-bold text-slate-800">Data Type Collision (Text vs Number)</h2>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Appears when a formula expects a number but finds text, spaces, or incompatible data structures.</p>
+          </div>
+          <!-- Presets -->
+          <div class="flex items-center gap-1.5 text-xs">
+            <button onclick="setValueScenario('Pending', '+')" class="px-2.5 py-1 rounded bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 font-medium">Text Note ("Pending")</button>
+            <button onclick="setValueScenario(' ', '+')" class="px-2.5 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 font-medium">Ghost Spacebar (" ")</button>
+            <button onclick="setValueScenario('150', '+')" class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 font-medium">Valid Number (150)</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5 items-start">
+          
+          <!-- Interactive Workspace -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>FORMULA SYNTAX COMPARISON</span>
+                <span class="text-[11px] text-slate-400">Comparing Literal Math vs Excel Function</span>
+              </div>
+
+              <!-- Cells setup -->
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="p-3 bg-white rounded-lg border border-slate-200">
+                  <span class="text-slate-500 font-semibold block mb-1">Cell A2 (Raw Number):</span>
+                  <div class="font-mono-code text-sm font-bold text-slate-800">500</div>
+                  <span class="text-[10px] text-emerald-600 font-medium">Type: Number (Integer)</span>
+                </div>
+
+                <div class="p-3 bg-white rounded-lg border border-slate-200">
+                  <span class="text-slate-500 font-semibold block mb-1">Cell B2 (Inspectable Input):</span>
+                  <input type="text" id="val-cell-b2" value="Pending" class="w-full p-1.5 border border-slate-300 rounded font-mono-code text-sm font-bold text-slate-800">
+                  <span id="val-b2-status" class="text-[10px] text-rose-600 font-medium block mt-1">Type: String (Text characters)</span>
+                </div>
+              </div>
+
+              <!-- Formula method toggle -->
+              <div class="pt-2 border-t border-slate-200">
+                <span class="text-xs font-bold text-slate-700 block mb-2">Calculation Method:</span>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <button id="val-btn-plus" onclick="setValueFormulaType('plus')" class="p-2.5 rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold text-left transition flex flex-col">
+                    <span class="font-mono-code font-bold text-sm mb-0.5">=A2 + B2</span>
+                    <span class="text-[10px] text-slate-500 font-normal">Direct arithmetic addition operator</span>
+                  </button>
+
+                  <button id="val-btn-sum" onclick="setValueFormulaType('sum')" class="p-2.5 rounded-lg border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-medium text-left transition flex flex-col">
+                    <span class="font-mono-code font-bold text-sm mb-0.5">=SUM(A2, B2)</span>
+                    <span class="text-[10px] text-slate-500 font-normal">Excel built-in aggregation function</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Result Card -->
+            <div id="val-result-card" class="p-4 rounded-xl border-2 border-rose-300 bg-rose-50 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide block">Calculation Result in Cell C2:</span>
+                <span id="val-result-formula" class="font-mono-code text-xs text-slate-700 font-semibold">=A2 + B2 (500 + "Pending")</span>
+              </div>
+              <div id="val-result-value" class="font-mono-code font-black text-2xl text-rose-700 bg-white px-3 py-1.5 rounded-lg border border-rose-200 shadow-sm">
+                #VALUE!
+              </div>
+            </div>
+
+            <div id="val-breakdown-box" class="p-3 bg-rose-50/70 border border-rose-200 rounded-lg text-xs space-y-1.5">
+              <strong class="text-rose-900 font-bold flex items-center gap-1.5">
+                <span>💥</span> The Addition Operator Crash:
+              </strong>
+              <p class="text-slate-700 leading-relaxed text-[11px]">
+                The plus sign (<code class="font-mono font-bold">+</code>) strictly commands Excel's arithmetic CPU to execute numerical addition. When asked to evaluate <code class="font-mono font-bold">500 + "Pending"</code>, Excel cannot convert English letters into a numerical quantity, aborting with <strong class="text-rose-700">#VALUE!</strong>.
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Secret Superpower: SUM vs Plus -->
+          <div class="lg:col-span-5 flex flex-col gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white space-y-3">
+              <span class="text-emerald-400 font-bold uppercase tracking-wider text-[11px] block">Excel Secret Superpower</span>
+              <p class="text-slate-300 leading-relaxed">
+                Why did Excel invent <code class="text-emerald-300 font-mono font-bold">=SUM()</code> if the <code class="text-amber-300 font-mono font-bold">+</code> sign already existed?
+              </p>
+              <div class="space-y-2 text-[11px] text-slate-300">
+                <div class="p-2 rounded bg-slate-800 border border-slate-700">
+                  <span class="text-rose-400 font-mono font-bold">=A2 + B2</span><br>
+                  Strict arithmetic. Crashes if any cell holds text, labels, or spaces.
+                </div>
+                <div class="p-2 rounded bg-slate-800 border border-slate-700">
+                  <span class="text-emerald-400 font-mono font-bold">=SUM(A2, B2)</span><br>
+                  Intelligent wrapper. <strong>Silently ignores text</strong> and simply treats labels as 0!
+                </div>
+              </div>
+            </div>
+
+            <!-- The Invisible Spacebar Trap -->
+            <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 space-y-1.5">
+              <strong class="text-amber-900 font-bold block flex items-center gap-1">
+                <span>👻</span> The "Ghost Spacebar" Trap
+              </strong>
+              <p class="text-slate-600 text-[11px] leading-relaxed">
+                Did a coworker press <kbd class="px-1 bg-white border border-amber-300 rounded font-mono">Space</kbd> instead of <kbd class="px-1 bg-white border border-amber-300 rounded font-mono">Delete</kbd> to clear a cell?
+              </p>
+              <p class="text-slate-600 text-[11px] leading-relaxed">
+                To your eye, the cell looks 100% empty. But to Excel, it contains a 1-character text string (<code class="font-mono">" "</code>). A formula using <code class="font-mono">+</code> will crash with <code class="font-mono text-rose-700">#VALUE!</code>.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="section-hash-name" class="error-panel hidden flex-col gap-5">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded bg-purple-100 text-purple-900 font-mono-code font-black text-sm border border-purple-300">#NAME?</span>
+              <h2 class="text-lg font-bold text-slate-800">Syntax Typo & Unrecognized Identifier</h2>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Excel cannot identify what word you typed. Usually a misspelled function, unquoted text, or missing range colon.</p>
+          </div>
+          <!-- Presets -->
+          <div class="flex items-center gap-1.5 text-xs">
+            <button onclick="setNameScenario('typo-func')" class="px-2.5 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 font-medium">Misspelled Function</button>
+            <button onclick="setNameScenario('unquoted-str')" class="px-2.5 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 font-medium">Unquoted Text</button>
+            <button onclick="setNameScenario('bad-range')" class="px-2.5 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 font-medium">Missing Colon Range</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5 items-start">
+          
+          <!-- Interactive Parser Workbench -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>INTERACTIVE FORMULA PARSER</span>
+                <span class="text-[11px] text-slate-400">Live Syntax Analyzer</span>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Type or Edit Formula in Formula Bar:</label>
+                <div class="flex items-center bg-white border border-slate-300 rounded-lg px-3 py-2 shadow-inner">
+                  <span class="font-mono-code italic text-slate-400 font-bold mr-2 text-sm">fx</span>
+                  <input type="text" id="name-formula-input" value="=SUMM(B2:B8)" class="w-full font-mono-code text-sm font-bold text-slate-900 outline-none">
+                </div>
+              </div>
+
+              <!-- Quick fix suggestions -->
+              <div class="flex items-center justify-between text-xs pt-1">
+                <span class="text-slate-500 font-medium">Common Autocomplete Suggestions:</span>
+                <div class="flex gap-1.5 font-mono-code text-[11px]">
+                  <button onclick="setNameFormula('=SUM(B2:B8)')" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300 font-bold">=SUM(B2:B8)</button>
+                  <button onclick="setNameFormula('=AVERAGE(B2:B8)')" class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300 font-bold">=AVERAGE</button>
+                  <button onclick="setNameFormula('=IF(A2=&quot;Yes&quot;, 10, 0)')" class="px-2 py-0.5 rounded bg-slate-200 text-slate-800 hover:bg-slate-300 font-bold">="Yes"</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Output Card -->
+            <div id="name-result-card" class="p-4 rounded-xl border-2 border-purple-300 bg-purple-50 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide block">Parser Execution Status:</span>
+                <span id="name-eval-tag" class="font-mono-code text-xs text-purple-900 font-semibold">Unknown Token: "SUMM"</span>
+              </div>
+              <div id="name-result-val" class="font-mono-code font-black text-2xl text-purple-700 bg-white px-3 py-1.5 rounded-lg border border-purple-200 shadow-sm">
+                #NAME?
+              </div>
+            </div>
+
+            <!-- Diagnosis Step-by-Step -->
+            <div id="name-diagnosis-box" class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+              <!-- Dynamically populated -->
+            </div>
+
+          </div>
+
+          <!-- The Three Classic #NAME? Pitfalls -->
+          <div class="lg:col-span-5 flex flex-col gap-4 text-xs">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+              <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block border-b border-slate-100 pb-2">The 3 Big #NAME? Culprits</span>
+              
+              <div class="space-y-2.5">
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <div class="flex items-center justify-between font-bold text-slate-800 mb-1">
+                    <span>1. Misspelled Function</span>
+                    <span class="text-rose-600 font-mono text-[11px]">=VLOOKP(...)</span>
+                  </div>
+                  <p class="text-slate-500 text-[11px] leading-relaxed">
+                    Excel searches its dictionary of 500+ formulas. If you write <code class="font-mono font-bold text-slate-700">=SUMM</code> instead of <code class="font-mono font-bold text-emerald-700">=SUM</code>, it assumes it's a non-existent custom macro.
+                  </p>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <div class="flex items-center justify-between font-bold text-slate-800 mb-1">
+                    <span>2. Forgetting Quotation Marks</span>
+                    <span class="text-rose-600 font-mono text-[11px]">=IF(A1=Yes)</span>
+                  </div>
+                  <p class="text-slate-500 text-[11px] leading-relaxed">
+                    Without quotes, Excel thinks <code class="font-mono">Yes</code> is a <strong>Named Range</strong> on another sheet! Always wrap literal words in double quotes: <code class="font-mono text-emerald-700">"Yes"</code>.
+                  </p>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <div class="flex items-center justify-between font-bold text-slate-800 mb-1">
+                    <span>3. Missing Colon in Ranges</span>
+                    <span class="text-rose-600 font-mono text-[11px]">=SUM(A1 A10)</span>
+                  </div>
+                  <p class="text-slate-500 text-[11px] leading-relaxed">
+                    If you forget the colon <code class="font-mono">:</code> between <code class="font-mono">A1</code> and <code class="font-mono">A10</code>, Excel interprets it as space intersection syntax and breaks.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pro-Tip: Tab Key -->
+            <div class="p-3.5 bg-purple-50 rounded-xl border border-purple-200 text-purple-950 space-y-1">
+              <span class="font-bold text-xs flex items-center gap-1.5 text-purple-900">
+                <span>⌨️</span> The Never-Misspell Trick: <kbd class="px-1.5 py-0.5 bg-white border border-purple-300 rounded font-mono text-purple-800 font-bold">TAB</kbd> Key
+              </span>
+              <p class="text-slate-600 text-[11px] leading-relaxed">
+                When writing formulas in real Excel, type the first 3 letters (e.g. <code class="font-mono font-bold">=VLO</code>) and press <kbd class="px-1 bg-white border border-slate-300 rounded font-mono">TAB</kbd>. Excel autocompletes the formula and inserts the opening parenthesis <code class="font-mono">(</code> with zero typing mistakes.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="section-hash-doctor" class="error-panel hidden flex-col gap-5">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🩺</span>
+              <h2 class="text-lg font-bold text-slate-800">The Error Doctor: Diagnostic Challenge</h2>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Examine real-world spreadsheet accidents, diagnose the exact failure point, and apply the correct fix.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-semibold text-slate-500">Score: <strong id="doctor-score" class="font-mono-code text-emerald-600 text-sm">0</strong> / 4</span>
+            <button id="doctor-reset-btn" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium">Reset Quiz</button>
+          </div>
+        </div>
+
+        <div id="doctor-cases-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+          <!-- Dynamically populated cases via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+        </div>
+    </div>
+
 
     <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -3742,6 +5585,12 @@ document.addEventListener('DOMContentLoaded', () => {
             buildSlide15Grid();
             buildSlide16Grid();
             initSlide17VisualLab();
+            if (typeof initCoreFunctionsStudio === 'function') {
+                try { initCoreFunctionsStudio(); } catch(e) { console.warn('initCoreFunctionsStudio error:', e); }
+            }
+            if (typeof initHashErrorsLab === 'function') {
+                try { initHashErrorsLab(); } catch(e) { console.warn('initHashErrorsLab error:', e); }
+            }
             
             // Automatically sync total slide display with actual DOM elements
             document.getElementById('total-slide-num').textContent = totalSlides;
@@ -3770,6 +5619,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(animateIntersection, 500);
                 }
                 if (currentSlideIndex === 16 && window.renderRefGridState) { setTimeout(window.renderRefGridState, 100); }
+                if (currentSlideIndex === 17 && typeof initCoreFunctionsStudio === 'function') { setTimeout(initCoreFunctionsStudio, 50); }
+                if (currentSlideIndex === 18 && typeof initHashErrorsLab === 'function') { setTimeout(initHashErrorsLab, 50); }
             }
 
             function nextSlide() {
@@ -5109,5 +6960,1509 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     </script>
+
+    <!-- Slide 18: Core Functions Studio Script -->
+    <script>
+
+    /* =========================================================================
+       FUNCTION ROUTER & NAVIGATION SYSTEM
+       ========================================================================= */
+    const functionList = [
+      'sum', 'round', 'roundup', 'rounddown', 'mod',
+      'average', 'max', 'min', 'large', 'small',
+      'mid', 'concatenate',
+      'count', 'counta', 'countif'
+    ];
+
+    let currentFunctionIndex = 0;
+    let isSidebarOpen = false;
+    let isContextPopupOpen = false;
+
+    // Checks whether active function uses Table 4 (A1:A5) or Page 48 Dataset (A1:A12)
+    function isStatsGroup() {
+      const activeId = functionList[currentFunctionIndex];
+      return ['average', 'max', 'min', 'large', 'small'].includes(activeId);
+    }
+
+    function updateContextButtonLabel() {
+      const btn = document.getElementById('header-context-btn');
+      const label = document.getElementById('header-context-label');
+      const icon = document.getElementById('header-context-icon');
+      if (!btn || !label || !icon) return;
+
+      if (isStatsGroup()) {
+        label.textContent = 'Dataset (A1:A12)';
+        icon.textContent = '📊';
+        btn.className = "px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold transition flex items-center gap-1.5 shadow-xs";
+      } else {
+        label.textContent = 'Table 4 (A1:A5)';
+        icon.textContent = '📖';
+        btn.className = "px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 text-xs font-bold transition flex items-center gap-1.5 shadow-xs";
+      }
+    }
+
+    function toggleContextPopup(forceState) {
+      if (typeof forceState === 'boolean') {
+        isContextPopupOpen = forceState;
+      } else {
+        isContextPopupOpen = !isContextPopupOpen;
+      }
+
+      const cardTable4 = document.getElementById('table4-popup-card');
+      const cardStats = document.getElementById('stats-popup-card');
+      const arrow = document.getElementById('header-context-arrow');
+
+      if (!cardTable4 || !cardStats) return;
+
+      if (!isContextPopupOpen) {
+        cardTable4.classList.add('hidden');
+        cardStats.classList.add('hidden');
+        if (arrow) arrow.textContent = '▾';
+        return;
+      }
+
+      if (arrow) arrow.textContent = '▲';
+
+      if (isStatsGroup()) {
+        cardTable4.classList.add('hidden');
+        cardStats.classList.remove('hidden');
+      } else {
+        cardStats.classList.add('hidden');
+        cardTable4.classList.remove('hidden');
+      }
+    }
+
+    // Direct alias so any legacy or button calls to toggleTable4Card work flawlessly
+    function toggleTable4Card(forceState) {
+      toggleContextPopup(forceState);
+    }
+    window.toggleTable4Card = toggleTable4Card;
+    window.toggleContextPopup = toggleContextPopup;
+
+    function loadTable4Example(funcId) {
+      selectFunction(funcId);
+      if (funcId === 'sum') loadSumPreset();
+      else if (funcId === 'round') setRoundPreset(56.78, 1);
+      else if (funcId === 'roundup') setRoundUpPreset(1.234, 2);
+      else if (funcId === 'rounddown') setRoundDownPreset(1.234, 2);
+      else if (funcId === 'mod') setModPreset(1357, 2);
+
+      toggleTable4Card(false);
+    }
+
+    // Dismiss floating popup when clicking outside
+    document.addEventListener('click', (e) => {
+      const cardTable4 = document.getElementById('table4-popup-card');
+      const cardStats = document.getElementById('stats-popup-card');
+      const btn = document.getElementById('header-context-btn');
+
+      if (isContextPopupOpen) {
+        const clickedInsideTable4 = cardTable4 && cardTable4.contains(e.target);
+        const clickedInsideStats = cardStats && cardStats.contains(e.target);
+        const clickedBtn = btn && btn.contains(e.target);
+
+        if (!clickedInsideTable4 && !clickedInsideStats && !clickedBtn) {
+          toggleTable4Card(false);
+        }
+      }
+    });
+
+    function toggleSidebar() {
+      isSidebarOpen = !isSidebarOpen;
+      applySidebarState();
+    }
+
+    function applySidebarState() {
+      const sidebar = document.getElementById('function-sidebar');
+      const mainArea = document.getElementById('main-content-area');
+      const toggleBtn = document.getElementById('sidebar-toggle-btn');
+
+      if (!sidebar || !mainArea) return;
+
+      if (isSidebarOpen) {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        mainArea.classList.remove('lg:col-span-12');
+        mainArea.classList.add('lg:col-span-9');
+        if (toggleBtn) {
+          toggleBtn.classList.add('bg-indigo-50', 'border-indigo-300', 'text-indigo-700');
+        }
+      } else {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        mainArea.classList.remove('lg:col-span-9');
+        mainArea.classList.add('lg:col-span-12');
+        if (toggleBtn) {
+          toggleBtn.classList.remove('bg-indigo-50', 'border-indigo-300', 'text-indigo-700');
+        }
+      }
+    }
+
+    function selectFunction(funcId) {
+      const idx = functionList.indexOf(funcId);
+      if (idx !== -1) {
+        currentFunctionIndex = idx;
+        renderActiveView();
+        if (window.innerWidth < 1024 && isSidebarOpen) {
+          toggleSidebar();
+        }
+      }
+    }
+
+    function navigateStep(direction) {
+      currentFunctionIndex = (currentFunctionIndex + direction + functionList.length) % functionList.length;
+      renderActiveView();
+    }
+
+    function renderActiveView() {
+      const activeId = functionList[currentFunctionIndex];
+
+      document.getElementById('func-counter-badge').textContent = `${currentFunctionIndex + 1} / ${functionList.length}`;
+
+      const pill = document.getElementById('active-func-header-pill');
+      if (pill) {
+        pill.textContent = `=${activeId.toUpperCase()}`;
+      }
+
+      updateContextButtonLabel();
+      toggleContextPopup(false); // Close popup when switching functions
+
+      document.querySelectorAll('.func-nav-item').forEach(btn => {
+        if (btn.dataset.id === activeId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      document.querySelectorAll('.func-view').forEach(view => {
+        if (view.id === `view-${activeId}`) {
+          view.classList.remove('hidden');
+        } else {
+          view.classList.add('hidden');
+        }
+      });
+    }
+
+    /* =========================================================================
+       1. SUM VIEW LOGIC
+       ========================================================================= */
+    let sumCells = [
+      { id: 'A1', val: 1.234, checked: true },
+      { id: 'A2', val: 56.78, checked: true },
+      { id: 'A3', val: 204.6, checked: true },
+      { id: 'A4', val: 19.84, checked: false },
+      { id: 'A5', val: 1357, checked: false }
+    ];
+
+    function loadSumPreset() {
+      sumCells[0].checked = true;
+      sumCells[1].checked = true;
+      sumCells[2].checked = true;
+      sumCells[3].checked = false;
+      sumCells[4].checked = false;
+      renderSumTable();
+      updateSumCalculations();
+    }
+
+    function renderSumTable() {
+      const tbody = document.getElementById('sum-table-body');
+      tbody.innerHTML = '';
+      sumCells.forEach((c, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = `transition ${c.checked ? 'bg-indigo-50/40' : ''}`;
+        tr.innerHTML = `
+          <td class="py-2 text-center bg-slate-100 font-bold text-slate-500">${c.id}</td>
+          <td class="px-3 py-2">
+            <input type="number" step="any" value="${c.val}" class="w-full font-bold text-slate-800 bg-transparent outline-none" oninput="onSumValChange(${idx}, this.value)">
+          </td>
+          <td class="py-2 text-center">
+            <input type="checkbox" ${c.checked ? 'checked' : ''} class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 cursor-pointer" onchange="toggleSumCell(${idx}, this.checked)">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function onSumValChange(idx, val) {
+      sumCells[idx].val = parseFloat(val) || 0;
+      updateSumCalculations();
+    }
+
+    function toggleSumCell(idx, isChecked) {
+      sumCells[idx].checked = isChecked;
+      renderSumTable();
+      updateSumCalculations();
+    }
+
+    function updateSumCalculations() {
+      const included = sumCells.filter(c => c.checked);
+      const total = included.reduce((acc, c) => acc + c.val, 0);
+
+      let formulaText = '=SUM(0)';
+      if (included.length > 0) {
+        const rowIndices = included
+          .map(c => parseInt(c.id.replace('A', ''), 10))
+          .sort((a, b) => a - b);
+
+        const isContinuous = rowIndices.every((val, i) => i === 0 || val === rowIndices[i - 1] + 1);
+
+        if (isContinuous && rowIndices.length > 1) {
+          formulaText = `=SUM(A${rowIndices[0]}:A${rowIndices[rowIndices.length - 1]})`;
+        } else if (rowIndices.length === 1) {
+          formulaText = `=SUM(A${rowIndices[0]})`;
+        } else {
+          formulaText = `=SUM(${included.map(c => c.id).join(', ')})`;
+        }
+      }
+
+      document.getElementById('sum-formula-display').textContent = formulaText;
+      document.getElementById('sum-result-display').textContent = total.toFixed(3);
+      document.getElementById('sum-step-by-step').textContent = included.length > 0
+        ? `${included.map(c => c.val).join(' + ')} = ${total.toFixed(3)}`
+        : '0';
+    }
+
+    /* =========================================================================
+       2. ROUND VIEW LOGIC
+       ========================================================================= */
+    function setRoundPreset(num, digits) {
+      document.getElementById('round-input-num').value = num;
+      document.getElementById('core-round-slider').value = digits;
+      updateRoundView();
+    }
+
+    function updateRoundView() {
+      const num = parseFloat(document.getElementById('round-input-num').value) || 0;
+      const digits = parseInt(document.getElementById('core-round-slider').value, 10);
+      document.getElementById('round-digits-badge').textContent = digits;
+
+      const factor = Math.pow(10, digits);
+      const rounded = Math.round(num * factor) / factor;
+
+      document.getElementById('round-formula-display').textContent = `=ROUND(${num}, ${digits})`;
+      document.getElementById('round-result-val').textContent = rounded.toFixed(digits);
+
+      document.getElementById('round-boundary-text').innerHTML = `
+        Rounding <code class="font-mono font-bold">${num}</code> to <code class="font-mono font-bold">${digits}</code> decimal place(s).
+        Result lands on <strong>${rounded.toFixed(digits)}</strong>.
+      `;
+    }
+
+    /* =========================================================================
+       3. ROUNDUP VIEW LOGIC
+       ========================================================================= */
+    function setRoundUpPreset(num, digits) {
+      document.getElementById('roundup-input-num').value = num;
+      document.getElementById('roundup-slider').value = digits;
+      updateRoundUpView();
+    }
+
+    function updateRoundUpView() {
+      const num = parseFloat(document.getElementById('roundup-input-num').value) || 0;
+      const digits = parseInt(document.getElementById('roundup-slider').value, 10);
+      document.getElementById('roundup-digits-badge').textContent = digits;
+
+      const factor = Math.pow(10, digits);
+      const rounded = Math.ceil(num * factor) / factor;
+
+      document.getElementById('roundup-formula-display').textContent = `=ROUNDUP(${num}, ${digits})`;
+      document.getElementById('roundup-result-val').textContent = rounded.toFixed(digits);
+    }
+
+    /* =========================================================================
+       4. ROUNDDOWN VIEW LOGIC
+       ========================================================================= */
+    function setRoundDownPreset(num, digits) {
+      document.getElementById('rounddown-input-num').value = num;
+      document.getElementById('rounddown-slider').value = digits;
+      updateRoundDownView();
+    }
+
+    function updateRoundDownView() {
+      const num = parseFloat(document.getElementById('rounddown-input-num').value) || 0;
+      const digits = parseInt(document.getElementById('rounddown-slider').value, 10);
+      document.getElementById('rounddown-digits-badge').textContent = digits;
+
+      const factor = Math.pow(10, digits);
+      const rounded = Math.floor(num * factor) / factor;
+
+      document.getElementById('rounddown-formula-display').textContent = `=ROUNDDOWN(${num}, ${digits})`;
+      document.getElementById('rounddown-result-val').textContent = rounded.toFixed(digits);
+    }
+
+    /* =========================================================================
+       5. MOD VIEW LOGIC
+       ========================================================================= */
+    function setModPreset(n, d) {
+      document.getElementById('mod-num').value = n;
+      document.getElementById('mod-div').value = d;
+      updateModView();
+    }
+
+    function updateModView() {
+      const n = parseInt(document.getElementById('mod-num').value, 10) || 0;
+      const d = parseInt(document.getElementById('mod-div').value, 10);
+
+      const formulaDisplay = document.getElementById('mod-formula-display');
+      const resultVal = document.getElementById('mod-result-val');
+      const vertNum = document.getElementById('mod-vert-num');
+      const vertDiv = document.getElementById('mod-vert-div');
+      const vertQuot = document.getElementById('mod-vert-quot');
+      const vertRem = document.getElementById('mod-vert-rem');
+      const horizEq = document.getElementById('mod-horiz-equation');
+      const descText = document.getElementById('mod-desc-text');
+
+      if (!d || d === 0) {
+        formulaDisplay.textContent = `=MOD(${n}, 0)`;
+        resultVal.textContent = '#DIV/0!';
+        if (vertNum) vertNum.textContent = n;
+        if (vertDiv) vertDiv.textContent = '0';
+        if (vertQuot) vertQuot.textContent = 'Undefined';
+        if (vertRem) vertRem.textContent = '#DIV/0!';
+        if (horizEq) horizEq.textContent = `${n} ÷ 0 = Cannot divide by zero`;
+        if (descText) descText.textContent = 'Divisor cannot be 0. Excel triggers a #DIV/0! error.';
+        return;
+      }
+
+      const remainder = n % d;
+      const quotient = Math.floor(n / d);
+
+      formulaDisplay.textContent = `=MOD(${n}, ${d})`;
+      resultVal.textContent = remainder;
+
+      if (vertNum) vertNum.textContent = n;
+      if (vertDiv) vertDiv.textContent = d;
+      if (vertQuot) vertQuot.textContent = quotient;
+      if (vertRem) vertRem.textContent = remainder;
+
+      if (horizEq) {
+        horizEq.textContent = `${n} ÷ ${d} = ${quotient} with Remainder ${remainder}`;
+      }
+
+      if (descText) {
+        descText.innerHTML = `
+          When <strong>${n}</strong> is divided by <strong>${d}</strong>, it fits <strong>${quotient}</strong> whole times with <strong class="text-amber-900 font-bold">${remainder} leftover remainder</strong>. Excel's <code class="font-mono text-amber-800 font-bold">=MOD</code> ignores the quotient and returns only the remainder.
+        `;
+      }
+    }
+
+    /* =========================================================================
+       STATS DATASET: AVERAGE, MAX, MIN, LARGE, SMALL
+       ========================================================================= */
+    const textbookStatsData = [50, 55, 58, 57, 62, 65, 61, 59, 55, 53, 54, 52];
+    let currentStats = [...textbookStatsData];
+
+    function resetStatsDatasetToTextbook() {
+      currentStats = [...textbookStatsData];
+      renderAllStatsComponents();
+    }
+
+    function renderAllStatsComponents() {
+      renderAverageGrid();
+      updateAverageView();
+      renderMaxView();
+      renderMinView();
+      updateLargeView();
+      updateSmallView();
+    }
+
+    // Generic helper to render the authentic 2-column Excel table for any stats view
+    function renderStatsTableGrid(tbodyId, highlightConditionFn, highlightClass, highlightBadgeText) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      currentStats.forEach((val, idx) => {
+        const isTarget = highlightConditionFn(val, idx);
+        const tr = document.createElement('tr');
+        
+        if (isTarget) {
+          tr.className = `transition ${highlightClass} font-bold shadow-xs relative`;
+        } else {
+          tr.className = "hover:bg-slate-50 transition bg-white";
+        }
+
+        tr.innerHTML = `
+          <td class="py-1 px-2 text-center ${isTarget ? 'bg-amber-200/50 font-black' : 'bg-slate-100 text-slate-500'} border-r border-slate-200 font-bold select-none text-[10px]">
+            A${idx + 1}
+          </td>
+          <td class="px-2 py-1 relative">
+            <div class="flex items-center justify-between">
+              ${isTarget ? `<span class="text-[9px] px-1 py-0.2 rounded font-sans font-black uppercase tracking-wider mr-1 opacity-90">${highlightBadgeText}</span>` : '<span></span>'}
+              <input type="number" step="any" value="${val}" class="w-16 text-right font-bold ${isTarget ? 'text-slate-950 font-black text-sm' : 'text-slate-900'} bg-transparent outline-none focus:bg-white focus:ring-1 focus:ring-indigo-500 px-1 py-0 rounded font-mono-code text-xs leading-none" oninput="onStatItemChange(${idx}, this.value)">
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 6. AVERAGE
+    function renderAverageGrid() {
+      const tbody = document.getElementById('average-excel-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      currentStats.forEach((val, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-blue-50/70 transition bg-white";
+        tr.innerHTML = `
+          <td class="py-1 px-2 text-center bg-slate-100 text-slate-500 border-r border-slate-200 font-bold select-none text-[10px]">
+            A${idx + 1}
+          </td>
+          <td class="px-2 py-1">
+            <input type="number" step="any" value="${val}" class="w-full text-right font-bold text-slate-900 bg-transparent outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 px-1 py-0 rounded font-mono-code text-xs leading-none" oninput="onStatItemChange(${idx}, this.value)">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function onStatItemChange(idx, val) {
+      currentStats[idx] = parseFloat(val) || 0;
+      renderAllStatsComponents();
+    }
+
+    function updateAverageView() {
+      const sum = currentStats.reduce((a, b) => a + b, 0);
+      const count = currentStats.length;
+      const avg = count > 0 ? (sum / count) : 0;
+      const resVal = document.getElementById('average-result-val');
+      if (resVal) resVal.textContent = avg.toFixed(4);
+      
+      const bdText = document.getElementById('average-breakdown-text');
+      if (bdText) {
+        const expandedSumStr = currentStats.join(' + ');
+        bdText.innerHTML = `
+          <!-- Full Equation with Division -->
+          <div class="p-4 bg-white rounded-xl border border-blue-200 font-mono-code text-slate-800 shadow-xs space-y-3">
+            <div class="text-xs text-slate-600 font-sans font-semibold">Step 1: Add all 12 cell values, then divide by count:</div>
+            <div class="p-3.5 bg-blue-50/70 rounded-xl border border-blue-200 text-blue-950 font-bold text-xs sm:text-sm md:text-base leading-relaxed break-words tracking-tight">
+              (${expandedSumStr}) ÷ ${count}
+            </div>
+
+            <div class="text-xs text-slate-600 font-sans font-semibold pt-1">Step 2: Simplify total sum ÷ 12:</div>
+            <div class="flex flex-wrap items-center gap-2.5 text-sm sm:text-base font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <span class="text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded font-mono">${sum}</span>
+              <span class="text-slate-400 font-sans text-lg">÷</span>
+              <span class="text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded font-mono">${count}</span>
+              <span class="text-slate-400 font-sans text-lg">=</span>
+              <span class="text-blue-700 font-black text-xl bg-blue-50 border border-blue-200 px-3 py-0.5 rounded font-mono">${avg.toFixed(5)}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // Update Excel bottom status bar
+      const statAvg = document.getElementById('excel-status-avg');
+      const statSum = document.getElementById('excel-status-sum');
+      if (statAvg) statAvg.textContent = avg.toFixed(2);
+      if (statSum) statSum.textContent = sum;
+    }
+
+    // 7. MAX (PAGE 7)
+    function renderMaxView() {
+      const maxVal = Math.max(...currentStats);
+      const resVal = document.getElementById('max-result-val');
+      if (resVal) resVal.textContent = maxVal;
+
+      const statPeak = document.getElementById('max-status-peak');
+      if (statPeak) statPeak.textContent = maxVal;
+
+      // Find cell(s) that match MAX and light them up
+      const maxIndices = [];
+      currentStats.forEach((v, idx) => {
+        if (v === maxVal) maxIndices.push(idx);
+      });
+
+      renderStatsTableGrid(
+        'max-excel-tbody',
+        (v) => v === maxVal,
+        'bg-amber-100 text-amber-950 border-2 border-amber-400',
+        '🏆 MAX'
+      );
+
+      const breakdown = document.getElementById('max-scan-breakdown');
+      if (breakdown) {
+        const matchingCellsStr = maxIndices.map(i => `Cell A${i + 1}`).join(' & ');
+        breakdown.innerHTML = `
+          <div class="p-4 bg-white rounded-xl border border-amber-200 font-mono-code text-slate-800 shadow-xs space-y-3">
+            <div class="text-xs text-slate-600 font-sans font-semibold">1. Range Evaluation (A1:A12):</div>
+            <div class="p-3 bg-amber-50/70 rounded-xl border border-amber-200 text-amber-950 font-bold text-xs sm:text-sm leading-relaxed">
+              MAX({${currentStats.join(', ')}})
+            </div>
+
+            <div class="text-xs text-slate-600 font-sans font-semibold pt-1">2. Single Peak Identified:</div>
+            <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <span>Winning Cell:</span>
+              <span class="text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded font-mono">${matchingCellsStr}</span>
+              <span>with peak magnitude</span>
+              <span class="text-amber-900 font-black text-xl bg-amber-100 border border-amber-300 px-3 py-0.5 rounded font-mono">${maxVal}</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // 8. MIN (PAGE 8)
+    function renderMinView() {
+      const minVal = Math.min(...currentStats);
+      const resVal = document.getElementById('min-result-val');
+      if (resVal) resVal.textContent = minVal;
+
+      const statTrough = document.getElementById('min-status-trough');
+      if (statTrough) statTrough.textContent = minVal;
+
+      // Find cell(s) that match MIN and light them up
+      const minIndices = [];
+      currentStats.forEach((v, idx) => {
+        if (v === minVal) minIndices.push(idx);
+      });
+
+      renderStatsTableGrid(
+        'min-excel-tbody',
+        (v) => v === minVal,
+        'bg-teal-100 text-teal-950 border-2 border-teal-400',
+        '▼ MIN'
+      );
+
+      const breakdown = document.getElementById('min-scan-breakdown');
+      if (breakdown) {
+        const matchingCellsStr = minIndices.map(i => `Cell A${i + 1}`).join(' & ');
+        breakdown.innerHTML = `
+          <div class="p-4 bg-white rounded-xl border border-teal-200 font-mono-code text-slate-800 shadow-xs space-y-3">
+            <div class="text-xs text-slate-600 font-sans font-semibold">1. Range Evaluation (A1:A12):</div>
+            <div class="p-3 bg-teal-50/70 rounded-xl border border-teal-200 text-teal-950 font-bold text-xs sm:text-sm leading-relaxed">
+              MIN({${currentStats.join(', ')}})
+            </div>
+
+            <div class="text-xs text-slate-600 font-sans font-semibold pt-1">2. Lowest Baseline Identified:</div>
+            <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <span>Trough Cell:</span>
+              <span class="text-teal-800 bg-teal-100 border border-teal-300 px-2 py-0.5 rounded font-mono">${matchingCellsStr}</span>
+              <span>with minimum magnitude</span>
+              <span class="text-teal-900 font-black text-xl bg-teal-100 border border-teal-300 px-3 py-0.5 rounded font-mono">${minVal}</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // 9. LARGE (PAGE 9)
+    function setLargeK(k) {
+      const slider = document.getElementById('large-k-slider');
+      if (slider) slider.value = k;
+      updateLargeView();
+    }
+
+    function updateLargeView() {
+      const slider = document.getElementById('large-k-slider');
+      if (!slider) return;
+      const k = parseInt(slider.value, 10);
+      
+      const badge = document.getElementById('large-k-badge');
+      if (badge) badge.textContent = `k = ${k}`;
+      
+      const suffix = k === 1 ? '1st' : (k === 2 ? '2nd' : (k === 3 ? '3rd' : `${k}th`));
+      
+      const rankTitle = document.getElementById('large-rank-title');
+      if (rankTitle) rankTitle.textContent = `${suffix} Largest Value`;
+      
+      const formulaStr = document.getElementById('large-formula-str');
+      if (formulaStr) formulaStr.textContent = `=LARGE(A1:A12, ${k})`;
+
+      const fxBar = document.getElementById('large-fx-bar');
+      if (fxBar) fxBar.textContent = `=LARGE(A1:A12, ${k})`;
+
+      const statRank = document.getElementById('large-status-rank');
+      if (statRank) statRank.textContent = `${suffix} (${k})`;
+
+      const tblBadge = document.getElementById('large-table-badge');
+      if (tblBadge) tblBadge.textContent = `Lit: ${suffix}`;
+
+      // Sort descending to locate k-th value
+      const sortedDesc = [...currentStats].sort((a, b) => b - a);
+      const targetVal = sortedDesc[k - 1];
+
+      const resVal = document.getElementById('large-result-val');
+      if (resVal) resVal.textContent = targetVal;
+
+      // Find the cell in currentStats that matches this k-th value
+      // Light up the cell in the 2-column Excel table
+      let targetCellIdx = -1;
+      // If there are duplicate values, find corresponding duplicate occurrence rank
+      const occurrences = [];
+      sortedDesc.forEach((v, sIdx) => {
+        if (sIdx === k - 1) occurrences.push(v);
+      });
+      // Match index in original currentStats
+      for (let i = 0; i < currentStats.length; i++) {
+        if (currentStats[i] === targetVal) {
+          targetCellIdx = i;
+          break;
+        }
+      }
+
+      renderStatsTableGrid(
+        'large-excel-tbody',
+        (v, idx) => idx === targetCellIdx,
+        'bg-indigo-100 text-indigo-950 border-2 border-indigo-400',
+        `★ ${suffix}`
+      );
+
+      // Render the sorted descending ladder
+      const ladder = document.getElementById('large-ladder-container');
+      if (ladder) {
+        ladder.innerHTML = '';
+        sortedDesc.forEach((v, idx) => {
+          const isTarget = idx === (k - 1);
+          const pill = document.createElement('span');
+          if (isTarget) {
+            pill.className = "px-3 py-1 rounded-lg bg-indigo-600 text-white font-black shadow-xs text-xs border border-indigo-700";
+            pill.textContent = `[${idx + 1}] ${v} (${suffix})`;
+          } else {
+            pill.className = "px-2 py-1 rounded bg-white border border-slate-200 text-slate-700 text-xs";
+            pill.textContent = `[${idx + 1}] ${v}`;
+          }
+          ladder.appendChild(pill);
+        });
+      }
+
+      // Explanation box
+      const expBox = document.getElementById('large-explanation-box');
+      if (expBox) {
+        expBox.innerHTML = `
+          <strong class="text-indigo-900 block font-bold text-xs">Textbook Evaluation (Page 48):</strong>
+          <p class="text-slate-700 text-[11px] leading-relaxed">
+            Position <code class="font-mono font-bold text-indigo-800">k = ${k}</code> pulls the <strong>${suffix} highest number</strong>.
+            Excel sorts the 12 items descending in memory: the value is <strong class="text-indigo-900 font-mono text-sm">${targetVal}</strong>, which lights up in <strong class="text-indigo-900 font-mono">Cell A${targetCellIdx + 1}</strong> on the left table!
+          </p>
+        `;
+      }
+    }
+
+    // 10. SMALL (PAGE 10)
+    function setSmallK(k) {
+      const slider = document.getElementById('small-k-slider');
+      if (slider) slider.value = k;
+      updateSmallView();
+    }
+
+    function updateSmallView() {
+      const slider = document.getElementById('small-k-slider');
+      if (!slider) return;
+      const k = parseInt(slider.value, 10);
+      
+      const badge = document.getElementById('small-k-badge');
+      if (badge) badge.textContent = `k = ${k}`;
+      
+      const suffix = k === 1 ? '1st' : (k === 2 ? '2nd' : (k === 3 ? '3rd' : `${k}th`));
+      
+      const rankTitle = document.getElementById('small-rank-title');
+      if (rankTitle) rankTitle.textContent = `${suffix} Smallest Value`;
+      
+      const formulaStr = document.getElementById('small-formula-str');
+      if (formulaStr) formulaStr.textContent = `=SMALL(A1:A12, ${k})`;
+
+      const fxBar = document.getElementById('small-fx-bar');
+      if (fxBar) fxBar.textContent = `=SMALL(A1:A12, ${k})`;
+
+      const statRank = document.getElementById('small-status-rank');
+      if (statRank) statRank.textContent = `${suffix} (${k})`;
+
+      const tblBadge = document.getElementById('small-table-badge');
+      if (tblBadge) tblBadge.textContent = `Lit: ${suffix}`;
+
+      // Sort ascending to locate k-th smallest value
+      const sortedAsc = [...currentStats].sort((a, b) => a - b);
+      const targetVal = sortedAsc[k - 1];
+
+      const resVal = document.getElementById('small-result-val');
+      if (resVal) resVal.textContent = targetVal;
+
+      // Find the cell in currentStats that matches this k-th smallest value
+      let targetCellIdx = -1;
+      for (let i = 0; i < currentStats.length; i++) {
+        if (currentStats[i] === targetVal) {
+          targetCellIdx = i;
+          break;
+        }
+      }
+
+      renderStatsTableGrid(
+        'small-excel-tbody',
+        (v, idx) => idx === targetCellIdx,
+        'bg-teal-100 text-teal-950 border-2 border-teal-400',
+        `▲ ${suffix}`
+      );
+
+      // Render the sorted ascending ladder
+      const ladder = document.getElementById('small-ladder-container');
+      if (ladder) {
+        ladder.innerHTML = '';
+        sortedAsc.forEach((v, idx) => {
+          const isTarget = idx === (k - 1);
+          const pill = document.createElement('span');
+          if (isTarget) {
+            pill.className = "px-3 py-1 rounded-lg bg-teal-600 text-white font-black shadow-xs text-xs border border-teal-700";
+            pill.textContent = `[${idx + 1}] ${v} (${suffix})`;
+          } else {
+            pill.className = "px-2 py-1 rounded bg-white border border-slate-200 text-slate-700 text-xs";
+            pill.textContent = `[${idx + 1}] ${v}`;
+          }
+          ladder.appendChild(pill);
+        });
+      }
+
+      // Explanation box
+      const expBox = document.getElementById('small-explanation-box');
+      if (expBox) {
+        expBox.innerHTML = `
+          <strong class="text-teal-900 block font-bold text-xs">Textbook Evaluation (Page 48):</strong>
+          <p class="text-slate-700 text-[11px] leading-relaxed">
+            Position <code class="font-mono font-bold text-teal-800">k = ${k}</code> pulls the <strong>${suffix} lowest number</strong> from the bottom.
+            Ascending sorted sequence: the value is <strong class="text-teal-900 font-mono text-sm">${targetVal}</strong>, which lights up in <strong class="text-teal-900 font-mono">Cell A${targetCellIdx + 1}</strong> on the left table!
+          </p>
+        `;
+      }
+    }
+
+    /* =========================================================================
+       11. MID VIEW LOGIC
+       ========================================================================= */
+    function setMidTextbookPreset() {
+      document.getElementById('mid-source-str').value = "Profit and loss";
+      document.getElementById('mid-start-slider').value = 2;
+      document.getElementById('mid-len-slider').value = 3;
+      updateMidView();
+    }
+
+    function updateMidView() {
+      const str = document.getElementById('mid-source-str').value;
+      const startSlider = document.getElementById('mid-start-slider');
+      const lenSlider = document.getElementById('mid-len-slider');
+
+      startSlider.max = Math.max(1, str.length);
+      lenSlider.max = Math.max(1, str.length);
+
+      const start = parseInt(startSlider.value, 10);
+      const len = parseInt(lenSlider.value, 10);
+
+      document.getElementById('mid-start-badge').textContent = start;
+      document.getElementById('mid-len-badge').textContent = len;
+
+      const extracted = str.substr(start - 1, len);
+      document.getElementById('mid-formula-display').textContent = `=MID(A1, ${start}, ${len})`;
+      document.getElementById('mid-result-display').textContent = `"${extracted}"`;
+
+      const ruler = document.getElementById('mid-ruler-cells');
+      ruler.innerHTML = '';
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i] === ' ' ? '␣' : str[i];
+        const idx = i + 1;
+        const isSlice = idx >= start && idx < (start + len);
+        const cell = document.createElement('div');
+        cell.className = `char-cell flex flex-col items-center justify-center p-1.5 rounded border text-xs min-w-[28px] transition ${
+          isSlice ? 'active-slice font-black' : 'bg-white border-slate-200 text-slate-700'
+        }`;
+        cell.innerHTML = `
+          <span class="text-sm">${char}</span>
+          <span class="text-[9px] opacity-70">${idx}</span>
+        `;
+        ruler.appendChild(cell);
+      }
+    }
+
+    /* =========================================================================
+       12. CONCATENATE & AMPERSAND VIEW LOGIC
+       ========================================================================= */
+    let concatSeparator = ' ';
+
+    function setConcatTextbookPreset() {
+      document.getElementById('concat-last').value = "Chan";
+      document.getElementById('concat-first').value = "Siu Ming";
+      setConcatSep(' ');
+    }
+
+    function setConcatSep(s) {
+      concatSeparator = s;
+      ['space', 'comma', 'none'].forEach(k => {
+        const btn = document.getElementById(`concat-sep-${k}`);
+        if ((k === 'space' && s === ' ') || (k === 'comma' && s === ', ') || (k === 'none' && s === '')) {
+          btn.className = "p-2 rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-900 font-bold text-center";
+        } else {
+          btn.className = "p-2 rounded-lg border-2 border-slate-200 bg-white text-slate-700 text-center";
+        }
+      });
+      updateConcatView();
+    }
+
+    function updateConcatView() {
+      const last = document.getElementById('concat-last').value;
+      const first = document.getElementById('concat-first').value;
+      const joined = `${last}${concatSeparator}${first}`;
+
+      const sepLabel = concatSeparator === ' ' ? '" "' : (concatSeparator === ', ' ? '", "' : '""');
+      document.getElementById('concat-formula-1').textContent = `=CONCATENATE(A2, ${sepLabel}, B2)`;
+      document.getElementById('concat-formula-2').textContent = `=A2 & ${sepLabel} & B2`;
+      document.getElementById('concat-res-1').textContent = joined;
+      document.getElementById('concat-res-2').textContent = joined;
+    }
+
+    /* =========================================================================
+       13 & 14. COUNT & COUNTA TABLE LOGIC
+       ========================================================================= */
+    const countingDataset = [
+      { raw: "1", type: "number" },
+      { raw: "2", type: "number" },
+      { raw: "", type: "blank" },
+      { raw: "hi", type: "text" },
+      { raw: "Bonjour", type: "text" },
+      { raw: "?", type: "symbol" },
+      { raw: "2", type: "number" }
+    ];
+
+    function renderCountView() {
+      const tbody = document.getElementById('count-table-body');
+      tbody.innerHTML = '';
+      let numCount = 0;
+
+      countingDataset.forEach((row, idx) => {
+        const isNum = row.type === 'number';
+        if (isNum) numCount++;
+
+        const tr = document.createElement('tr');
+        tr.className = isNum ? 'bg-blue-50/60 font-bold' : '';
+        tr.innerHTML = `
+          <td class="py-2 text-center bg-slate-100 text-slate-500 font-bold">A${idx+1}</td>
+          <td class="px-3 py-2 font-mono-code">${row.raw === '' ? '<span class="text-slate-300">[Empty]</span>' : row.raw}</td>
+          <td class="px-3 py-2 font-sans text-[11px] text-slate-500">${row.type.toUpperCase()}</td>
+          <td class="px-3 py-2 text-center text-xs">
+            ${isNum ? '<span class="text-blue-700 font-bold">✓ Counted</span>' : '<span class="text-slate-400">✕ Skipped</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('count-result-val').textContent = numCount;
+    }
+
+    function renderCountAView() {
+      const tbody = document.getElementById('counta-table-body');
+      tbody.innerHTML = '';
+      let nonBlankCount = 0;
+
+      countingDataset.forEach((row, idx) => {
+        const isNonBlank = row.type !== 'blank';
+        if (isNonBlank) nonBlankCount++;
+
+        const tr = document.createElement('tr');
+        tr.className = isNonBlank ? 'bg-purple-50/60 font-bold' : '';
+        tr.innerHTML = `
+          <td class="py-2 text-center bg-slate-100 text-slate-500 font-bold">A${idx+1}</td>
+          <td class="px-3 py-2 font-mono-code">${row.raw === '' ? '<span class="text-slate-300">[Empty]</span>' : row.raw}</td>
+          <td class="px-3 py-2 font-sans text-[11px] text-slate-500">${row.type.toUpperCase()}</td>
+          <td class="px-3 py-2 text-center text-xs">
+            ${isNonBlank ? '<span class="text-purple-700 font-bold">✓ Counted</span>' : '<span class="text-rose-500 font-bold">✕ Blank</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('counta-result-val').textContent = nonBlankCount;
+    }
+
+    /* =========================================================================
+       15. COUNTIF VIEW LOGIC
+       ========================================================================= */
+    const gradeDataset = ["A", "B", "C", "A", "B", "B", "B"];
+
+    function setCountIfPreset(crit) {
+      document.getElementById('countif-criteria-input').value = crit;
+      updateCountIfView();
+    }
+
+    function updateCountIfView() {
+      const crit = document.getElementById('countif-criteria-input').value.trim();
+      document.getElementById('countif-formula-str').textContent = `=COUNTIF(A1:A7, "${crit}")`;
+
+      const tbody = document.getElementById('countif-table-body');
+      tbody.innerHTML = '';
+      let matchCount = 0;
+
+      gradeDataset.forEach((grade, idx) => {
+        const isMatch = grade.toLowerCase() === crit.toLowerCase();
+        if (isMatch) matchCount++;
+
+        const tr = document.createElement('tr');
+        tr.className = isMatch ? 'bg-emerald-50/70 font-bold' : '';
+        tr.innerHTML = `
+          <td class="py-2 text-center bg-slate-100 text-slate-500 font-bold">A${idx+1}</td>
+          <td class="px-3 py-2 font-mono-code font-bold text-slate-900">${grade}</td>
+          <td class="px-3 py-2 text-center text-xs">
+            ${isMatch ? '<span class="text-emerald-700 font-bold">✓ Matches "${crit}"</span>' : '<span class="text-slate-400">—</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('countif-result-val').textContent = matchCount;
+    }
+
+    /* =========================================================================
+       INITIALIZATION
+       ========================================================================= */
+    function initCoreFunctionsStudio() {
+
+      applySidebarState();
+      renderActiveView();
+
+      // Math
+      loadSumPreset();
+      updateRoundView();
+      updateRoundUpView();
+      updateRoundDownView();
+      updateModView();
+
+      // Stats
+      renderAllStatsComponents();
+
+      // Text
+      updateMidView();
+      updateConcatView();
+
+      // Count
+      renderCountView();
+      renderCountAView();
+      updateCountIfView();
+    };
+  
+    </script>
+
+    <!-- Slide 19: Hash Errors Diagnostic Lab Script -->
+    <script>
+
+    /* =========================================================================
+       PAGE ROUTING & TAB NAVIGATION
+       ========================================================================= */
+    const navButtons = document.querySelectorAll('.error-nav-btn');
+    const sections = {
+      'hash-width': document.getElementById('section-hash-width'),
+      'hash-div': document.getElementById('section-hash-div'),
+      'hash-value': document.getElementById('section-hash-value'),
+      'hash-name': document.getElementById('section-hash-name'),
+      'hash-doctor': document.getElementById('section-hash-doctor')
+    };
+
+    function switchErrorSection(targetKey) {
+      navButtons.forEach(btn => {
+        if (btn.dataset.target === targetKey) {
+          btn.className = "error-nav-btn px-3 py-1.5 rounded-lg transition bg-rose-600 text-white shadow-sm flex items-center gap-1.5 whitespace-nowrap font-bold";
+        } else {
+          btn.className = "error-nav-btn px-3 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5 whitespace-nowrap";
+        }
+      });
+
+      Object.keys(sections).forEach(key => {
+        if (key === targetKey) {
+          sections[key].classList.remove('hidden');
+          sections[key].classList.add('flex');
+        } else {
+          sections[key].classList.add('hidden');
+          sections[key].classList.remove('flex');
+        }
+      });
+    }
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => switchErrorSection(btn.dataset.target));
+    });
+
+    /* =========================================================================
+       BAY 1: COLUMN WIDTH (####) SIMULATOR LOGIC
+       ========================================================================= */
+    const widthSlider = document.getElementById('col-width-slider');
+    const widthDisplay = document.getElementById('col-width-display');
+    const thColB = document.getElementById('th-col-b');
+    const cellNum = document.getElementById('cell-overflow-num');
+    const cellDate = document.getElementById('cell-overflow-date');
+    const cellText = document.getElementById('cell-overflow-text');
+
+    const FULL_NUM_TEXT = "$1,489,520.00";
+    const FULL_DATE_TEXT = "10/24/2026";
+    const FULL_LABEL_TEXT = "Approved and Fully Cleared";
+
+    function updateColumnWidth(w) {
+      widthDisplay.textContent = `${w}px`;
+      thColB.style.width = `${w}px`;
+
+      // Threshold testing: around ~110px for the large number, ~85px for the date
+      if (w < 115) {
+        // Replace with hashes
+        const hashCount = Math.max(3, Math.floor(w / 11));
+        cellNum.textContent = "#".repeat(hashCount);
+        cellNum.className = "px-2 py-2 border-r border-slate-200 text-right font-black transition-all text-rose-600 bg-rose-50/50 overflow-hidden whitespace-nowrap";
+      } else {
+        cellNum.textContent = FULL_NUM_TEXT;
+        cellNum.className = "px-2 py-2 border-r border-slate-200 text-right font-bold transition-all text-slate-900 overflow-hidden whitespace-nowrap";
+      }
+
+      if (w < 82) {
+        const hashCount = Math.max(3, Math.floor(w / 11));
+        cellDate.textContent = "#".repeat(hashCount);
+        cellDate.className = "px-2 py-2 border-r border-slate-200 text-right font-black transition-all text-rose-600 bg-rose-50/50 overflow-hidden whitespace-nowrap";
+      } else {
+        cellDate.textContent = FULL_DATE_TEXT;
+        cellDate.className = "px-2 py-2 border-r border-slate-200 text-right font-semibold transition-all text-slate-900 overflow-hidden whitespace-nowrap";
+      }
+
+      // Text never turns to hashes! It simply clips smoothly.
+      cellText.textContent = FULL_LABEL_TEXT;
+      cellText.style.maxWidth = `${w}px`;
+    }
+
+    widthSlider.addEventListener('input', (e) => updateColumnWidth(parseInt(e.target.value, 10)));
+    document.getElementById('width-autofit-btn').addEventListener('click', () => {
+      widthSlider.value = 145;
+      updateColumnWidth(145);
+    });
+    document.getElementById('width-squish-btn').addEventListener('click', () => {
+      widthSlider.value = 45;
+      updateColumnWidth(45);
+    });
+
+    /* =========================================================================
+       BAY 2: DIVISION BY ZERO (#DIV/0!) LOGIC
+       ========================================================================= */
+    let divWrapper = 'none'; // 'none', 'iferror', 'if'
+    const divNumInput = document.getElementById('div-num-input');
+    const divDenomInput = document.getElementById('div-denom-input');
+    const denomBadge = document.getElementById('denom-type-badge');
+    const divResultCard = document.getElementById('div-result-card');
+    const divResultFormula = document.getElementById('div-result-formula');
+    const divResultValue = document.getElementById('div-result-value');
+    const tableDivA = document.getElementById('table-div-a');
+    const tableDivB = document.getElementById('table-div-b');
+    const tableDivC = document.getElementById('table-div-c');
+
+    function updateDivEvaluation() {
+      const numVal = parseFloat(divNumInput.value) || 0;
+      const rawDenom = divDenomInput.value.trim();
+      const isBlank = rawDenom === '';
+      const denomVal = isBlank ? 0 : parseFloat(rawDenom);
+
+      tableDivA.textContent = numVal;
+      tableDivB.textContent = isBlank ? '[Blank]' : denomVal;
+
+      if (isBlank) {
+        denomBadge.textContent = "Empty / Blank";
+        denomBadge.className = "absolute right-2 top-2 text-[10px] font-mono font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded";
+      } else if (denomVal === 0) {
+        denomBadge.textContent = "Exact 0";
+        denomBadge.className = "absolute right-2 top-2 text-[10px] font-mono font-bold text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded";
+      } else {
+        denomBadge.textContent = "Valid Number";
+        denomBadge.className = "absolute right-2 top-2 text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded";
+      }
+
+      const isZeroDiv = denomVal === 0;
+
+      // Handle formula rendering based on wrapper
+      if (divWrapper === 'none') {
+        divResultFormula.textContent = `=A2 / B2 (${numVal} / ${isBlank ? '0' : denomVal})`;
+        if (isZeroDiv) {
+          divResultValue.textContent = "#DIV/0!";
+          divResultValue.className = "font-mono-code font-black text-2xl text-rose-700 bg-white px-3 py-1.5 rounded-lg border border-rose-300 shadow-sm";
+          divResultCard.className = "p-4 rounded-xl border-2 border-rose-300 bg-rose-50 flex items-center justify-between";
+          tableDivC.textContent = "#DIV/0!";
+          tableDivC.className = "py-2 px-3 font-bold bg-rose-100 text-rose-800";
+        } else {
+          const res = (numVal / denomVal).toFixed(2);
+          divResultValue.textContent = res;
+          divResultValue.className = "font-mono-code font-black text-2xl text-emerald-700 bg-white px-3 py-1.5 rounded-lg border border-emerald-300 shadow-sm";
+          divResultCard.className = "p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 flex items-center justify-between";
+          tableDivC.textContent = res;
+          tableDivC.className = "py-2 px-3 font-bold bg-emerald-100 text-emerald-800";
+        }
+      } else if (divWrapper === 'iferror') {
+        divResultFormula.textContent = `=IFERROR(A2 / B2, 0)`;
+        if (isZeroDiv) {
+          divResultValue.textContent = "0";
+          divResultValue.className = "font-mono-code font-black text-2xl text-emerald-700 bg-white px-3 py-1.5 rounded-lg border border-emerald-300 shadow-sm";
+          divResultCard.className = "p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 flex items-center justify-between";
+          tableDivC.textContent = "0 (Shielded)";
+          tableDivC.className = "py-2 px-3 font-bold bg-emerald-100 text-emerald-800";
+        } else {
+          const res = (numVal / denomVal).toFixed(2);
+          divResultValue.textContent = res;
+          divResultValue.className = "font-mono-code font-black text-2xl text-emerald-700 bg-white px-3 py-1.5 rounded-lg border border-emerald-300 shadow-sm";
+          divResultCard.className = "p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 flex items-center justify-between";
+          tableDivC.textContent = res;
+          tableDivC.className = "py-2 px-3 font-bold bg-emerald-100 text-emerald-800";
+        }
+      } else if (divWrapper === 'if') {
+        divResultFormula.textContent = `=IF(B2=0, "-", A2 / B2)`;
+        if (isZeroDiv) {
+          divResultValue.textContent = `"-"`;
+          divResultValue.className = "font-mono-code font-black text-2xl text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-300 shadow-sm";
+          divResultCard.className = "p-4 rounded-xl border-2 border-slate-300 bg-slate-50 flex items-center justify-between";
+          tableDivC.textContent = `"-" (Placeholder)`;
+          tableDivC.className = "py-2 px-3 font-bold bg-slate-100 text-slate-700";
+        } else {
+          const res = (numVal / denomVal).toFixed(2);
+          divResultValue.textContent = res;
+          divResultValue.className = "font-mono-code font-black text-2xl text-emerald-700 bg-white px-3 py-1.5 rounded-lg border border-emerald-300 shadow-sm";
+          divResultCard.className = "p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 flex items-center justify-between";
+          tableDivC.textContent = res;
+          tableDivC.className = "py-2 px-3 font-bold bg-emerald-100 text-emerald-800";
+        }
+      }
+    }
+
+    function setDivScenario(num, denom) {
+      divNumInput.value = num;
+      divDenomInput.value = denom === null ? '' : denom;
+      updateDivEvaluation();
+    }
+
+    function setDivWrapper(wrapType) {
+      divWrapper = wrapType;
+      ['none', 'iferror', 'if'].forEach(w => {
+        const btn = document.getElementById(`div-wrap-${w}`);
+        if (w === wrapType) {
+          btn.className = "p-2 rounded-lg border-2 border-amber-600 bg-amber-50 text-amber-900 font-bold text-center transition";
+        } else {
+          btn.className = "p-2 rounded-lg border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-medium text-center transition";
+        }
+      });
+      updateDivEvaluation();
+    }
+
+    divNumInput.addEventListener('input', updateDivEvaluation);
+    divDenomInput.addEventListener('input', updateDivEvaluation);
+
+    /* =========================================================================
+       BAY 3: DATA TYPE CLASH (#VALUE!) LOGIC
+       ========================================================================= */
+    let valFormulaMode = 'plus'; // 'plus' or 'sum'
+    const valInputB2 = document.getElementById('val-cell-b2');
+    const valStatusB2 = document.getElementById('val-b2-status');
+    const valResultCard = document.getElementById('val-result-card');
+    const valResultFormula = document.getElementById('val-result-formula');
+    const valResultValue = document.getElementById('val-result-value');
+    const valBreakdown = document.getElementById('val-breakdown-box');
+
+    function updateValueEvaluation() {
+      const b2Text = valInputB2.value;
+      const isPureNumber = !isNaN(Number(b2Text)) && b2Text.trim() !== '';
+
+      if (isPureNumber) {
+        valStatusB2.textContent = "Type: Valid Numerical Value";
+        valStatusB2.className = "text-[10px] text-emerald-600 font-semibold block mt-1";
+      } else if (b2Text === ' ') {
+        valStatusB2.textContent = "Type: Hidden Space Character (ASCII 32)";
+        valStatusB2.className = "text-[10px] text-amber-600 font-bold block mt-1";
+      } else {
+        valStatusB2.textContent = `Type: String / Label ("${b2Text}")`;
+        valStatusB2.className = "text-[10px] text-rose-600 font-semibold block mt-1";
+      }
+
+      if (valFormulaMode === 'plus') {
+        valResultFormula.textContent = `=A2 + B2 (500 + "${b2Text}")`;
+        if (isPureNumber) {
+          const sumVal = 500 + Number(b2Text);
+          valResultValue.textContent = sumVal;
+          valResultValue.className = "font-mono-code font-black text-2xl text-emerald-700 bg-white px-3 py-1.5 rounded-lg border border-emerald-300 shadow-sm";
+          valResultCard.className = "p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 flex items-center justify-between";
+          valBreakdown.className = "p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs space-y-1";
+          valBreakdown.innerHTML = `<strong class="text-emerald-900 font-bold">✓ Clean Arithmetic:</strong> Both inputs are numbers. Evaluated successfully to ${sumVal}.`;
+        } else {
+          valResultValue.textContent = "#VALUE!";
+          valResultValue.className = "font-mono-code font-black text-2xl text-rose-700 bg-white px-3 py-1.5 rounded-lg border border-rose-300 shadow-sm";
+          valResultCard.className = "p-4 rounded-xl border-2 border-rose-300 bg-rose-50 flex items-center justify-between";
+          valBreakdown.className = "p-3 bg-rose-50/70 border border-rose-200 rounded-lg text-xs space-y-1";
+          valBreakdown.innerHTML = `
+            <strong class="text-rose-900 font-bold flex items-center gap-1.5">💥 Type Crash:</strong>
+            <p class="text-slate-700 text-[11px]">Cannot add the number 500 to the non-numeric string "${b2Text}". In Excel, literal addition crashes immediately.</p>
+          `;
+        }
+      } else {
+        // SUM Function mode
+        valResultFormula.textContent = `=SUM(A2, B2) with B2 = "${b2Text}"`;
+        const sumVal = isPureNumber ? (500 + Number(b2Text)) : 500;
+        valResultValue.textContent = sumVal;
+        valResultValue.className = "font-mono-code font-black text-2xl text-emerald-700 bg-white px-3 py-1.5 rounded-lg border border-emerald-300 shadow-sm";
+        valResultCard.className = "p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 flex items-center justify-between";
+        valBreakdown.className = "p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs space-y-1";
+        valBreakdown.innerHTML = `
+          <strong class="text-blue-900 font-bold flex items-center gap-1.5">🛡️ =SUM() Auto-Rescue Active:</strong>
+          <p class="text-slate-700 text-[11px]">=SUM() automatically ignores the text note ("${b2Text}") and returns <strong>${sumVal}</strong> without crashing your worksheet!</p>
+        `;
+      }
+    }
+
+    function setValueFormulaType(mode) {
+      valFormulaMode = mode;
+      const btnPlus = document.getElementById('val-btn-plus');
+      const btnSum = document.getElementById('val-btn-sum');
+
+      if (mode === 'plus') {
+        btnPlus.className = "p-2.5 rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold text-left transition flex flex-col";
+        btnSum.className = "p-2.5 rounded-lg border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-medium text-left transition flex flex-col";
+      } else {
+        btnSum.className = "p-2.5 rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold text-left transition flex flex-col";
+        btnPlus.className = "p-2.5 rounded-lg border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-medium text-left transition flex flex-col";
+      }
+      updateValueEvaluation();
+    }
+
+    function setValueScenario(val, mode) {
+      valInputB2.value = val;
+      setValueFormulaType(mode === '+' ? 'plus' : 'sum');
+    }
+
+    valInputB2.addEventListener('input', updateValueEvaluation);
+
+    /* =========================================================================
+       BAY 4: SYNTAX & TYPO (#NAME?) LOGIC
+       ========================================================================= */
+    const nameInput = document.getElementById('name-formula-input');
+    const nameEvalTag = document.getElementById('name-eval-tag');
+    const nameResultVal = document.getElementById('name-result-val');
+    const nameResultCard = document.getElementById('name-result-card');
+    const nameDiagBox = document.getElementById('name-diagnosis-box');
+
+    const VALID_EXCEL_FUNCS = ['SUM', 'AVERAGE', 'COUNT', 'COUNTA', 'ROUND', 'MAX', 'MIN', 'MEDIAN', 'IF', 'VLOOKUP'];
+
+    function parseNameFormula(formulaStr) {
+      const clean = formulaStr.trim().replace(/^=/, '');
+      const matchFunc = clean.match(/^([A-Za-z0-9_]+)\s*\(/);
+
+      if (matchFunc) {
+        const funcName = matchFunc[1].toUpperCase();
+        if (!VALID_EXCEL_FUNCS.includes(funcName)) {
+          return {
+            isError: true,
+            type: 'bad_function',
+            token: funcName,
+            fix: funcName === 'SUMM' ? '=SUM(B2:B8)' : `=AVERAGE(B2:B8)`
+          };
+        }
+      }
+
+      // Check unquoted IF strings like IF(A2=Yes, 1, 0)
+      if (/IF\s*\([^=]+=([A-Za-z]+)/i.test(clean)) {
+        const unquotedWord = clean.match(/IF\s*\([^=]+=([A-Za-z]+)/i)[1];
+        if (unquotedWord.toUpperCase() !== 'TRUE' && unquotedWord.toUpperCase() !== 'FALSE') {
+          return {
+            isError: true,
+            type: 'unquoted_string',
+            token: unquotedWord,
+            fix: clean.replace(new RegExp(`=${unquotedWord}`, 'i'), `="${unquotedWord}"`)
+          };
+        }
+      }
+
+      // Check missing colon in ranges (e.g. SUM(B2 B8))
+      if (/[A-Z]+[0-9]+\s+[A-Z]+[0-9]+/i.test(clean)) {
+        return {
+          isError: true,
+          type: 'missing_colon',
+          token: 'Range Gap',
+          fix: clean.replace(/([A-Z]+[0-9]+)\s+([A-Z]+[0-9]+)/i, '$1:$2')
+        };
+      }
+
+      return { isError: false };
+    }
+
+    function evaluateNameFormula() {
+      const formulaVal = nameInput.value;
+      const parse = parseNameFormula(formulaVal);
+
+      if (parse.isError) {
+        nameResultVal.textContent = "#NAME?";
+        nameResultVal.className = "font-mono-code font-black text-2xl text-purple-700 bg-white px-3 py-1.5 rounded-lg border border-purple-300 shadow-sm";
+        nameResultCard.className = "p-4 rounded-xl border-2 border-purple-300 bg-purple-50 flex items-center justify-between";
+
+        if (parse.type === 'bad_function') {
+          nameEvalTag.textContent = `Unknown Function Token: "${parse.token}"`;
+          nameDiagBox.innerHTML = `
+            <div class="flex items-center justify-between">
+              <strong class="text-purple-900 font-bold">Unrecognized Function Name:</strong>
+              <button onclick="setNameFormula('${parse.fix}')" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">Apply Fix: ${parse.fix}</button>
+            </div>
+            <p class="text-slate-600 text-[11px] leading-relaxed">
+              Excel does not possess a formula named <strong>${parse.token}</strong>. The parser halted execution and flagged <code class="font-mono text-purple-700">#NAME?</code>.
+            </p>
+          `;
+        } else if (parse.type === 'unquoted_string') {
+          nameEvalTag.textContent = `Named Range Collision: "${parse.token}"`;
+          nameDiagBox.innerHTML = `
+            <div class="flex items-center justify-between">
+              <strong class="text-purple-900 font-bold">Missing Text Quotation Marks:</strong>
+              <button onclick="setNameFormula('=${parse.fix}')" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">Apply Quotes</button>
+            </div>
+            <p class="text-slate-600 text-[11px] leading-relaxed">
+              Without quotation marks, Excel treats <code class="font-mono">${parse.token}</code> as a named variable or range. Wrap words in double quotes: <code class="font-mono text-emerald-700 font-bold">"${parse.token}"</code>.
+            </p>
+          `;
+        } else if (parse.type === 'missing_colon') {
+          nameEvalTag.textContent = `Range Syntax Invalid`;
+          nameDiagBox.innerHTML = `
+            <div class="flex items-center justify-between">
+              <strong class="text-purple-900 font-bold">Missing Colon In Bounding Box:</strong>
+              <button onclick="setNameFormula('=${parse.fix}')" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]">Add Colon</button>
+            </div>
+            <p class="text-slate-600 text-[11px] leading-relaxed">
+              Ranges require a colon <code class="font-mono">:</code> between the top-left and bottom-right cells.
+            </p>
+          `;
+        }
+      } else {
+        nameResultVal.textContent = "Valid ✓";
+        nameResultVal.className = "font-mono-code font-black text-2xl text-emerald-700 bg-white px-3 py-1.5 rounded-lg border border-emerald-300 shadow-sm";
+        nameResultCard.className = "p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 flex items-center justify-between";
+        nameEvalTag.textContent = "Syntax Clean: Ready to evaluate";
+        nameDiagBox.innerHTML = `
+          <strong class="text-emerald-900 font-bold block">Formula Verified!</strong>
+          <p class="text-slate-600 text-[11px]">All function names and tokens are correctly recognized by Excel's compiler.</p>
+        `;
+      }
+    }
+
+    function setNameFormula(f) {
+      nameInput.value = f;
+      evaluateNameFormula();
+    }
+
+    function setNameScenario(scen) {
+      if (scen === 'typo-func') setNameFormula('=SUMM(B2:B8)');
+      else if (scen === 'unquoted-str') setNameFormula('=IF(A2=Yes, 1, 0)');
+      else if (scen === 'bad-range') setNameFormula('=SUM(B2 B8)');
+    }
+
+    nameInput.addEventListener('input', evaluateNameFormula);
+
+    /* =========================================================================
+       BAY 5: ERROR DOCTOR DIAGNOSTIC QUIZ
+       ========================================================================= */
+    const quizCases = [
+      {
+        id: 1,
+        title: "Case 1: The Accounting Mystery",
+        snippet: "Cell C2 formula: =A2 + B2<br>Cell A2 has 1200. Cell B2 has 'Exempt'.<br>The cell screams an error.",
+        options: ["####", "#DIV/0!", "#VALUE!", "#NAME?"],
+        correct: "#VALUE!",
+        reason: "The literal plus sign cannot add a number to an ASCII text string 'Exempt'."
+      },
+      {
+        id: 2,
+        title: "Case 2: The Shrinking Column",
+        snippet: "A user types 15,482,900 into column D. The moment they shrink the column, the digits vanish and become hashes.",
+        options: ["####", "#DIV/0!", "#VALUE!", "#NAME?"],
+        correct: "####",
+        reason: "Column width overflow. Excel protects the number from being misread as a smaller truncated number."
+      },
+      {
+        id: 3,
+        title: "Case 3: The New Field Survey",
+        snippet: "Formula in cell D2: =AVERGE(B2:B10).<br>No numbers appear; only a strange question mark error.",
+        options: ["####", "#DIV/0!", "#VALUE!", "#NAME?"],
+        correct: "#NAME?",
+        reason: "'AVERGE' is misspelled. Excel does not recognize the function name."
+      },
+      {
+        id: 4,
+        title: "Case 4: The Unfilled Metric",
+        snippet: "Formula: =A2 / B2.<br>Cell A2 is $50,000. Cell B2 is completely empty because team data hasn't arrived.",
+        options: ["####", "#DIV/0!", "#VALUE!", "#NAME?"],
+        correct: "#DIV/0!",
+        reason: "An empty cell evaluates to 0 in an arithmetic equation, triggering division by zero."
+      }
+    ];
+
+    let doctorScore = 0;
+    const answeredCases = new Set();
+
+    function initDoctorCases() {
+      const container = document.getElementById('doctor-cases-container');
+      container.innerHTML = '';
+      doctorScore = 0;
+      answeredCases.clear();
+      document.getElementById('doctor-score').textContent = doctorScore;
+
+      quizCases.forEach(c => {
+        const card = document.createElement('div');
+        card.className = "p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between gap-3 text-xs";
+        card.id = `quiz-card-${c.id}`;
+
+        card.innerHTML = `
+          <div>
+            <span class="font-bold text-slate-800 text-sm block mb-1">${c.title}</span>
+            <div class="p-2.5 bg-white rounded border border-slate-200 font-mono-code text-[11px] text-slate-700 leading-relaxed mb-3">
+              ${c.snippet}
+            </div>
+          </div>
+          <div>
+            <span class="text-[11px] font-semibold text-slate-500 block mb-1.5">Diagnose Error:</span>
+            <div class="grid grid-cols-4 gap-1.5">
+              ${c.options.map(opt => `
+                <button onclick="checkCaseAnswer(${c.id}, '${opt}')" class="quiz-btn-${c.id} py-1.5 px-1 rounded border border-slate-300 bg-white hover:bg-slate-100 font-mono-code font-bold text-slate-800 transition text-center text-xs">
+                  ${opt}
+                </button>
+              `).join('')}
+            </div>
+            <div id="quiz-feedback-${c.id}" class="mt-2 text-[11px] font-medium hidden"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function checkCaseAnswer(caseId, selected) {
+      if (answeredCases.has(caseId)) return;
+      answeredCases.add(caseId);
+
+      const caseObj = quizCases.find(c => c.id === caseId);
+      const feedback = document.getElementById(`quiz-feedback-${caseId}`);
+      const buttons = document.querySelectorAll(`.quiz-btn-${caseId}`);
+
+      buttons.forEach(b => {
+        b.disabled = true;
+        if (b.textContent.trim() === caseObj.correct) {
+          b.className = "py-1.5 px-1 rounded border-2 border-emerald-600 bg-emerald-100 font-mono-code font-bold text-emerald-900";
+        } else if (b.textContent.trim() === selected) {
+          b.className = "py-1.5 px-1 rounded border-2 border-rose-500 bg-rose-100 font-mono-code font-bold text-rose-800";
+        }
+      });
+
+      feedback.classList.remove('hidden');
+      if (selected === caseObj.correct) {
+        doctorScore++;
+        document.getElementById('doctor-score').textContent = doctorScore;
+        feedback.className = "mt-2 p-2 rounded bg-emerald-100 border border-emerald-300 text-emerald-900 font-medium text-[11px]";
+        feedback.innerHTML = `✓ <strong>Correct!</strong> ${caseObj.reason}`;
+      } else {
+        feedback.className = "mt-2 p-2 rounded bg-rose-100 border border-rose-300 text-rose-900 font-medium text-[11px]";
+        feedback.innerHTML = `✕ <strong>Actually ${caseObj.correct}:</strong> ${caseObj.reason}`;
+      }
+    }
+
+    document.getElementById('doctor-reset-btn').addEventListener('click', initDoctorCases);
+
+    /* =========================================================================
+       INITIALIZATION ON LOAD
+       ========================================================================= */
+    function initHashErrorsLab() {
+
+      updateColumnWidth(80);
+      updateDivEvaluation();
+      updateValueEvaluation();
+      evaluateNameFormula();
+      initDoctorCases();
+    };
+  
+    </script>
+
 </body>
 </html>
