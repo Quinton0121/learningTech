@@ -7099,12 +7099,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectFunction(funcId) {
-      const idx = functionList.indexOf(funcId);
-      if (idx !== -1) {
+      const idx = (typeof funcId === 'number') ? funcId : functionList.indexOf(funcId);
+      if (idx >= 0 && idx < functionList.length) {
         currentFunctionIndex = idx;
         renderActiveView();
         if (window.innerWidth < 1024 && isSidebarOpen) {
           toggleSidebar();
+        }
+        if (typeof window.onSubSlideChanged === 'function') {
+          window.onSubSlideChanged(currentFunctionIndex);
         }
       }
     }
@@ -7112,7 +7115,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function navigateStep(direction) {
       currentFunctionIndex = (currentFunctionIndex + direction + functionList.length) % functionList.length;
       renderActiveView();
+      if (typeof window.onSubSlideChanged === 'function') {
+        window.onSubSlideChanged(currentFunctionIndex);
+      }
     }
+
+    window.getCurrentSubSlide = function() {
+      const activeSlide = document.querySelector('.slide-container.active');
+      if (activeSlide && activeSlide.id === 'slide-18') {
+        return currentFunctionIndex;
+      }
+      return 0;
+    };
+
+    window.goToSubSlide = function(targetSubIdx) {
+      const activeSlide = document.querySelector('.slide-container.active');
+      if (activeSlide && activeSlide.id === 'slide-18') {
+        if (typeof targetSubIdx === 'number' && targetSubIdx >= 0 && targetSubIdx < functionList.length) {
+          if (currentFunctionIndex !== targetSubIdx) {
+            currentFunctionIndex = targetSubIdx;
+            renderActiveView();
+          }
+        }
+      }
+    };
 
     function renderActiveView() {
       const activeId = functionList[currentFunctionIndex];

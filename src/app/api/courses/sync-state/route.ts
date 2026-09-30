@@ -19,6 +19,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const clientSlideStr = searchParams.get('slide');
     const clientSlide = clientSlideStr ? parseInt(clientSlideStr, 10) : null;
+    const clientSubSlideStr = searchParams.get('subSlide');
+    const clientSubSlide = clientSubSlideStr ? parseInt(clientSubSlideStr, 10) : null;
     const courseId = searchParams.get('courseId');
 
     let course;
@@ -45,7 +47,8 @@ export async function GET(request: Request) {
         where: { id: enrollment.id },
         data: { 
           lastSeenAt: new Date(), 
-          currentSlide: clientSlide !== null ? clientSlide : enrollment.currentSlide 
+          currentSlide: clientSlide !== null ? clientSlide : enrollment.currentSlide,
+          currentSubSlide: clientSubSlide !== null ? clientSubSlide : enrollment.currentSubSlide
         }
       });
     }
@@ -53,7 +56,7 @@ export async function GET(request: Request) {
     if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
 
     let activeStudents = 0;
-    let activeStudentDetails: { name: string, slide: number }[] = [];
+    let activeStudentDetails: { name: string, slide: number, subSlide?: number }[] = [];
     
     if (user.role === 'EDUCATOR' || user.role === 'ADMIN') {
       const activeThreshold = new Date(Date.now() - 20000);
@@ -68,7 +71,8 @@ export async function GET(request: Request) {
       activeStudents = activeEnrollments.length;
       activeStudentDetails = activeEnrollments.map(e => ({
         name: e.user?.name || 'Unknown',
-        slide: e.currentSlide || 0
+        slide: e.currentSlide || 0,
+        subSlide: e.currentSubSlide || 0
       }));
     }
     
@@ -76,6 +80,7 @@ export async function GET(request: Request) {
       isSynced: course.isActive ? course.isSynced : false, 
       isActive: course.isActive,
       currentSlide: course.currentSlide,
+      currentSubSlide: course.currentSubSlide || 0,
       publishedSlide: course.publishedSlide,
       activeStudents: activeStudents,
       activeStudentDetails,
@@ -94,7 +99,7 @@ export async function POST(request: Request) {
     const token = authHeader.split(' ')[1];
     const decoded: any = jwt.verify(token, JWT_SECRET);
     
-    const { isSynced, currentSlide, publishedSlide, courseId } = await request.json();
+    const { isSynced, currentSlide, currentSubSlide, publishedSlide, courseId } = await request.json();
     
     const user = await prisma.user.findUnique({ where: { id: decoded.userId }});
     if (!user || user.sessionToken !== decoded.sessionToken || (user.role !== 'EDUCATOR' && user.role !== 'ADMIN')) {
@@ -115,6 +120,7 @@ export async function POST(request: Request) {
     const dataToUpdate: any = {};
     if (isSynced !== undefined) dataToUpdate.isSynced = isSynced;
     if (currentSlide !== undefined) dataToUpdate.currentSlide = currentSlide;
+    if (currentSubSlide !== undefined) dataToUpdate.currentSubSlide = currentSubSlide;
     if (publishedSlide !== undefined) dataToUpdate.publishedSlide = publishedSlide;
 
     await prisma.course.update({

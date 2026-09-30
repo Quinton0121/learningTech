@@ -556,6 +556,17 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         return activeIdx >= 0 ? activeIdx : 0;
       };
 
+      // Get Active Sub-Slide Index (e.g. for Slide 18 15-Function Studio)
+      window.getActiveSubSlide = function() {
+        if (typeof window.getCurrentSubSlide === 'function') {
+          try {
+            const sub = window.getCurrentSubSlide();
+            return (typeof sub === 'number') ? sub : 0;
+          } catch(e) {}
+        }
+        return 0;
+      };
+
       // Universal Safe Slide Navigation
       window.goToSlideDOM = function(targetIndex, triggerHook = true) {
         const slides = Array.from(document.querySelectorAll('.slide-container'));
@@ -624,18 +635,26 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         }
       };
 
-      // Broadcast Teacher Slide Change
-      function broadcastTeacherSlide(slideIdx) {
+      // Broadcast Teacher Slide & Sub-Slide Change
+      function broadcastTeacherSlide(slideIdx, subSlideIdx) {
         if (!isTeacher || !isSynced || isBroadcasting) return;
         isBroadcasting = true;
+        const activeSub = (typeof subSlideIdx === 'number') ? subSlideIdx : window.getActiveSubSlide();
         fetch('/api/courses/sync-state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({ isSynced: true, currentSlide: slideIdx, courseId })
+          body: JSON.stringify({ isSynced: true, currentSlide: slideIdx, currentSubSlide: activeSub, courseId })
         }).finally(() => {
           setTimeout(() => { isBroadcasting = false; }, 200);
         });
       }
+
+      // Teacher sub-slide navigation listener hook
+      window.onSubSlideChanged = function(subIdx) {
+        if (isTeacher && isSynced) {
+          broadcastTeacherSlide(window.getActiveSlideIndex(), subIdx);
+        }
+      };
 
       // Observe DOM Slide Changes (Teacher actions)
       const observer = new MutationObserver(() => {
@@ -719,10 +738,12 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         const startTime = Date.now();
 
         const activeIdx = window.getActiveSlideIndex();
+        const activeSubIdx = window.getActiveSubSlide();
         const courseIdParam = courseId ? ('&courseId=' + encodeURIComponent(courseId)) : '';
+        const subParam = '&subSlide=' + encodeURIComponent(activeSubIdx);
 
         try {
-          const res = await fetch('/api/courses/sync-state?slide=' + activeIdx + courseIdParam, {
+          const res = await fetch('/api/courses/sync-state?slide=' + activeIdx + subParam + courseIdParam, {
             headers: { 'Authorization': 'Bearer ' + token }
           });
           if (res.status === 401 || res.status === 403) {
@@ -766,7 +787,8 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
                   listEl.innerHTML = '<div class="text-slate-500 italic text-xs">' + (lang === 'en' ? 'No students online' : '暫無學生在線') + '</div>';
                 } else {
                   listEl.innerHTML = data.activeStudentDetails.map(s => {
-                    return '<div class="flex justify-between items-center"><span class="truncate pr-2">' + s.name + '</span><span class="bg-indigo-600/30 text-indigo-400 text-xs px-2 py-0.5 rounded flex-shrink-0 font-mono">Slide ' + (s.slide + 1) + '</span></div>';
+                    const subText = (s.slide === 17 && typeof s.subSlide === 'number') ? (' (Func ' + (s.subSlide + 1) + '/15)') : '';
+                    return '<div class="flex justify-between items-center"><span class="truncate pr-2">' + s.name + '</span><span class="bg-indigo-600/30 text-indigo-400 text-xs px-2 py-0.5 rounded flex-shrink-0 font-mono">Slide ' + (s.slide + 1) + subText + '</span></div>';
                   }).join('');
                 }
               }
@@ -852,6 +874,14 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
                 // Ensure buttons remain locked in sync mode
                 window.goToSlideDOM(activeIdx, false);
               }
+
+              // Sync sub-slide (e.g. Slide 18 15 functions) without touching interactive inputs
+              if (typeof data.currentSubSlide === 'number' && typeof window.goToSubSlide === 'function') {
+                const currentSub = window.getActiveSubSlide();
+                if (currentSub !== data.currentSubSlide) {
+                  try { window.goToSubSlide(data.currentSubSlide); } catch(e) {}
+                }
+              }
             } else {
               if (syncDot) syncDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
               if (syncText) {
@@ -895,16 +925,41 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
       // --- 4. Teacher Action Listeners ---
       document.getElementById('sync-btn')?.addEventListener('click', () => {
         const activeIdx = window.getActiveSlideIndex();
+        const activeSubIdx = window.getActiveSubSlide();
         fetch('/api/courses/sync-state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({ isSynced: true, currentSlide: activeIdx, courseId })
+          body: JSON.stringify({ isSynced: true, currentSlide: activeIdx, currentSubSlide: activeSubIdx, courseId })
         }).then(() => {
           isSynced = true;
           window.pollSyncState();
           const lang = localStorage.getItem('courseLang') || 'en';
           window.showSyncToast(lang === 'en' ? 'Class Synchronized!' : '課堂已開始同步！', false);
         });
+      });
+
+      // Intercept sub-page prev/next buttons for learners when synced
+      ['prev-func-top', 'next-func-top', 'prev-func-bottom', 'next-func-bottom'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', (e) => {
+          if (!isTeacher && isSynced) {
+            e.preventDefault();
+            e.stopPropagation();
+            const lang = localStorage.getItem('courseLang') || 'en';
+            window.showSyncToast(lang === 'en' ? 'Class is synced with teacher' : '課堂目前與教師同步中', true);
+            return false;
+          }
+        }, true);
+      });
+      document.querySelectorAll('.func-nav-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          if (!isTeacher && isSynced) {
+            e.preventDefault();
+            e.stopPropagation();
+            const lang = localStorage.getItem('courseLang') || 'en';
+            window.showSyncToast(lang === 'en' ? 'Class is synced with teacher' : '課堂目前與教師同步中', true);
+            return false;
+          }
+        }, true);
       });
 
       document.getElementById('desync-btn')?.addEventListener('click', () => {

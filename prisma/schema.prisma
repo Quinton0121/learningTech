@@ -58,6 +58,7 @@ model Course {
   isSynced       Boolean      @default(false)
   isActive       Boolean      @default(false)
   currentSlide   Int          @default(0)
+  currentSubSlide Int         @default(0)
   publishedSlide Int          @default(0)
   createdAt      DateTime     @default(now())
   startedAt      DateTime?
@@ -88,6 +89,7 @@ model Enrollment {
   status       String    @default("PENDING") // PENDING, APPROVED
   lastSeenAt   DateTime?
   currentSlide Int?      @default(0)
+  currentSubSlide Int?   @default(0)
   pcId         String?   // Mapped PC ID for this specific class
   gameScore    Float?    // Final score for Slide 16 range game
   gameDetails  String?   // JSON details (ranges, formula, timestamp)
