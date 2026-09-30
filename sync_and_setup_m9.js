@@ -37,7 +37,7 @@ async function main() {
             where: { id: 'cms1kpibu0001wfaoyhkvj9id' },
             update: {
                 htmlContent: htmlA,
-                publishedSlide: 18
+                publishedSlide: 19
             },
             create: {
                 id: 'cms1kpibu0001wfaoyhkvj9id',
@@ -47,7 +47,7 @@ async function main() {
                 htmlContent: htmlA,
                 isPublic: true,
                 studentQuota: 50,
-                publishedSlide: 18
+                publishedSlide: 19
             }
         });
         console.log("Upserted Excel A course (id: cms1kpibu0001wfaoyhkvj9id)");
@@ -60,7 +60,7 @@ async function main() {
             where: { id: 'cms7c77ap0001wfpk6qjc1nm7' },
             update: {
                 htmlContent: htmlB,
-                publishedSlide: 18
+                publishedSlide: 19
             },
             create: {
                 id: 'cms7c77ap0001wfpk6qjc1nm7',
@@ -70,7 +70,7 @@ async function main() {
                 htmlContent: htmlB,
                 isPublic: true,
                 studentQuota: 50,
-                publishedSlide: 18
+                publishedSlide: 19
             }
         });
         console.log("Upserted Excel B course (id: cms7c77ap0001wfpk6qjc1nm7)");

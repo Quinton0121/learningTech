@@ -263,6 +263,32 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
       "GRAND TOTAL:": "總計金額：",
       "Visualize the Shift": "觀察公式位移",
 
+      // Excel AVERAGE Visualizer (Slide 19)
+      "STEP 19: AVERAGE": "步驟 19：AVERAGE 函數",
+      "See How AVERAGE Works": "探索 AVERAGE 平均值函數的運作原理",
+      "Excel AVERAGE Visualizer": "Excel AVERAGE 函數視覺化實驗室",
+      "Interactive Math Lab": "互動數學實驗室",
+      "Change values and watch the total redistribute into equal arithmetic shares": "調整數值觀察總數如何均等重新分配為算術平均份額",
+      "Change the values below and watch the total redistribute into equal shares. This is the idea behind the arithmetic mean in Excel.": "調整下方數值觀察總數如何均等重新分配。這就是 Excel 算術平均數的核心概念。",
+      "Observation 1": "觀測值 1",
+      "Observation 2": "觀測值 2",
+      "Observation 3": "觀測值 3",
+      "Reset example": "重置範例",
+      "Drag any slider to update the dynamic distribution model.": "拖曳任意滑桿即可即時更新模型。",
+      "From separate values to equal shares": "從獨立數值到均等分配",
+      "1. Starting values": "1. 原始數值",
+      "Each stack represents one observation.": "每個積木柱代表一個觀測數值。",
+      "2. Share the total equally": "2. 均等重新分配總和",
+      "Each stack becomes the same height: the average.": "每個柱子變為相同高度：即為平均值。",
+      "1. Add (SUM)": "1. 加總 (SUM)",
+      "Find the total of all values.": "計算所有數值的總和。",
+      "2. Count (COUNT)": "2. 計數 (COUNT)",
+      "Count how many observations there are.": "計算共有多少個觀測值。",
+      "3. Divide (AVERAGE)": "3. 除法 (AVERAGE)",
+      "Total ÷ number of observations = average.": "總和 ÷ 觀測值個數 = 平均值。",
+      "calculates the same result when the three values are in cells A1, A2, and A3. The visual uses fractional blocks when the average is not a whole number.": "當三個數值位於單元格 A1、A2 和 A3 時計算相同結果。當平均值非整數時，視覺化會使用小數積木塊表示。",
+      "STEP 20: DIAGNOSTICS": "步驟 20：錯誤診斷",
+
       // Blender 3D Course
       "Blender 3D Navigation & Transform Masterclass": "Blender 3D 視圖導航與變換大師課",
       "Intro to 3D Navigation in Blender": "Blender 3D 視圖導航基礎",
@@ -636,7 +662,10 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         if (targetIndex === 17 && typeof window.initCoreFunctionsStudio === 'function') {
           setTimeout(window.initCoreFunctionsStudio, 50);
         }
-        if (targetIndex === 18 && typeof window.initHashErrorsLab === 'function') {
+        if (targetIndex === 18 && typeof window.initAverageVisualizer === 'function') {
+          setTimeout(window.initAverageVisualizer, 50);
+        }
+        if (targetIndex === 19 && typeof window.initHashErrorsLab === 'function') {
           setTimeout(window.initHashErrorsLab, 50);
         }
 
