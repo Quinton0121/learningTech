@@ -32,6 +32,13 @@ export default function Home() {
   const { t, language } = useLanguage();
   const [showPcIdModal, setShowPcIdModal] = useState(false);
   const [tempPcId, setTempPcId] = useState('');
+  const [savedPcId, setSavedPcId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSavedPcId(localStorage.getItem('pc_id'));
+    }
+  }, []);
   
   // Registration Flow State
   const [step, setStep] = useState(1); // 1 = Details, 2 = Verify Code
@@ -263,6 +270,30 @@ export default function Home() {
             </button>
 
             <div className={`nav-actions ${isMobileMenuOpen ? 'open' : ''}`} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <Link 
+                href="/setup" 
+                className="btn-secondary" 
+                style={{ 
+                  padding: '6px 14px', 
+                  fontSize: '0.88rem', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '6px', 
+                  textDecoration: 'none',
+                  borderColor: savedPcId ? '#0284c7' : undefined,
+                  color: savedPcId ? '#0284c7' : undefined,
+                  fontWeight: 500
+                }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>{t('header.setupPcId')}</span>
+                {savedPcId && (
+                  <span style={{ fontSize: '0.75rem', background: '#e0f2fe', color: '#0369a1', padding: '1px 6px', borderRadius: '999px', fontWeight: 600 }}>
+                    {savedPcId}
+                  </span>
+                )}
+              </Link>
               <button type="button" className="btn-secondary" style={{ padding: '6px 16px', fontSize: '0.88rem' }} onClick={() => { resetForm(true); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>{t('header.login')}</button>
               <button type="button" className="btn-primary" style={{ padding: '6px 18px', fontSize: '0.88rem' }} onClick={() => { resetForm(false); setShowAuthModal(true); setIsMobileMenuOpen(false); }}>Register</button>
             </div>
@@ -287,13 +318,39 @@ export default function Home() {
             {t('hero.subtitle')}
           </p>
           
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
             <button className="btn-primary" style={{ padding: '14px 32px', fontSize: '1.05rem', minWidth: '190px' }} onClick={() => { setRole('EDUCATOR'); resetForm(true); setShowAuthModal(true); }}>
               {t('hero.loginAsEducator')}
             </button>
             <button className="btn-secondary" style={{ padding: '14px 32px', fontSize: '1.05rem', minWidth: '190px' }} onClick={() => { setRole('LEARNER'); resetForm(true); setShowAuthModal(true); }}>
               {t('hero.loginAsStudent')}
             </button>
+            <Link 
+              href="/setup" 
+              className="btn-secondary" 
+              style={{ 
+                padding: '14px 28px', 
+                fontSize: '1.05rem', 
+                minWidth: '190px',
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '8px', 
+                textDecoration: 'none',
+                background: 'rgba(2, 132, 199, 0.05)',
+                borderColor: 'rgba(2, 132, 199, 0.3)',
+                color: '#0284c7',
+                fontWeight: 500
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <span>{t('hero.setupPcId')}</span>
+              {savedPcId && (
+                <span style={{ fontSize: '0.8rem', background: '#0284c7', color: '#fff', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>
+                  {savedPcId}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </section>
