@@ -30,6 +30,18 @@ export async function GET(request: Request) {
       } else {
         course = await prisma.course.findFirst({ where: { educatorId: user.id } }) || await prisma.course.findFirst();
       }
+
+      if (course && course.isSynced && clientSlide !== null) {
+        if (course.currentSlide !== clientSlide || (clientSubSlide !== null && course.currentSubSlide !== clientSubSlide)) {
+          course = await prisma.course.update({
+            where: { id: course.id },
+            data: {
+              currentSlide: clientSlide,
+              currentSubSlide: clientSubSlide !== null ? clientSubSlide : course.currentSubSlide
+            }
+          });
+        }
+      }
     } else {
       let enrollment;
       if (courseId) {
@@ -77,7 +89,7 @@ export async function GET(request: Request) {
     }
     
     return NextResponse.json({ 
-      isSynced: course.isActive ? course.isSynced : false, 
+      isSynced: !!course.isSynced, 
       isActive: course.isActive,
       currentSlide: course.currentSlide,
       currentSubSlide: course.currentSubSlide || 0,
@@ -107,28 +119,37 @@ export async function POST(request: Request) {
     }
 
     let course;
-    if (user.role === 'ADMIN' || user.role === 'EDUCATOR') {
-      if (courseId) {
-        course = await prisma.course.findFirst({ where: { id: courseId } });
-      } else {
-        course = await prisma.course.findFirst({ where: { educatorId: user.id } }) || await prisma.course.findFirst();
-      }
+    if (courseId) {
+      course = await prisma.course.findFirst({ where: { id: courseId } });
+    } else {
+      course = await prisma.course.findFirst({ where: { educatorId: user.id } }) || await prisma.course.findFirst();
     }
     
     if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
 
     const dataToUpdate: any = {};
-    if (isSynced !== undefined) dataToUpdate.isSynced = isSynced;
+    if (isSynced !== undefined) {
+      dataToUpdate.isSynced = isSynced;
+      if (isSynced === true) {
+        dataToUpdate.isActive = true;
+      }
+    }
     if (currentSlide !== undefined) dataToUpdate.currentSlide = currentSlide;
     if (currentSubSlide !== undefined) dataToUpdate.currentSubSlide = currentSubSlide;
     if (publishedSlide !== undefined) dataToUpdate.publishedSlide = publishedSlide;
 
-    await prisma.course.update({
+    const updated = await prisma.course.update({
       where: { id: course.id },
       data: dataToUpdate
     });
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ 
+      success: true, 
+      isSynced: updated.isSynced,
+      isActive: updated.isActive,
+      currentSlide: updated.currentSlide,
+      currentSubSlide: updated.currentSubSlide
+    }, { status: 200 });
 
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

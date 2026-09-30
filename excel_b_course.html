@@ -5623,6 +5623,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentSlideIndex === 18 && typeof initHashErrorsLab === 'function') { setTimeout(initHashErrorsLab, 50); }
             }
 
+            window.onSlideEntered = function(targetIdx) {
+                currentSlideIndex = targetIdx;
+                if (targetIdx === 2) {
+                    setTimeout(animateIntersection, 500);
+                }
+                if (targetIdx === 16 && typeof window.renderRefGridState === 'function') {
+                    setTimeout(window.renderRefGridState, 100);
+                }
+                if (targetIdx === 17 && typeof initCoreFunctionsStudio === 'function') {
+                    setTimeout(initCoreFunctionsStudio, 50);
+                }
+                if (targetIdx === 18 && typeof initHashErrorsLab === 'function') {
+                    setTimeout(initHashErrorsLab, 50);
+                }
+            };
+            window.animateIntersection = animateIntersection;
+            if (typeof initCoreFunctionsStudio === 'function') window.initCoreFunctionsStudio = initCoreFunctionsStudio;
+            if (typeof initHashErrorsLab === 'function') window.initHashErrorsLab = initHashErrorsLab;
+
             function nextSlide() {
                 if (currentSlideIndex < totalSlides - 1) {
                     currentSlideIndex++;

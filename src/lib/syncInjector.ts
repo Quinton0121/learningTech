@@ -626,6 +626,20 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
           }
         }
 
+        // Trigger slide-specific animations and initializers
+        if (targetIndex === 2 && typeof window.animateIntersection === 'function') {
+          setTimeout(window.animateIntersection, 500);
+        }
+        if (targetIndex === 16 && typeof window.renderRefGridState === 'function') {
+          setTimeout(window.renderRefGridState, 100);
+        }
+        if (targetIndex === 17 && typeof window.initCoreFunctionsStudio === 'function') {
+          setTimeout(window.initCoreFunctionsStudio, 50);
+        }
+        if (targetIndex === 18 && typeof window.initHashErrorsLab === 'function') {
+          setTimeout(window.initHashErrorsLab, 50);
+        }
+
         // Call Course-Specific Enter Hook
         if (typeof window.onSlideEntered === 'function') {
           try { window.onSlideEntered(targetIndex); } catch(e) {}
@@ -635,17 +649,31 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         }
       };
 
-      // Broadcast Teacher Slide & Sub-Slide Change
+      // Broadcast Teacher Slide & Sub-Slide Change (with queueing)
+      let pendingBroadcast = null;
       function broadcastTeacherSlide(slideIdx, subSlideIdx) {
-        if (!isTeacher || !isSynced || isBroadcasting) return;
-        isBroadcasting = true;
+        if (!isTeacher || !isSynced) return;
         const activeSub = (typeof subSlideIdx === 'number') ? subSlideIdx : window.getActiveSubSlide();
+        
+        if (isBroadcasting) {
+          pendingBroadcast = { slideIdx, subSlideIdx: activeSub };
+          return;
+        }
+
+        isBroadcasting = true;
         fetch('/api/courses/sync-state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
           body: JSON.stringify({ isSynced: true, currentSlide: slideIdx, currentSubSlide: activeSub, courseId })
         }).finally(() => {
-          setTimeout(() => { isBroadcasting = false; }, 200);
+          setTimeout(() => { 
+            isBroadcasting = false; 
+            if (pendingBroadcast) {
+              const p = pendingBroadcast;
+              pendingBroadcast = null;
+              broadcastTeacherSlide(p.slideIdx, p.subSlideIdx);
+            }
+          }, 150);
         });
       }
 
@@ -670,6 +698,21 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
       document.querySelectorAll('.slide-container').forEach(slide => {
         observer.observe(slide, { attributes: true, attributeFilter: ['class'] });
       });
+
+      // Teacher explicit button & keyboard navigation hooks
+      if (isTeacher) {
+        document.getElementById('next-btn')?.addEventListener('click', () => {
+          setTimeout(() => { if (isSynced) broadcastTeacherSlide(window.getActiveSlideIndex()); }, 50);
+        });
+        document.getElementById('prev-btn')?.addEventListener('click', () => {
+          setTimeout(() => { if (isSynced) broadcastTeacherSlide(window.getActiveSlideIndex()); }, 50);
+        });
+        window.addEventListener('keydown', (e) => {
+          if (['ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp', ' '].includes(e.key)) {
+            setTimeout(() => { if (isSynced) broadcastTeacherSlide(window.getActiveSlideIndex()); }, 50);
+          }
+        });
+      }
 
       // Intercept Next/Prev button clicks for learners
       document.getElementById('next-btn')?.addEventListener('click', (e) => {
@@ -918,7 +961,7 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         }, delay);
 
         clearTimeout(window.syncTimeoutId);
-        const nextInterval = (isSynced || isTeacher) ? 1200 : 4000;
+        const nextInterval = isSynced ? 1000 : (isTeacher ? 1200 : 1500);
         window.syncTimeoutId = setTimeout(pollSyncState, nextInterval);
       };
 
