@@ -467,16 +467,14 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         dock.classList.remove('top-dock-collapsed');
         if (handle) {
           handle.classList.add('opacity-0', 'pointer-events-none', 'hidden');
-          handle.classList.remove('flex');
+          handle.classList.remove('flex', 'opacity-100');
         }
-        localStorage.setItem('course_top_dock_collapsed', 'false');
       } else {
         dock.classList.add('top-dock-collapsed');
         if (handle) {
           handle.classList.remove('opacity-0', 'pointer-events-none', 'hidden');
-          handle.classList.add('flex');
+          handle.classList.add('flex', 'opacity-100');
         }
-        localStorage.setItem('course_top_dock_collapsed', 'true');
       }
     };
 
@@ -755,8 +753,6 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
               backBtn.classList.remove('hidden');
               backBtn.style.display = 'flex';
             }
-            const topDock = document.getElementById('course-top-dock');
-            if (topDock) topDock.classList.remove('top-dock-collapsed');
 
             const studentCountEl = document.getElementById('active-students-count');
             if (studentCountEl) studentCountEl.textContent = data.activeStudents || 0;
