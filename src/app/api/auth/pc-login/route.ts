@@ -8,16 +8,28 @@ const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-development-key-chang
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { pcId } = body;
+    const rawPcId = body.pcId;
 
-    if (!pcId) {
+    if (!rawPcId) {
       return NextResponse.json({ error: 'Missing pcId' }, { status: 400 });
     }
+
+    const cleanPcId = String(rawPcId).trim();
+    const variations = Array.from(new Set([
+      cleanPcId,
+      cleanPcId.toLowerCase(),
+      cleanPcId.toUpperCase(),
+      cleanPcId.replace(/^(pc|PC)[-_ ]*/i, ''),
+      'PC-' + cleanPcId.replace(/^(pc|PC)[-_ ]*/i, ''),
+      'PC' + cleanPcId.replace(/^(pc|PC)[-_ ]*/i, ''),
+      cleanPcId.padStart(2, '0'),
+      cleanPcId.replace(/^0+/, '')
+    ]));
 
     // Find any ACTIVE course that has an APPROVED enrollment mapped to this pcId
     const activeEnrollment = await prisma.enrollment.findFirst({
       where: {
-        pcId: pcId,
+        pcId: { in: variations },
         status: 'APPROVED',
         course: {
           isActive: true
