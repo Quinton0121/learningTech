@@ -31,6 +31,7 @@ export function getSyncInjectorHTML() {
     #course-top-dock {
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
       pointer-events: none;
+      z-index: 100 !important;
     }
     #course-top-dock.top-dock-collapsed {
       transform: translateY(-85px);
@@ -42,25 +43,26 @@ export function getSyncInjectorHTML() {
     }
     #top-dock-expand-handle {
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 110 !important;
     }
     </style>
 
     <!-- Top Dock Floating Trigger Handle (visible when collapsed) -->
-    <button id="top-dock-expand-handle" onclick="toggleTopDock(true)" class="fixed top-2.5 left-1/2 transform -translate-x-1/2 z-[70] bg-slate-900/85 hover:bg-slate-900 text-slate-200 hover:text-white backdrop-blur-md px-3.5 py-1 rounded-full border border-slate-700/60 shadow-xl text-xs font-semibold items-center gap-1.5 transition-all opacity-0 pointer-events-none hidden hover:scale-105 pointer-events-auto" title="Show Course Controls (or press 'H')">
+    <button id="top-dock-expand-handle" onclick="toggleTopDock(true)" class="fixed top-2.5 left-1/2 transform -translate-x-1/2 z-[110] bg-slate-900/90 hover:bg-slate-900 text-slate-100 hover:text-white backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-700 shadow-2xl text-xs font-bold items-center gap-1.5 transition-all opacity-0 pointer-events-none hidden hover:scale-105 pointer-events-auto" title="Show Course Controls (or press Alt+H)">
         <i class="fa-solid fa-chevron-down text-[10px] text-emerald-400"></i>
-        <span class="lang-en">Course Menu</span><span class="lang-zh hidden">顯示控制欄</span>
+        <span class="lang-en">Show Controls</span><span class="lang-zh hidden">顯示控制欄</span>
     </button>
 
     <!-- Collapsible Top Dock Container -->
-    <div id="course-top-dock" class="fixed top-0 left-0 w-full z-[60] pointer-events-none">
+    <div id="course-top-dock" class="fixed top-0 left-0 w-full z-[100] pointer-events-none">
         <!-- Back to Dashboard -->
-        <button id="back-dashboard-btn" onclick="goBack()" class="fixed top-4 left-4 z-[60] bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-300 shadow-xl text-slate-700 text-xs font-bold hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-2 pointer-events-auto">
+        <button id="back-dashboard-btn" onclick="goBack()" class="fixed top-4 left-4 z-[100] bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-300 shadow-xl text-slate-700 text-xs font-bold hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-2 pointer-events-auto">
             <i class="fa-solid fa-arrow-left"></i>
             <span class="lang-en">Dashboard</span><span class="lang-zh hidden">返回首頁</span>
         </button>
 
         <!-- Teacher Sync Controls -->
-        <div id="teacher-controls" class="fixed top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-50 bg-white/95 backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-300 shadow-xl text-slate-800 hidden pointer-events-auto">
+        <div id="teacher-controls" class="fixed top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-[100] bg-white/95 backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-300 shadow-xl text-slate-800 hidden pointer-events-auto">
             <div class="flex items-center gap-2 pr-2 border-r border-slate-300">
                 <i class="fa-solid fa-chalkboard-user text-indigo-600"></i>
                 <span class="text-slate-900 font-bold text-xs sm:text-sm">
@@ -121,13 +123,13 @@ export function getSyncInjectorHTML() {
 
             <div class="h-4 border-l border-slate-300"></div>
             <!-- Quick Collapse Button inside Teacher Bar -->
-            <button onclick="toggleTopDock(false)" class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 w-6 h-6 rounded-full flex items-center justify-center transition-colors" title="Hide Top Controls (or press 'H')">
+            <button onclick="toggleTopDock(false)" class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 w-6 h-6 rounded-full flex items-center justify-center transition-colors" title="Hide Top Controls (or press Alt+H)">
                 <i class="fa-solid fa-chevron-up text-xs"></i>
             </button>
         </div>
         
         <!-- Student Sync Indicator -->
-        <div id="student-indicator" class="fixed top-4 right-28 z-50 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-300 shadow-xl hidden items-center gap-2 pointer-events-auto">
+        <div id="student-indicator" class="fixed top-4 right-28 z-[100] bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-300 shadow-xl hidden items-center gap-2 pointer-events-auto">
             <div id="student-sync-dot" class="w-2.5 h-2.5 rounded-full bg-slate-400"></div>
             <span id="student-sync-text" class="text-slate-700 text-xs font-semibold">
                 <span class="lang-en">Independent Mode</span><span class="lang-zh hidden">獨立模式</span>
@@ -136,7 +138,7 @@ export function getSyncInjectorHTML() {
         </div>
 
         <!-- Top Right Control Cluster (Language Toggle & Collapse Button) -->
-        <div id="top-right-cluster" class="fixed top-4 right-4 z-[60] flex items-center gap-2 pointer-events-auto">
+        <div id="top-right-cluster" class="fixed top-4 right-4 z-[100] flex items-center gap-2 pointer-events-auto">
             <!-- Language Toggle Button -->
             <button id="lang-toggle-btn" onclick="toggleLang()" class="bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-300 shadow-xl text-slate-700 text-xs font-bold hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5">
                 <i class="fa-solid fa-globe text-sky-600"></i>
@@ -144,14 +146,14 @@ export function getSyncInjectorHTML() {
             </button>
 
             <!-- Collapse Bar Button -->
-            <button id="collapse-top-bar-btn" onclick="toggleTopDock(false)" class="bg-white/95 backdrop-blur-md w-8 h-8 rounded-full border border-slate-300 shadow-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center" title="Hide Controls (or press 'H')">
+            <button id="collapse-top-bar-btn" onclick="toggleTopDock(false)" class="bg-white/95 backdrop-blur-md w-8 h-8 rounded-full border border-slate-300 shadow-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all flex items-center justify-center" title="Hide Controls (or press Alt+H)">
                 <i class="fa-solid fa-chevron-up text-xs"></i>
             </button>
         </div>
     </div>
 
     <!-- Sync Toast Alert -->
-    <div id="sync-toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[70] bg-white/95 border border-indigo-300 text-slate-800 text-sm px-5 py-2.5 rounded-xl shadow-2xl opacity-0 pointer-events-none translate-y-2 flex items-center gap-2">
+    <div id="sync-toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[110] bg-white/95 border border-indigo-300 text-slate-800 text-sm px-5 py-2.5 rounded-xl shadow-2xl opacity-0 pointer-events-none translate-y-2 flex items-center gap-2">
         <i id="sync-toast-icon" class="fa-solid fa-circle-check text-emerald-600"></i>
         <span id="sync-toast-text">Notification</span>
     </div>`;
@@ -159,6 +161,14 @@ export function getSyncInjectorHTML() {
 
 export function getSyncInjectorJS(injectedCourseId?: string) {
   return `<script>
+    function onDOMReady(fn) {
+      if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        setTimeout(fn, 0);
+      } else {
+        document.addEventListener('DOMContentLoaded', fn);
+      }
+    }
+
     // --- 1. Global Translation Dictionary & Language Engine ---
     window.__SYNC_COURSE_ID__ = "${injectedCourseId || ''}";
 
@@ -470,17 +480,18 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
       }
     };
 
-    // Press 'H' (when not typing in an input/textarea) to toggle top controls
+    // Press 'Alt+H' (when not typing in an input/textarea) to toggle top controls
     document.addEventListener('keydown', (e) => {
       const activeTag = document.activeElement?.tagName;
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag)) return;
-      if (e.key === 'h' || e.key === 'H') {
+      if ((e.key === 'h' || e.key === 'H') && (e.altKey || e.metaKey)) {
+        e.preventDefault();
         window.toggleTopDock();
       }
     });
 
     // --- 2. Mobile Touch Event Mapper ---
-    document.addEventListener("DOMContentLoaded", () => {
+    onDOMReady(() => {
         function mapTouch(selector) {
             document.querySelectorAll(selector).forEach(el => {
                 if (!el.dataset.touchMapped) {
@@ -498,7 +509,7 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
     });
 
     // --- 3. Synchronization & Navigation Controller ---
-    document.addEventListener("DOMContentLoaded", () => {
+    onDOMReady(() => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
@@ -507,10 +518,18 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload && (payload.role === 'EDUCATOR' || payload.role === 'ADMIN')) {
           isTeacher = true;
-          document.getElementById('teacher-controls')?.classList.remove('hidden');
-          document.getElementById('back-dashboard-btn')?.classList.remove('hidden');
+          const tCtrl = document.getElementById('teacher-controls');
+          if (tCtrl) {
+            tCtrl.classList.remove('hidden');
+            tCtrl.style.display = 'flex';
+          }
           const backBtn = document.getElementById('back-dashboard-btn');
-          if (backBtn) backBtn.style.display = 'flex';
+          if (backBtn) {
+            backBtn.classList.remove('hidden');
+            backBtn.style.display = 'flex';
+          }
+          const topDock = document.getElementById('course-top-dock');
+          if (topDock) topDock.classList.remove('top-dock-collapsed');
         }
       } catch(e) {}
 
@@ -726,10 +745,18 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
           const lang = localStorage.getItem('courseLang') || 'en';
 
           if (isTeacher) {
-            document.getElementById('teacher-controls')?.classList.remove('hidden');
-            document.getElementById('back-dashboard-btn')?.classList.remove('hidden');
+            const tCtrl = document.getElementById('teacher-controls');
+            if (tCtrl) {
+              tCtrl.classList.remove('hidden');
+              tCtrl.style.display = 'flex';
+            }
             const backBtn = document.getElementById('back-dashboard-btn');
-            if (backBtn) backBtn.style.display = 'flex';
+            if (backBtn) {
+              backBtn.classList.remove('hidden');
+              backBtn.style.display = 'flex';
+            }
+            const topDock = document.getElementById('course-top-dock');
+            if (topDock) topDock.classList.remove('top-dock-collapsed');
 
             const studentCountEl = document.getElementById('active-students-count');
             if (studentCountEl) studentCountEl.textContent = data.activeStudents || 0;
@@ -931,12 +958,6 @@ export function getSyncInjectorJS(injectedCourseId?: string) {
       const initialLang = localStorage.getItem('courseLang') || 'en';
       window.applyCourseLanguage(initialLang);
       window.pollSyncState();
-
-      // Restore saved top dock collapse state
-      const savedDockState = localStorage.getItem('course_top_dock_collapsed');
-      if (savedDockState === 'true') {
-        window.toggleTopDock(false);
-      }
     });
   </script>`;
 }
