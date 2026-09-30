@@ -82,7 +82,36 @@ export default function SetupPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', padding: '20px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', padding: '20px', position: 'relative' }}>
+      {/* Top Left Return to Home Button */}
+      <div style={{ position: 'fixed', top: '24px', left: '24px', zIndex: 100 }}>
+        <Link 
+          href="/"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 18px',
+            background: 'rgba(30, 41, 59, 0.9)',
+            border: '1px solid #475569',
+            borderRadius: '999px',
+            color: '#f8fafc',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(8px)',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>Home</span>
+        </Link>
+      </div>
+
       <div style={{ 
         padding: '36px', 
         maxWidth: '440px', 
@@ -195,30 +224,38 @@ export default function SetupPage() {
               href="/"
               style={{ 
                 flex: 1,
-                padding: '10px', 
-                fontSize: '0.85rem', 
-                color: '#94a3b8', 
-                border: '1px solid #334155', 
-                borderRadius: '8px', 
+                padding: '12px', 
+                fontSize: '0.9rem', 
+                fontWeight: 600,
+                color: '#f8fafc', 
+                background: '#334155',
+                border: '1px solid #475569', 
+                borderRadius: '10px', 
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                gap: '6px'
               }}
             >
-              Go to Classroom Home
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <span>Back to Home</span>
             </Link>
 
             <button 
               type="button"
               onClick={handleClear}
               style={{ 
-                padding: '10px 16px', 
+                padding: '12px 16px', 
                 background: 'transparent', 
                 border: '1px solid #ef4444', 
                 color: '#f87171', 
-                fontSize: '0.85rem', 
-                borderRadius: '8px', 
+                fontSize: '0.88rem', 
+                fontWeight: 600,
+                borderRadius: '10px', 
                 cursor: 'pointer' 
               }}
             >
