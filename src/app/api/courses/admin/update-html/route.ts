@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
+import { sanitizeAndPrepareCourseHtml } from '@/lib/courseHtmlSanitizer';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-development-key-change-in-production';
 
@@ -31,16 +32,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing courseId or file' }, { status: 400 });
     }
 
-    const htmlContent = await file.text();
+    const rawHtml = await file.text();
+    if (!rawHtml || rawHtml.trim().length === 0) {
+      return NextResponse.json({ error: 'Uploaded HTML file is empty' }, { status: 400 });
+    }
+
+    const sanitized = sanitizeAndPrepareCourseHtml(rawHtml);
 
     const course = await prisma.course.update({
       where: { id: courseId },
       data: {
-        htmlContent: htmlContent
+        htmlContent: sanitized.html
       }
     });
 
-    return NextResponse.json({ message: 'Course HTML successfully updated and sync code auto-injected!', course });
+    return NextResponse.json({
+      message: sanitized.repaired
+        ? 'Course HTML updated and auto-repaired to comply with sync rules!'
+        : 'Course HTML successfully updated!',
+      course,
+      diagnostics: {
+        slideCount: sanitized.slideCount,
+        repaired: sanitized.repaired,
+        repairsApplied: sanitized.repairsApplied
+      }
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

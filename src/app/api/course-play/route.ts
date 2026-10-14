@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getSyncInjectorHTML, getSyncInjectorJS } from '@/lib/syncInjector';
+import { sanitizeAndPrepareCourseHtml } from '@/lib/courseHtmlSanitizer';
 
 const prisma = new PrismaClient();
 
@@ -25,7 +26,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL(`/course.html?id=${id}`, req.url));
   }
 
-  let html = course.htmlContent;
+  // Pre-sanitize and ensure full compliance with Teacher Sync & Publish rules
+  const sanitized = sanitizeAndPrepareCourseHtml(course.htmlContent);
+  let html = sanitized.html;
   
   // Inject UI at the start of <body>
   const bodyMatch = html.match(/<body[^>]*>/i);

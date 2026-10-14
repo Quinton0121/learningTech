@@ -25,6 +25,7 @@ export default function EducatorDashboard() {
   const [inboxMessages, setInboxMessages] = useState<any[]>([]);
   const [showInbox, setShowInbox] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState<string>('ADMIN');
+  const [isImportingHtml, setIsImportingHtml] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     setMounted(true);
@@ -181,6 +182,66 @@ export default function EducatorDashboard() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportHtml = (course: any) => {
+    if (!course.htmlContent) {
+      alert("No HTML content available for this course.");
+      return;
+    }
+    const blob = new Blob([course.htmlContent], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const safeTitle = (course.title || "course").replace(/[^a-zA-Z0-9_\u4e00-\u9fa5-]/g, "_").toLowerCase();
+    a.download = `${safeTitle}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportHtml = async (courseId: string, file: File) => {
+    if (!file) return;
+    const confirmMsg = `Are you sure you want to replace the HTML content of this course with "${file.name}"?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setIsImportingHtml(prev => ({ ...prev, [courseId]: true }));
+    try {
+      const formData = new FormData();
+      formData.append("courseId", courseId);
+      formData.append("file", file);
+
+      const res = await fetch("/api/courses/educator/update-html", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        let diagMsg = `Course HTML successfully updated!`;
+        if (data.diagnostics) {
+          diagMsg += `\n- Total slides ready: ${data.diagnostics.slideCount}`;
+          if (data.diagnostics.repairsApplied && data.diagnostics.repairsApplied.length > 0) {
+            diagMsg += `\n\nAuto-compliance repairs applied:`;
+            data.diagnostics.repairsApplied.forEach((r: string) => {
+              diagMsg += `\n✓ ${r}`;
+            });
+          } else {
+            diagMsg += `\n✓ HTML fully complied with all sync & publish rules out of the box!`;
+          }
+        }
+        alert(diagMsg);
+        fetchCourses(token);
+      } else {
+        alert("Import failed: " + (data.error || "Unknown error"));
+      }
+    } catch (err: any) {
+      alert("Error uploading HTML: " + err.message);
+    } finally {
+      setIsImportingHtml(prev => ({ ...prev, [courseId]: false }));
+    }
   };
 
   const handleTogglePublic = async (courseId: string, currentPublic: boolean) => {
@@ -648,6 +709,69 @@ export default function EducatorDashboard() {
                       >
                         Delete
                       </button>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleExportHtml(course)}
+                        className="btn-secondary"
+                        style={{
+                          flex: 1,
+                          minWidth: '130px',
+                          padding: '10px 14px',
+                          fontSize: '0.95rem',
+                          border: '1px solid #10b981',
+                          color: '#10b981',
+                          background: 'rgba(16, 185, 129, 0.08)',
+                          cursor: 'pointer',
+                          borderRadius: '8px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          fontWeight: 600
+                        }}
+                        title="Download raw HTML file of this course"
+                      >
+                        <i className="fa-solid fa-file-export"></i>
+                        <span>Export HTML</span>
+                      </button>
+
+                      <label
+                        style={{
+                          flex: 1,
+                          minWidth: '130px',
+                          padding: '10px 14px',
+                          fontSize: '0.95rem',
+                          border: '1px solid #6366f1',
+                          color: '#6366f1',
+                          background: 'rgba(99, 102, 241, 0.08)',
+                          cursor: isImportingHtml[course.id] ? 'wait' : 'pointer',
+                          borderRadius: '8px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          fontWeight: 600
+                        }}
+                        title="Upload HTML file to update this course"
+                      >
+                        <i className={isImportingHtml[course.id] ? "fa-solid fa-spinner fa-spin" : "fa-solid fa-file-import"}></i>
+                        <span>{isImportingHtml[course.id] ? "Importing..." : "Import HTML"}</span>
+                        <input
+                          type="file"
+                          accept=".html,.htm"
+                          style={{ display: 'none' }}
+                          disabled={isImportingHtml[course.id]}
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              handleImportHtml(course.id, e.target.files[0]);
+                              e.target.value = '';
+                            }
+                          }}
+                        />
+                      </label>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)', padding: '16px 0', marginBottom: '16px' }}>
